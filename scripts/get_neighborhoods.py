@@ -337,6 +337,7 @@ def make_AMR_dict(RGI_dataframes, AMR_gene_index):
             AMR_dict[genome] = AMR_gene_row
 
     return AMR_dict
+
 def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name, neighborhood_size):
     """
     Finds gene neighborhood of size 2N (user-defined by neighborhood_size, i.e., N genes downstream and upstream)
@@ -524,7 +525,6 @@ def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.2
             del AMR_gene_dict[item]
 
     return AMR_gene_dict
-
 
 def make_gene_neighborhood_JSON(AMR_gene_neighborhood_sets):
     """
