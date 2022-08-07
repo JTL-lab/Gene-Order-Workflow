@@ -22,7 +22,6 @@ import warnings
 import argparse
 import time
 
-
 def load_filepaths(rgi_path_arg, gbk_path_arg):
     """
     Loads all RGI and GBK filepaths from user provided directory paths and returns them in respective lists.
@@ -57,14 +56,12 @@ def load_filepaths(rgi_path_arg, gbk_path_arg):
 
     return rgi_filepaths, gbk_filepaths
 
-
 def get_filename(filepath):
     """
     Gets filename from filepath (i.e. removes directories and file suffix)
     """
     filename = os.path.basename(filepath).split(".")[0]
     return filename
-
 
 def load_GBK_file(GBK_filepath):
     """
@@ -79,7 +76,6 @@ def load_GBK_file(GBK_filepath):
     annotations = [record.annotations for record in records]
 
     return records, features, annotations
-
 
 def make_GBK_dict(GBK_filepath):
     """
@@ -103,7 +99,6 @@ def make_GBK_dict(GBK_filepath):
 
     return GBK_dict
 
-
 def parse_genbank_proteins(features_list):
     """
     Obtains proteins from GBK file features_list
@@ -116,7 +111,6 @@ def parse_genbank_proteins(features_list):
 
     return protein_features
 
-
 def get_protein_sequences(records, protein_features):
     """
     Makes a list of protein sequences from a list of protein features
@@ -128,7 +122,6 @@ def get_protein_sequences(records, protein_features):
                                   id=record.qualifiers['locus_tag'][0],
                                   name=record.name))
     return seqs
-
 def make_GBK_dataframe(GBK_file_path):
     """
     Input: The output file from parse_genbank_proteins
@@ -302,7 +295,6 @@ def find_union_AMR_genes(rgi_dataframes):
                 union_of_best_hits.append(val)
 
     return unique_best_hit_ARO, union_of_best_hits
-
 def get_RGI_instances(AMR_dicts):
     """
     Get single instance and multiple instance (i.e. occurring in multiple places in genome data) AMR genes respectively
@@ -320,28 +312,6 @@ def get_RGI_instances(AMR_dicts):
                 single_instance_AMR[AMR_gene] = AMR_dict
 
     return single_instance_AMR, multiple_instance_AMR
-
-def filter_AMR_gene_instances():
-    """
-    Filters AMR gene instance dict for multiple instance AMR genes to allow for one-to-one genome comparisons
-    Lines 396 - 418
-    """
-
-    return
-
-def divide_df_by_locus():
-    """
-    Groups
-    Lines 421 - 443
-    """
-    return
-
-def find_AMR_gene(GBK_df, genome_id, AMR_gene):
-    """
-    Given a
-    """
-    return
-
 def get_neighborhood_gene_data(neighborhood_df, num_genes):
     """
     Given a neighborhood dataframe, obtains the locus tags, protein sequences, and gene names as separate dicts
@@ -367,7 +337,6 @@ def make_AMR_dict(RGI_dataframes, AMR_gene_index):
             AMR_dict[genome] = AMR_gene_row
 
     return AMR_dict
-
 def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name, neighborhood_size):
     """
     Finds gene neighborhood of size 2N (user-defined by neighborhood_size, i.e., N genes downstream and upstream)
@@ -376,8 +345,6 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
 
     # Get the GBK data for the given genome
     GBK_df = GBK_df_dict[genome_id]
-    print("GBK df: ")
-    print(GBK_df)
     GBK_df.reset_index(drop=True, inplace=True)
 
     contig_flag = 0
@@ -398,9 +365,7 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
         upstream_neighbours = GBK_df.iloc[upstream_indices]
 
         # Create a dataframe containing the full neighborhood data; TBD verify that contig ends handled
-        print("NEIGHBORHOODS DF: ")
         neighborhood_df = pd.concat([downstream_neighbours, AMR_gene_df_row, upstream_neighbours]).sort_values(by="Gene_Start")
-        print(neighborhood_df)
 
         return neighborhood_df
 
@@ -730,33 +695,3 @@ if __name__ == '__main__':
 
     execution_time = (time.time() - start_time)
     print("Execution time in seconds: {}".format(str(execution_time)))
-
-    # 2) Make an AMR presence dictionary of AMR genes present (keys: AMR genes, values: list of genomes)
-    # gbk_dicts = []
-    # for gbk_file in gbk_file_paths:
-    #    gbk_dict = make_GBK_dict(gbk_file)
-    #    gbk_dicts.append(gbk_dict)
-
-    # genome_rgi_hits = []
-    # for rgi_file, gbk_file in rgi_file_paths, gbk_dicts:
-    #    rgi_dict = get_RGI_hits(rgi_file, gbk_file)
-    #    genome_rgi_hits.append(rgi_dict)
-
-    # 3) Apply cutoff threshold to AMR genes
-    # for AMR_dict in genome_rgi_hits:
-    #    delete_low_occurring_genes(AMR_dict, len(rgi_file_paths), cutoff_percent)
-
-    # 4) Extract AMR gene neighborhoods: get the neighbour gene names and indices
-    # (Store them in neighbour_genes and neighbour_indices)
-    # neighbor_genes = []
-    # neighbor_indices = []
-
-    # Get unique AMR genes across all genomes
-    # unique_AMR_genes = get_unique_AMR_genes(genome_rgi_hits)
-
-    # Get all AMR gene neighborhoods
-    # N = 10
-    # for gene in unique_AMR_genes:
-    #    neighborhood = find_AMR_gene_neighborhood(gene, N, genome_rgi_hits, rgi_path, features)
-
-    # 5) Store each gene's gene neighborhood data in JSON file
