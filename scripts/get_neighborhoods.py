@@ -672,18 +672,16 @@ if __name__ == '__main__':
         # Make entry for gene occurrences
         genomes_AMR_dict[AMR_gene] = make_AMR_dict(rgi_dataframes, AMR_gene)
 
-    # 6) Preprocess multiple instance AMR genes for one-to-one genome comparisons and divide frames based on locus tags
-
-    # 7) Extract AMR neighborhoods and store them in neighborhood dataframes
+    # 6) Extract AMR neighborhoods and store them in neighborhood dataframes
     neighborhoods, flags = get_all_AMR_gene_neighborhoods(genomes_AMR_dict, gbk_dataframes, ARO_union, num_neighbours)
 
     print("Num neighborhoods: {}".format(len(neighborhoods)))
     print(neighborhoods)
 
-    # 8) Get the locus, protein, and gene name details for each neighborhood respectively for FNA file creation
+    # 7) Get the locus, protein, and gene name details for each neighborhood respectively for FNA file creation
     locuses, protein_seqs, gene_names = get_neighborhood_data(neighborhoods)
 
-    # 10) Save neighborhoods to FNA files needed for All-vs-all BLAST results later
+    # 8) Save neighborhoods to FNA files needed for All-vs-all BLAST results later
     for AMR_gene, AMR_neighborhood_dict in neighborhoods.items():
         for genome_id, neighborhood in AMR_neighborhood_dict.items():
             # Make output subdirectory for the gene
