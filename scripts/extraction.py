@@ -71,51 +71,6 @@ def load_GBK_file(GBK_filepath):
 
     return records, features, annotations
 
-def make_GBK_dict(GBK_filepath):
-    """
-    Makes a dictionary of gene names with their start index as the key
-    """
-    GBK_dict = {}
-    records, features, annotations = load_GBK_file(GBK_filepath)
-
-    for record in records:
-        for feature in record.features:
-            if feature.type == 'CDS' and 'pseudo' not in feature.qualifiers:
-                # Get start index of gene
-                location = str(feature.location).split(':')
-                start = location[0].strip('[')
-
-                # Get gene name
-                gene_name = feature.qualifiers['gene']
-
-                GBK_dict[start] = gene_name
-
-    return GBK_dict
-
-def parse_genbank_proteins(features_list):
-    """
-    Obtains proteins from GBK file features_list
-    """
-    protein_features = []
-    for feature in features_list:
-        # Keep only valid proteins!
-        if feature.type == 'CDS' and 'pseudo' not in feature.qualifiers:
-            protein_features.append(feature)
-
-    return protein_features
-
-def get_protein_sequences(records, protein_features):
-    """
-    Makes a list of protein sequences from a list of protein features
-    """
-    seqs = []
-    for record in records:
-        for feature in protein_features:
-            seqs.append(SeqRecord(Seq(record.qualifiers['translation'][0]),
-                                  id=record.qualifiers['locus_tag'][0],
-                                  name=record.name))
-    return seqs
-
 def make_GBK_dataframe(GBK_file_path):
     """
     Input: The output file from parse_genbank_proteins
@@ -278,24 +233,6 @@ def find_union_AMR_genes(rgi_dataframes):
                 union_of_best_hits.append(val)
 
     return unique_best_hit_ARO, union_of_best_hits
-
-def get_RGI_instances(AMR_dicts):
-    """
-    Get single instance and multiple instance (i.e. occurring in multiple places in genome data) AMR genes respectively
-    """
-    single_instance_AMR = {}
-    multiple_instance_AMR = {}
-
-    # Check the AMR dictionary for each respective AMR gene found
-    for AMR_gene, AMR_dict in AMR_dicts.items():
-        for key, val in AMR_dict.items():
-            # If AMR gene occurred in multiple places, add to multiple instance dict to keep track of this
-            if len(val) > 1:
-                multiple_instance_AMR[AMR_gene] = AMR_dict
-            else:
-                single_instance_AMR[AMR_gene] = AMR_dict
-
-    return single_instance_AMR, multiple_instance_AMR
 
 def get_neighborhood_gene_data(neighborhood_df, num_genes):
     """
