@@ -612,7 +612,8 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
     for AMR_gene, genome_neighborhoods in neighborhoods.items():
 
         # Make output subdirectory for the gene
-        out_path = output_path + '/fasta/' + AMR_gene.strip('()')
+        gene_name = AMR_gene.replace('(', '_').replace(')', '_').replace('-','').replace("'", "")
+        out_path = output_path + '/fasta/' + gene_name
         check_output_path(out_path)
 
         for genome_id in genome_neighborhoods.keys():
