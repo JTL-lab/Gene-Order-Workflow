@@ -43,10 +43,8 @@ def parse_args(args=None):
 def load_filepaths(rgi_path_arg, gbk_path_arg):
     """
     Loads all RGI and GBK filepaths from user provided directory paths and returns them in respective lists.
-
     Assumes that RGI file names have the following naming convention:
     xxxxxxxxxxxxxxxxxxx_genomic.fna_rgi.txt
-
     Assumes that GBK file names have the following naming convention:
     xxxxxxxxxxxxxxxxxxx_genomic.fna.gbk
     """
@@ -265,21 +263,6 @@ def find_union_AMR_genes(rgi_dataframes):
     return unique_best_hit_ARO, union_of_best_hits
 
 
-def get_neighborhood_gene_data(neighborhood_df, num_genes):
-    """
-    Given a neighborhood dataframe, obtains the locus tags, protein sequences, and gene names as separate dicts
-    """
-    locus_list = neighborhood_df['Locus_Tag'].tolist()
-    protein_list = neighborhood_df['Protein_Sequence'].tolist()
-    gene_name_list = neighborhood_df['Gene_Name'].tolist()
-
-    locus_to_protein_dict = {}
-    for gene in range(len(locus_list)):
-        locus_to_protein_dict[locus_list[gene].strip()] = protein_list[gene]
-
-    return locus_list, protein_list, gene_name_list
-
-
 def make_AMR_dict(RGI_dataframes, AMR_gene_index):
     """
     Given the RGI dataframes for the genomes being analyzed, creates a dictionary of AMR genes
@@ -312,21 +295,24 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
         # Get only genes on the same contig as the focal gene for consideration as neighbors
         contig_id = AMR_gene_df_row.Contig_Name.tolist()[0]
         contig_df = GBK_df.loc[(GBK_df['Contig_Name'] == contig_id)].sort_values(by='Gene_Start')
+        contig_df.reset_index(drop=True, inplace=True)
 
         AMR_gene_index = contig_df.index[(contig_df['Gene_Start'] == gene_start - 1)].tolist()
         gene_index = AMR_gene_index[0]
 
         # Get downstream neighbors
-        downstream_indices = [gene_index - index for index in range(1, neighborhood_size + 1)]
+        downstream = [gene_index - index for index in range(1, neighborhood_size + 1)]
+
+        # If contig end present downstream, some indices will be negative: remove these to prevent index errors
+        downstream_indices = [index for index in downstream if index >= 0]
         downstream_neighbors = pd.DataFrame(columns=['Gene_Start', 'Gene_End', 'Gene_Strand', 'Locus_Tag', 'Gene_Name',
                                                      'Product', 'Protein_Sequence', 'Contig_Name'])
-        for i in range(len(downstream_indices)):
+        for i in range(len(downstream_indices)-1, -1, -1):
             try:
                 neighbor = contig_df.iloc[downstream_indices[i]]
-                downstream_neighbors.append(neighbor)
+                downstream_neighbors = downstream_neighbors.append(neighbor)
             except IndexError:
-                print("Contig end found at position -{} downstream.".format(i))
-                break
+                print("Contig end found at position -{} downstream.".format(i+1))
 
         # Get upstream neighbors
         upstream_indices = [gene_index + index for index in range(1, neighborhood_size + 1)]
@@ -335,10 +321,9 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
         for i in range(len(upstream_indices)):
             try:
                 neighbor = contig_df.iloc[upstream_indices[i]]
-                upstream_neighbors.append(neighbor)
+                upstream_neighbors = upstream_neighbors.append(neighbor)
             except IndexError:
-                print("Contig end found at position {} upstream.".format(i))
-                break
+                print("Contig end found at position {} upstream.".format(i+1))
 
         # Create a dataframe containing the full neighborhood data
         neighborhood_df = pd.concat([downstream_neighbors, AMR_gene_df_row, upstream_neighbors])
@@ -372,15 +357,14 @@ def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_ge
 
             # Get start index of the focal AMR gene from the RGI dataframe
             start_vals = AMR_dict[genome]['Start']
-
             start_vals_list = list(start_vals)
             start_index = start_vals_list[0]
 
             # Make gene neighborhood dataframe for each genome for the focal gene, AMR_gene
-            neighborhood_df = make_AMR_gene_neighborhood_df(GBK_df_dict, genome, start_index,
-                                                            AMR_gene, neighborhood_size)
+            neighborhood_df = make_AMR_gene_neighborhood_df(GBK_df_dict, genome, start_index, AMR_gene, neighborhood_size)
+
             try:
-                if len(neighborhood_df) > 0:
+                if len(neighborhood_df) > 1:
                     neighbors[genome] = neighborhood_df
             except TypeError:
                 print("AMR gene {} was not present in this genome!".format(AMR_gene))
@@ -391,51 +375,65 @@ def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_ge
     return gene_neighborhoods, contig_ends
 
 
-def get_neighborhood_data(instance_neighborhoods_dict, num_neighbors):
+def get_neighborhood_gene_data(neighborhood_df):
+    """
+    Given a neighborhood dataframe, obtains the locus tags, protein sequences, and gene names as separate dicts
+    """
+    locus_list = neighborhood_df['Locus_Tag'].tolist()
+    protein_list = neighborhood_df['Protein_Sequence'].tolist()
+    gene_name_list = neighborhood_df['Gene_Name'].tolist()
+
+    locus_to_protein_dict = {}
+    for gene in range(len(locus_list)):
+        locus_to_protein_dict[locus_list[gene].strip()] = protein_list[gene]
+
+    return locus_list, protein_list, gene_name_list
+
+
+def get_neighborhood_data(neighborhoods_dict, num_neighbors):
     """
     Extracts locus, protein sequence, and gene name data for a dictionary of neighborhood data created using
     get_all_AMR_gene_neighborhoods.
     """
-    instance_locus_data = {}
-    instance_protein_data = {}
-    instance_gene_name_data = {}
-    for neighborhood, neighborhood_data in instance_neighborhoods_dict.items():
+    locus_dict = {}
+    protein_dict = {}
+    gene_name_dict = {}
+
+    for AMR_gene, genome_neighborhoods in neighborhoods_dict.items():
         locus_tags = {}
         protein_seqs = {}
         gene_names = {}
 
-        for gene, neighbor in neighborhood_data.items():
-            locus_tags[gene], protein_seqs[gene], gene_names[gene] = get_neighborhood_gene_data(neighborhood_data[gene],
-                                                                                                num_neighbors)
+        for genome_id, neighborhood_df in genome_neighborhoods.items():
+            locus_tags[genome_id], protein_seqs[genome_id], gene_names[genome_id] = \
+                get_neighborhood_gene_data(genome_neighborhoods[genome_id])
 
-        instance_locus_data[neighborhood] = locus_tags
-        instance_protein_data[neighborhood] = protein_seqs
-        instance_gene_name_data[neighborhood] = gene_names
+        locus_dict[AMR_gene] = locus_tags
+        protein_dict[AMR_gene] = protein_seqs
+        gene_name_dict[AMR_gene] = gene_names
 
-    return instance_locus_data, instance_protein_data, instance_gene_name_data
+    return locus_dict, protein_dict, gene_name_dict
 
 
-def write_AMR_neighborhood_to_FNA(AMR_neighborhoods_dict, AMR_gene, genome_id, locuses_dict,
-                                  protein_sequences_dict, output_path):
+def write_AMR_neighborhood_to_FNA(AMR_gene_neighborhoods_dict, AMR_gene, locuses_dict, protein_seqs_dict, out_path):
     """
     Given a dictionary containing AMR gene neighborhoods for a set of genomes being analyzed and a specified output
     directory path, creates a distinct .fna file for each AMR gene neighborhood to use for BLAST All-vs-All comparison.
     """
-    neighborhood_dict = AMR_neighborhoods_dict[AMR_gene]
-    # Create a new FASTA file to write neighborhood sequence and identifier data to
-    with open(output_path + '/' + genome_id + '.fasta', 'w') as output_fasta:
-        for neighbor in neighborhood_dict.keys():
-            for locus, protein_seq in zip(locuses_dict[AMR_gene][neighbor], protein_sequences_dict[AMR_gene][neighbor]):
+    for genome_id, genome_neighborhood_df in AMR_gene_neighborhoods_dict.items():
+        # Create a new FASTA file to write neighborhood sequence and identifier data to
+        with open(out_path + '/' + genome_id + '.fasta', 'w') as output_fasta:
+            for locus, protein_seq in zip(locuses_dict[AMR_gene][genome_id], protein_seqs_dict[AMR_gene][genome_id]):
                 locus_output = locus.strip("'")
                 protein_output = protein_seq.strip("'")
-                output_fasta.write('>' + neighbor + '_{}\n'.format(locus_output))
+                output_fasta.write('>' + genome_id + '_{}\n'.format(locus_output))
                 output_fasta.write('{}\n'.format(protein_output))
         output_fasta.close()
 
 
-def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.75):
+def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.80):
     """
-    Removes keys of AMR genes not present in cutoff percentage of genomes (recommended minimum/default of 25%).
+    Removes keys of AMR genes not present in cutoff percentage of genomes (recommended minimum/default of 80%).
     - AMR_gene_dict should be the dictionary of one type of AMR gene, with entries representing
     its occurrences within genomes.
     - Cutoff percentage is a float between 0 and 1 (e.g., 0.8 means only genes present in min 80% of genomes are kept).
@@ -444,9 +442,13 @@ def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.7
     minimum_num_genomes = num_genomes * cutoff_percentage
 
     # Remove all AMR genes that occur in less genomes than the threshold amount
-    for item, occurrences in AMR_gene_dict.items():
-        if len(occurrences) < minimum_num_genomes:
-            del AMR_gene_dict[item]
+    genes_to_remove = []
+    for AMR_gene, neighborhoods_dict in AMR_gene_dict.items():
+        if len(neighborhoods_dict) < minimum_num_genomes:
+            genes_to_remove.append(AMR_gene)
+
+    for AMR_gene in genes_to_remove:
+        del AMR_gene_dict[AMR_gene]
 
     return AMR_gene_dict
 
@@ -474,7 +476,6 @@ def make_gene_neighborhood_JSON(AMR_gene_neighborhood_sets):
 
     This function should be run on the complete set of neighborhoods (i.e. for all AMR genes).
     """
-
     with open('neighborhoods.json', 'a') as outfile:
         json.dump(AMR_gene_neighborhood_sets, outfile)
     outfile.close()
@@ -539,6 +540,7 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
     gbk_contigs = {}
 
     for gbk_filepath in gbk_filepaths:
+
         # Get GBK filename for GBK dictionary keys
         gbk_filename = get_filename(gbk_filepath)
 
@@ -594,30 +596,36 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
         # Make entry for gene occurrences
         genomes_AMR_dict[AMR_gene] = make_AMR_dict(rgi_dataframes, AMR_gene)
 
+    genomes_AMR_dict_filtered = delete_low_occurring_genes(genomes_AMR_dict, len(gbk_filepaths))
+
     print("Extracting gene neighborhood data for neighborhoods of size {}...".format(num_neighbors))
 
     # 6) Extract AMR neighborhoods and store them in neighborhood dataframes
-    neighborhoods, flags = get_all_AMR_gene_neighborhoods(genomes_AMR_dict, gbk_dataframes, ARO_union, num_neighbors)
+    neighborhoods, flags = get_all_AMR_gene_neighborhoods(genomes_AMR_dict_filtered, gbk_dataframes,
+                                                          ARO_union, num_neighbors)
 
     # 7) Get the locus, protein, and gene name details for each neighborhood respectively for FNA file creation
     locuses, protein_seqs, gene_names = get_neighborhood_data(neighborhoods, num_neighbors)
 
     # 8) Save neighborhoods to FNA files needed for All-vs-all BLAST results later
     print("Generating neighborhood FNA files...")
-    for AMR_gene, AMR_neighborhood_dict in neighborhoods.items():
+    for AMR_gene, genome_neighborhoods in neighborhoods.items():
+
         # Make output subdirectory for the gene
         out_path = output_path + '/fasta/' + AMR_gene.strip('()')
         check_output_path(out_path)
 
-        for genome_id, neighborhood in AMR_neighborhood_dict.items():
+        for genome_id in genome_neighborhoods.keys():
             # Make file with genome ID as filename
-            write_AMR_neighborhood_to_FNA(neighborhoods, AMR_gene, genome_id, locuses, protein_seqs, out_path)
+            write_AMR_neighborhood_to_FNA(genome_neighborhoods, AMR_gene, locuses, protein_seqs, out_path)
 
     # 9) Make neighorhoods summary textfile in output dir
     print("Making extraction summary file...")
     write_summary_file(output_path, len(gbk_filepaths), num_neighbors, len(neighborhoods))
 
     # 10) TO DO: Store each gene's gene neighborhood data in JSON file (will add once visualization added)
+
+    print("Neighborhood extraction complete.")
 
 
 def main(args=None):
