@@ -15,12 +15,12 @@ from Bio import SeqIO
 import json
 import sys
 import argparse
-from utils import get_filename, strip_brackets
+from utils import get_filename, check_output_path, strip_brackets
 
 
 def parse_args(args=None):
     Description = "Extract AMR gene neighborhoods according to fixed window size of N genes upstream and downstream."
-    Epilog = "Example usage: python extraction.py <RGI_PATH> <GBK_PATH> <OUTPUT_PATH> --n <NEIGHBORHOOD_SIZE> --p " \
+    Epilog = "Example usage: python extraction.py <RGI_PATH> <GBK_PATH> <OUTPUT_PATH> -n <NEIGHBORHOOD_SIZE> -p " \
              "<PERCENT> "
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
@@ -31,10 +31,10 @@ def parse_args(args=None):
     parser.add_argument('OUTPUT_PATH', metavar='output_path', type=str, help='Path to output directory where '
                                                                              'extracted neighborhood FASTA files will'
                                                                              ' be saved.')
-    parser.add_argument('--n', metavar='n', type=int, default=10, help='Neighborhood window size, i.e. number of genes '
+    parser.add_argument('-n', metavar='n', type=int, default=10, help='Neighborhood window size, i.e. number of genes '
                                                                        'to consider upstream and downstream of focal '
                                                                        'gene.')
-    parser.add_argument('--p', metavar='p', type=float, default=0.75, help='Cutoff percentage of genomes that a given '
+    parser.add_argument('-p', metavar='p', type=float, default=0.75, help='Cutoff percentage of genomes that a given '
                                                                            'AMR gene should be present in for its '
                                                                            'neighborhood to be considered.')
     return parser.parse_args(args)
@@ -431,7 +431,7 @@ def write_AMR_neighborhood_to_FNA(AMR_gene_neighborhoods_dict, AMR_gene, locuses
         output_fasta.close()
 
 
-def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.80):
+def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.35):
     """
     Removes keys of AMR genes not present in cutoff percentage of genomes (recommended minimum/default of 80%).
     - AMR_gene_dict should be the dictionary of one type of AMR gene, with entries representing
@@ -439,7 +439,7 @@ def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.8
     - Cutoff percentage is a float between 0 and 1 (e.g., 0.8 means only genes present in min 80% of genomes are kept).
     """
     # Define threshold amount of genomes an AMR gene must be present in for inclusion
-    minimum_num_genomes = num_genomes * cutoff_percentage
+    minimum_num_genomes = round(num_genomes * cutoff_percentage)
 
     # Remove all AMR genes that occur in less genomes than the threshold amount
     genes_to_remove = []
@@ -480,14 +480,6 @@ def make_gene_neighborhood_JSON(AMR_gene_neighborhood_sets):
         json.dump(AMR_gene_neighborhood_sets, outfile)
     outfile.close()
     return
-
-
-def check_output_path(path):
-    """
-    Checks for presence of specified output path and creates the directory if it does not exist
-    """
-    if not os.path.exists(path):
-        os.makedirs(path)
 
 
 def write_summary_file(output_dir, num_genomes, neighborhood_size, num_AMR_genes):

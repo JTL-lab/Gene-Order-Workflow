@@ -54,6 +54,15 @@ def get_dir_filenames(filepaths):
 
     return filenames
 
+
+def check_output_path(path):
+    """
+    Checks for presence of specified output path and creates the directory if it does not exist
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 def make_output_file(output_path):
     """
     Creates an empty textfile in the specified output directory.
@@ -74,6 +83,5 @@ def remove_files(path_to_dir, file_ext):
     Removes all files from a specified directory that do not have the given extension.
     """
     for file in os.listdir(path_to_dir):
-        filepath = os.path.join(path_to_dir, file)
-        if not filepath.endswith(file_ext):
-            os.remove(filepath)
+        if not file.endswith(file_ext):
+            os.remove(path_to_dir + '/' + file)
