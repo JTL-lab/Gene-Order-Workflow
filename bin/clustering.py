@@ -19,8 +19,6 @@ from scipy.spatial.distance import euclidean
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 
-from skbio.stats.ordination import pcoa
-
 import markov_clustering as mcl
 
 from DBCV import DBCV
@@ -251,14 +249,10 @@ def get_similarity_matrices(amr_blast_dict, neighborhoods_dict, neighborhood_siz
                 neighborhood_2 = neighborhoods_dict[AMR_gene][genome_1_id]
 
             # ORIGINAL FILTERING CONDITION
-            blast_neighborhood = blast_df[(((blast_df['query_id'].isin(neighborhood_1)) & (blast_df['sub_id'].isin(neighborhood_2))) |
-                                           (((blast_df['query_id'].isin(neighborhood_2)) & (blast_df['sub_id'].isin(neighborhood_1)))))]
-
-
-            # Try this: attempt with correct syntax to make sure sub_id and query_id aren't from same genome w/ second condition
-            #blast_neighborhood = blast_df[(
-            #        ((blast_df['sub_id'].isin(neighborhood_1)) & (blast_df['query_id'].contains(genome_1_id))) |
-            #        ((blast_df['sub_id'].isin(neighborhood_2)) & (blast_df['query_id'].contains(genome_2_id))))]
+            blast_neighborhood = blast_df[(((blast_df['query_id'].isin(neighborhood_1)) &
+                                            (blast_df['sub_id'].isin(neighborhood_2))) |
+                                           (((blast_df['query_id'].isin(neighborhood_2)) &
+                                             (blast_df['sub_id'].isin(neighborhood_1)))))]
 
             blast_neighborhood_df = remove_BLAST_duplicates(blast_neighborhood)
 
@@ -531,9 +525,11 @@ def cluster_neighborhoods(fasta_path, blast_path, output_path, neighborhood_size
 
     # Generate distance matrices
     print("Calculating distance matrices...")
+
     distance_matrices_df_dict = {}
     average_similarity_scores_dict = {}
     for AMR_gene, similarity_matrix_data in similarity_matrices_dict.items():
+
         similarity_matrix = np.array(similarity_matrix_data)
         genome_names = AMR_genome_names_dict[AMR_gene]
 
@@ -550,6 +546,7 @@ def cluster_neighborhoods(fasta_path, blast_path, output_path, neighborhood_size
     check_clustering_savepaths(output_path)
 
     max_distance_scores_dict = {}
+
     for AMR_gene, distance_matrix_df in distance_matrices_df_dict.items():
 
         # Get distance matrix
@@ -561,17 +558,16 @@ def cluster_neighborhoods(fasta_path, blast_path, output_path, neighborhood_size
         # Retain maximum distance score for each AMR gene for distances histogram
         max_distance_scores_dict[AMR_gene] = get_maximum_distance_score(distance_matrix, genome_names)
 
-        print("Generating UPGMA clusters...")
+        print("Generating UPGMA clusters for {g}...".format(g=AMR_gene))
         upgma_clusters = UPGMA_clustering(distance_matrix)
         graph_UPGMA_clusters(upgma_clusters, genome_names, AMR_gene, output_path)
         plotly_dendrogram(distance_matrix, genome_names, AMR_gene, output_path)
 
         print("Generating DBSCAN clusters...")
-        print(distance_matrix_df)
         dbscan_clusters, labels = DBSCAN_clustering(distance_matrix)
-        print(labels)
-        # TO DO: determine effective way to visualize DBSCAN clusters using distance matrix data...
-        #graph_DBSCAN_clusters(distance_matrix_df, dbscan_clusters, labels, AMR_gene, output_path)
+
+        # Plot DBSCAN clusters using distance matrix and PCoA: colour according to cluster assignment
+        graph_DBSCAN_clusters(distance_matrix_df, dbscan_clusters, labels, AMR_gene, output_path)
         plotly_pcoa(distance_matrix_df, genome_names, labels, AMR_gene, output_path)
 
     for AMR_gene, similarity_matrix_data in similarity_matrices_dict.items():
@@ -582,7 +578,7 @@ def cluster_neighborhoods(fasta_path, blast_path, output_path, neighborhood_size
         df = pd.DataFrame(data=similarity_matrix, index=genome_names, columns=genome_names)
         values = df.values
 
-        print("Generating Markov clusters...")
+        print("Generating Markov clusters for {g}...".format(g=AMR_gene))
         sparse_sim_matrix = get_sparse_matrix(similarity_matrix)
         clusters = MCL_clustering(sparse_sim_matrix)
         draw_MCL_graph(sparse_sim_matrix, clusters,
@@ -591,7 +587,7 @@ def cluster_neighborhoods(fasta_path, blast_path, output_path, neighborhood_size
                        save_path=output_path)
         plotly_mcl_network(sparse_sim_matrix, clusters, genome_names, AMR_gene, output_path)
 
-    # Generate histograms
+    # Generate summary histograms for analyzed genomes' similarities
     print("Generating average similarity and max distance histograms for all neighborhoods...")
     plot_similarity_histogram(average_similarity_scores_dict, output_path)
     plot_distance_histogram(max_distance_scores_dict, output_path)
@@ -603,5 +599,4 @@ def main(args=None):
 
 
 if __name__ == '__main__':
-    #sys.exit(main())
-    cluster_neighborhoods('tinydata/fasta', 'tinydata/blast', 'tinydata')
+    sys.exit(main())

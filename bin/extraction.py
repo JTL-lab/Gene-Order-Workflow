@@ -48,7 +48,6 @@ def load_filepaths(rgi_path_arg, gbk_path_arg):
     Assumes that GBK file names have the following naming convention:
     xxxxxxxxxxxxxxxxxxx_genomic.fna.gbk
     """
-
     # Get paths for RGI files
     try:
         rgi_filepaths = glob.glob(os.path.join(rgi_path_arg, "*.txt"))
@@ -452,6 +451,19 @@ def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.3
 
     return AMR_gene_dict
 
+def get_AMR_gene_statistics(rgi_dataframes):
+    """
+    Given RGI dataframes, counts the number of Perfect and Strict hits in each genome.
+    Needed for extraction summary file.
+    """
+    amr_gene_statistics = {}
+    for genome, rgi_df in rgi_dataframes.items():
+        perfect_count = len(rgi_df[rgi_df["Cut_Off"] == "Perfect"])
+        strict_count = len(rgi_df[rgi_df["Cut_Off"] == "Strict"])
+        loose_count = len(rgi_df[rgi_df["Cut_Off"] == "Loose"])
+        amr_gene_statistics[genome] = [perfect_count, strict_count, loose_count]
+
+    return amr_gene_statistics
 
 def make_gene_neighborhood_JSON(AMR_gene_neighborhood_sets):
     """
@@ -482,19 +494,30 @@ def make_gene_neighborhood_JSON(AMR_gene_neighborhood_sets):
     return
 
 
-def write_summary_file(output_dir, num_genomes, neighborhood_size, num_AMR_genes):
+def write_summary_file(output_dir, gbk_dataframes, neighborhood_size, ARO_union, amr_gene_statistics):
     """
     Writes summary data of neighborhood extraction for the set of genomes being analyzed to
     output/Neighborhoods_Extraction_Summary.txt.
     """
     with open(output_dir + '/' + 'Neighborhoods_Extraction_Summary.txt', 'w') as outfile:
         outfile.write('----------------------------------------------------------------------------------------' + '\n')
-        outfile.write('NEIGHBORHOODS SUMMARY' + '\n')
+        outfile.write('NEIGHBORHOOD EXTRACTION SUMMARY' + '\n')
+        outfile.write('----------------------------------------------------------------------------------------' + '\n\n')
         outfile.write('----------------------------------------------------------------------------------------' + '\n')
-        outfile.write('Number of genomes analyzed: {}'.format(num_genomes) + '\n')
+        outfile.write('General Details' + '\n')
+        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        outfile.write('Number of genomes analyzed: {}'.format(len(gbk_dataframes.keys())) + '\n')
         outfile.write('Neighborhood size extracted: {}'.format(neighborhood_size) + '\n')
-        outfile.write('Number of AMR gene models extracted: {}'.format(num_AMR_genes) + '\n')
-    outfile.close()
+        outfile.write('Number of AMR gene models extracted: {}'.format(len(ARO_union)) + '\n\n')
+        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        outfile.write('AMR Gene Details Per Genome' + '\n')
+        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        outfile.write('GENOME_ID' + '\t' + 'PERFECT_HITS' + '\t' + 'STRICT_HITS' + '\t' + 'LOOSE_HITS' + '\n')
+        for genome, counts in amr_gene_statistics.items():
+            outfile.write('{genome}\t{perfect}\t{strict}\t{loose}\n'.format(genome=get_filename(genome),
+                                                                            perfect=counts[0],
+                                                                            strict=counts[1],
+                                                                            loose=counts[2]))
 
 
 def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff_percent):
@@ -557,6 +580,8 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
         rgi_df = make_RGI_dataframe(rgi_filepath)
         rgi_dataframes[rgi_filename] = rgi_df
 
+    amr_statistics = get_AMR_gene_statistics(rgi_dataframes)
+
     for rgi_filename, rgi_df in rgi_dataframes.items():
 
         # Replace each RGI dataframe with one with the proper DNA orientation representation to match GBKs
@@ -614,7 +639,7 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
 
     # 9) Make neighorhoods summary textfile in output dir
     print("Making extraction summary file...")
-    write_summary_file(output_path, len(gbk_filepaths), num_neighbors, len(neighborhoods))
+    write_summary_file(output_path, gbk_dataframes, num_neighbors, ARO_union, amr_statistics)
 
     # 10) TO DO: Store each gene's gene neighborhood data in JSON file (will add once visualization added)
 
