@@ -1,0 +1,15 @@
+process CLUSTERING {
+    tag "clustering"
+    input:
+      path fasta_path
+      path blast_path
+      path output_path
+
+    output:
+      path "${output_path}/clustering", emit: cluster_path
+
+    script:
+    """
+    clustering.py $fasta_path $blast_path $output_path
+    """
+}

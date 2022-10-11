@@ -1,0 +1,2 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+1	9d/3f7783	41497	NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION (extraction)	FAILED	0	2022-10-10 21:56:18.201	44.5s	44.4s	94.4%	406.5 MB	673.9 MB	281.2 MB	53.2 MB
