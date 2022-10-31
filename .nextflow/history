@@ -1,0 +1,1 @@
+2022-10-11 10:21:03	7.9s	nasty_gautier	ERR	8ae015d865466971cf7ca5f40bd1f1be	29bd0acd-bb28-4a6f-93f4-3524fef2baf3	nextflow main.nf -profile Docker --rgi_path assets/sample_data/RGI --gbk_path assets/sample_data/GBK --output_path assets
