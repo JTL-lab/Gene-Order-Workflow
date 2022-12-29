@@ -35,13 +35,6 @@ nextflow.enable.dsl = 2
 
 include { GENEORDERANALYSIS } from './workflows/geneorderanalysis'
 
-//
-// WORKFLOW: Run main nf-core/geneorderanalysis analysis pipeline
-//
-workflow NFCORE_GENEORDERANALYSIS {
-    GENEORDERANALYSIS ()
-}
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN ALL WORKFLOWS
@@ -53,7 +46,7 @@ workflow NFCORE_GENEORDERANALYSIS {
 // See: https://github.com/nf-core/rnaseq/issues/619
 //
 workflow {
-    NFCORE_GENEORDERANALYSIS ()
+    GENEORDERANALYSIS ()
 }
 
 /*

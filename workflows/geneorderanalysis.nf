@@ -10,7 +10,7 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 //WorkflowGeneorderanalysis.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.rgi_path, params.gbk_path, params.output_path, params.blast_path ]
+def checkPathParamList = [ params.rgi_path, params.gbk_path, params.output_path ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
@@ -36,7 +36,11 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { EXTRACTION } from '../modules/local/extraction'
+include { MAKE_GENOME_FILEPAIRS } from '../modules/local/make_genome_filepairs'
+include { RUN_DIAMOND } from '../subworkflows/local/run_diamond'
 include { CLUSTERING } from '../modules/local/clustering'
+
+include { DIAMOND_BLASTP } from '../modules/nf-core/modules/diamond/blastp/main'  addParams( options: [args:'--task blastp --outfmt 6 --max-hsps 1'] )
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +59,6 @@ workflow GENEORDERANALYSIS {
     def rgi_ch = Channel.fromPath(params.rgi_path)
     def gbk_ch = Channel.fromPath(params.gbk_path)
     def output_ch = Channel.fromPath(params.output_path)
-    //def blast_ch = Channel.fromPath(params.blast_path)
 
     //
     // MODULE: Run extraction 
@@ -65,14 +68,47 @@ workflow GENEORDERANALYSIS {
     	gbk_ch,
     	output_ch
     )
+    
+    //
+    // MODULE: Run nf-core/diamond to obtain BLAST results
+    //
+    def fasta_path = EXTRACTION.out.fasta_path
+    def blast_path = EXTRACTION.out.blast_path
+    
+    MAKE_GENOME_FILEPAIRS (
+        fasta_path,
+        blast_path,
+        output_ch
+    )
+    
+    csv_path = MAKE_GENOME_FILEPAIRS.out.csv_path
+    
+    //def fasta_filepaths = Channel.from('$fasta_path/*.fasta', chec)
+    //RUN_DIAMOND (
+    //    csv_path,
+    //	fasta_path,
+    //	blast_path
+    //)
+
+    //DIAMOND_BLASTP (
+    //	tuple(val/path),
+    //	path db,
+    //	val out_ext
+    //	val blast_columns
+    //)
 
     //
     // MODULE: Run clustering
     //
+    
     CLUSTERING (
     	EXTRACTION.out.fasta_path,
     	EXTRACTION.out.blast_path,
     	output_ch
+    )
+    
+    VISUALIZATION (
+    
     )
     
     //workflow_summary    = WorkflowGeneorderanalysis.paramsSummaryMultiqc(workflow, summary_params)

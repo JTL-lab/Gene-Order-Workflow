@@ -1,87 +1,38 @@
-Oct.-11 10:21:03.117 [main] DEBUG nextflow.cli.Launcher - $> nextflow main.nf -profile Docker --rgi_path assets/sample_data/RGI --gbk_path assets/sample_data/GBK --output_path assets
-Oct.-11 10:21:03.155 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.0
-Oct.-11 10:21:03.227 [main] INFO  nextflow.cli.CmdRun - Launching `main.nf` [nasty_gautier] DSL2 - revision: 8ae015d865
-Oct.-11 10:21:03.238 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/julia/.nextflow/plugins; core-plugins: nf-amazon@1.7.1,nf-azure@0.13.1,nf-console@1.0.3,nf-ga4gh@1.0.3,nf-google@1.1.4,nf-sqldb@0.4.0,nf-tower@1.4.0
-Oct.-11 10:21:03.239 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
-Oct.-11 10:21:03.247 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
-Oct.-11 10:21:03.248 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
-Oct.-11 10:21:03.251 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
-Oct.-11 10:21:03.259 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
-Oct.-11 10:21:03.297 [main] DEBUG nextflow.Session - Session uuid: 29bd0acd-bb28-4a6f-93f4-3524fef2baf3
-Oct.-11 10:21:03.298 [main] DEBUG nextflow.Session - Run name: nasty_gautier
-Oct.-11 10:21:03.299 [main] DEBUG nextflow.Session - Executor pool size: 8
-Oct.-11 10:21:03.333 [main] DEBUG nextflow.cli.CmdRun - 
+Dec.-01 09:14:48.058 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf -profile docker --rgi_path sample_data/RGI --gbk_path sample_data/GBK --output_path output
+Dec.-01 09:14:48.218 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.0
+Dec.-01 09:14:48.415 [main] INFO  nextflow.cli.CmdRun - Launching `main.nf` [infallible_kirch] DSL2 - revision: 36eca505f8
+Dec.-01 09:14:48.442 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/julia/.nextflow/plugins; core-plugins: nf-amazon@1.7.1,nf-azure@0.13.1,nf-console@1.0.3,nf-ga4gh@1.0.3,nf-google@1.1.4,nf-sqldb@0.4.0,nf-tower@1.4.0
+Dec.-01 09:14:48.445 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Dec.-01 09:14:48.465 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Dec.-01 09:14:48.467 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Dec.-01 09:14:48.473 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Dec.-01 09:14:48.492 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Dec.-01 09:14:48.604 [main] DEBUG nextflow.Session - Session uuid: 3e79a059-de02-4e55-8df9-233556e55d9d
+Dec.-01 09:14:48.604 [main] DEBUG nextflow.Session - Run name: infallible_kirch
+Dec.-01 09:14:48.607 [main] DEBUG nextflow.Session - Executor pool size: 8
+Dec.-01 09:14:48.692 [main] DEBUG nextflow.cli.CmdRun - 
   Version: 22.04.0 build 5697
   Created: 23-04-2022 18:00 UTC (15:00 ADT)
   System: Linux 5.4.0-54-generic
-  Runtime: Groovy 3.0.10 on OpenJDK 64-Bit Server VM 11.0.10+9-Ubuntu-0ubuntu1.20.04
+  Runtime: Groovy 3.0.10 on OpenJDK 64-Bit Server VM 11.0.17+8-post-Ubuntu-1ubuntu220.04
   Encoding: UTF-8 (UTF-8)
-  Process: 57278@cerberus [127.0.1.1]
-  CPUs: 8 - Mem: 15.4 GB (7.1 GB) - Swap: 2 GB (1.9 GB)
-Oct.-11 10:21:03.349 [main] DEBUG nextflow.Session - Work-dir: /home/julia/Documents/GIT/Gene-Order-Workflow/work [ext2/ext3]
-Oct.-11 10:21:03.374 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
-Oct.-11 10:21:03.382 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
-Oct.-11 10:21:03.399 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
-Oct.-11 10:21:03.407 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
-Oct.-11 10:21:03.463 [main] DEBUG nextflow.Session - Session start invoked
-Oct.-11 10:21:03.470 [main] DEBUG nextflow.Session - Using default localLib path: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
-Oct.-11 10:21:03.472 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
-Oct.-11 10:21:03.472 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib/nfcore_external_java_deps.jar
-Oct.-11 10:21:03.842 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
-Oct.-11 10:21:04.625 [main] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `blast_path` -- Initialise it to a default value eg. `params.blast_path = some_value`
-Oct.-11 10:21:04.899 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct.-11 10:21:04.899 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct.-11 10:21:04.902 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
-Oct.-11 10:21:04.906 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=8; memory=15.4 GB; capacity=8; pollInterval=100ms; dumpInterval=5m
-Oct.-11 10:21:04.976 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct.-11 10:21:04.976 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct.-11 10:21:04.978 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION, SAMPLESHEET_CHECK, EXTRACTION, CLUSTERING, NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:CLUSTERING
-Oct.-11 10:21:04.978 [main] DEBUG nextflow.Session - Ignite dataflow network (5)
-Oct.-11 10:21:04.983 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION
-Oct.-11 10:21:04.984 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:CLUSTERING
-Oct.-11 10:21:04.984 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
-Oct.-11 10:21:04.984 [main] DEBUG nextflow.Session - Session await
-Oct.-11 10:21:05.074 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct.-11 10:21:05.077 [Task submitter] INFO  nextflow.Session - [ec/3e4b00] Submitted process > NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION (extraction)
-Oct.-11 10:21:10.563 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION (extraction); status: COMPLETED; exit: 0; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ec/3e4b0017c6ff6c980f989f02bc377b]
-Oct.-11 10:21:10.567 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Process `NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION (extraction)` is unable to find [UnixPath]: `/home/julia/Documents/GIT/Gene-Order-Workflow/work/ec/3e4b0017c6ff6c980f989f02bc377b/assets/blast` (pattern: `assets/blast`)
-Oct.-11 10:21:10.589 [Task monitor] ERROR nextflow.processor.TaskProcessor - Error executing process > 'NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION (extraction)'
+  Process: 2929824@cerberus [127.0.1.1]
+  CPUs: 8 - Mem: 15.4 GB (6.5 GB) - Swap: 2 GB (1.4 GB)
+Dec.-01 09:14:48.729 [main] DEBUG nextflow.Session - Work-dir: /home/julia/Documents/GIT/Gene-Order-Workflow/work [ext2/ext3]
+Dec.-01 09:14:48.801 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Dec.-01 09:14:48.821 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Dec.-01 09:14:48.869 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Dec.-01 09:14:48.889 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
+Dec.-01 09:14:49.085 [main] DEBUG nextflow.Session - Session start invoked
+Dec.-01 09:14:49.102 [main] DEBUG nextflow.Session - Using default localLib path: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
+Dec.-01 09:14:49.107 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
+Dec.-01 09:14:49.108 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib/nfcore_external_java_deps.jar
+Dec.-01 09:14:49.969 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Dec.-01 09:14:53.000 [main] ERROR nextflow.cli.Launcher - Module compilation error
+- file : /home/julia/Documents/GIT/Gene-Order-Workflow/./workflows/../subworkflows/local/run_diamond.nf
+- cause: Unexpected input: '{' @ line 68, column 22.
+   workflow RUN_DIAMOND {
+                        ^
 
-Caused by:
-  Missing output file(s) `assets/blast` expected by process `NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION (extraction)`
+1 error
 
-Command executed:
-
-  extraction.py RGI GBK assets
-
-Command exit status:
-  0
-
-Command output:
-  Processing GBK and RGI files...
-  Extracting gene neighborhood data for neighborhoods of size 10...
-  Contig end found at position 8 upstream.
-  Contig end found at position 9 upstream.
-  Contig end found at position 10 upstream.
-  Gene Ec_EF-Tu not found.
-  AMR gene Ec_EF-Tu was not present in this genome!
-  Gene Ec_EF-Tu not found.
-  AMR gene Ec_EF-Tu was not present in this genome!
-  Generating neighborhood FNA files...
-  Making extraction summary file...
-  Neighborhood extraction complete.
-
-Work dir:
-  /home/julia/Documents/GIT/Gene-Order-Workflow/work/ec/3e4b0017c6ff6c980f989f02bc377b
-
-Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`
-Oct.-11 10:21:10.595 [main] DEBUG nextflow.Session - Session await > all process finished
-Oct.-11 10:21:10.596 [Task monitor] DEBUG nextflow.Session - Session aborted -- Cause: Missing output file(s) `assets/blast` expected by process `NFCORE_GENEORDERANALYSIS:GENEORDERANALYSIS:EXTRACTION (extraction)`
-Oct.-11 10:21:10.609 [main] DEBUG nextflow.Session - Session await > all barriers passed
-Oct.-11 10:21:10.611 [main] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `email` -- Initialise it to a default value eg. `params.email = some_value`
-Oct.-11 10:21:10.611 [main] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `email_on_fail` -- Initialise it to a default value eg. `params.email_on_fail = some_value`
-Oct.-11 10:21:10.613 [main] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `monochrome_logs` -- Initialise it to a default value eg. `params.monochrome_logs = some_value`
-Oct.-11 10:21:10.614 [main] INFO  nextflow.Nextflow - -[0;35m[null][0;31m Pipeline completed with errors[0m-
-Oct.-11 10:21:10.619 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=1; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=0ms; failedDuration=5.4s; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=0; ]
-Oct.-11 10:21:10.858 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
-Oct.-11 10:21:10.863 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

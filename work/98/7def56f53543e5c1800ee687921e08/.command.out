@@ -1,0 +1,10 @@
+
+
+Building a new DB, current time: 11/21/2022 13:33:21
+New DB name:   /home/julia/Documents/GIT/Gene-Order-Workflow/work/98/7def56f53543e5c1800ee687921e08/fasta/baeR/SA20153980.fasta
+New DB title:  fasta/baeR/SA20153980.fasta
+Sequence type: Protein
+Keep MBits: T
+Maximum file size: 1000000000B
+Adding sequences from FASTA; added 21 sequences in 0.00205684 seconds.
+Blasting All-vs-All for fasta/baeR/SA20153980.fasta vs fasta/baeR/SA20153983.fasta...

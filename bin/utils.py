@@ -6,6 +6,8 @@ Utils for file manipulation and general data preprocessing used by multiple modu
 
 import os
 import glob
+import string
+import random
 
 def strip_brackets(var):
     """
@@ -85,3 +87,10 @@ def remove_files(path_to_dir, file_ext):
     for file in os.listdir(path_to_dir):
         if not file.endswith(file_ext):
             os.remove(path_to_dir + '/' + file)
+
+def generate_alphanumeric_string(length):
+    """
+    Generate a random alphanumeric string of fixed length
+    """
+    str = string.ascii_lowercase
+    return ''.join(random.choice(str) for i in range(length))

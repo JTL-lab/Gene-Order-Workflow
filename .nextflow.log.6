@@ -1,0 +1,77 @@
+Nov.-28 15:19:53.757 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf -profile docker --rgi_path sample_data/RGI --gbk_path sample_data/GBK --output_path output
+Nov.-28 15:19:53.836 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.0
+Nov.-28 15:19:53.947 [main] INFO  nextflow.cli.CmdRun - Launching `main.nf` [deadly_shaw] DSL2 - revision: 36eca505f8
+Nov.-28 15:19:53.963 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/julia/.nextflow/plugins; core-plugins: nf-amazon@1.7.1,nf-azure@0.13.1,nf-console@1.0.3,nf-ga4gh@1.0.3,nf-google@1.1.4,nf-sqldb@0.4.0,nf-tower@1.4.0
+Nov.-28 15:19:53.964 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Nov.-28 15:19:53.975 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Nov.-28 15:19:53.976 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Nov.-28 15:19:53.980 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Nov.-28 15:19:53.991 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Nov.-28 15:19:54.054 [main] DEBUG nextflow.Session - Session uuid: a0daecd6-276b-4068-a9e7-17acb96cfc11
+Nov.-28 15:19:54.054 [main] DEBUG nextflow.Session - Run name: deadly_shaw
+Nov.-28 15:19:54.055 [main] DEBUG nextflow.Session - Executor pool size: 8
+Nov.-28 15:19:54.095 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 22.04.0 build 5697
+  Created: 23-04-2022 18:00 UTC (15:00 ADT)
+  System: Linux 5.4.0-54-generic
+  Runtime: Groovy 3.0.10 on OpenJDK 64-Bit Server VM 11.0.17+8-post-Ubuntu-1ubuntu220.04
+  Encoding: UTF-8 (UTF-8)
+  Process: 1544348@cerberus [127.0.1.1]
+  CPUs: 8 - Mem: 15.4 GB (178.5 MB) - Swap: 2 GB (1.9 GB)
+Nov.-28 15:19:54.114 [main] DEBUG nextflow.Session - Work-dir: /home/julia/Documents/GIT/Gene-Order-Workflow/work [ext2/ext3]
+Nov.-28 15:19:54.150 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Nov.-28 15:19:54.160 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Nov.-28 15:19:54.183 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Nov.-28 15:19:54.195 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
+Nov.-28 15:19:54.287 [main] DEBUG nextflow.Session - Session start invoked
+Nov.-28 15:19:54.298 [main] DEBUG nextflow.Session - Using default localLib path: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
+Nov.-28 15:19:54.300 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
+Nov.-28 15:19:54.300 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib/nfcore_external_java_deps.jar
+Nov.-28 15:19:54.766 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Nov.-28 15:19:56.029 [main] DEBUG nextflow.Session - Session aborted -- Cause: Cannot find a component with name 'EXTRACTION' in module: /home/julia/Documents/GIT/Gene-Order-Workflow/./workflows/../modules/local/extraction.nf
+Nov.-28 15:19:56.041 [main] ERROR nextflow.cli.Launcher - @unknown
+nextflow.exception.MissingModuleComponentException: Cannot find a component with name 'EXTRACTION' in module: /home/julia/Documents/GIT/Gene-Order-Workflow/./workflows/../modules/local/extraction.nf
+	at nextflow.script.ScriptMeta.addModule(ScriptMeta.groovy:264)
+	at nextflow.script.ScriptMeta.addModule(ScriptMeta.groovy:255)
+	at nextflow.script.IncludeDef.load0(IncludeDef.groovy:117)
+	at nextflow.script.IncludeDef$load0$1.call(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:139)
+	at Script_36e7859f.runScript(Script_36e7859f:38)
+	at nextflow.script.BaseScript.runDsl2(BaseScript.groovy:170)
+	at nextflow.script.BaseScript.run(BaseScript.groovy:203)
+	at nextflow.script.ScriptParser.runScript(ScriptParser.groovy:220)
+	at nextflow.script.ScriptParser.runScript(ScriptParser.groovy:206)
+	at nextflow.script.ScriptParser.runScript(ScriptParser.groovy:200)
+	at nextflow.script.IncludeDef.memoizedMethodPriv$loadModule0PathMapSession(IncludeDef.groovy:142)
+	at nextflow.script.IncludeDef.access$0(IncludeDef.groovy)
+	at nextflow.script.IncludeDef$__clinit__closure1.doCall(IncludeDef.groovy)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:107)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:323)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:274)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1035)
+	at groovy.lang.Closure.call(Closure.java:412)
+	at org.codehaus.groovy.runtime.memoize.Memoize$MemoizeFunction.lambda$call$0(Memoize.java:137)
+	at org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:137)
+	at org.codehaus.groovy.runtime.memoize.ConcurrentCommonCache.getAndPut(ConcurrentCommonCache.java:113)
+	at org.codehaus.groovy.runtime.memoize.Memoize$MemoizeFunction.call(Memoize.java:136)
+	at nextflow.script.IncludeDef.loadModule0(IncludeDef.groovy)
+	at nextflow.script.IncludeDef.load0(IncludeDef.groovy:114)
+	at nextflow.script.IncludeDef$load0$1.call(Unknown Source)
+	at org.codehaus.groovy.runtime.callsite.CallSiteArray.defaultCall(CallSiteArray.java:47)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:125)
+	at org.codehaus.groovy.runtime.callsite.AbstractCallSite.call(AbstractCallSite.java:139)
+	at Script_6d11bcfb.runScript(Script_6d11bcfb:36)
+	at nextflow.script.BaseScript.runDsl2(BaseScript.groovy:170)
+	at nextflow.script.BaseScript.run(BaseScript.groovy:203)
+	at nextflow.script.ScriptParser.runScript(ScriptParser.groovy:220)
+	at nextflow.script.ScriptRunner.run(ScriptRunner.groovy:212)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:120)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:334)
+	at nextflow.cli.Launcher.run(Launcher.groovy:480)
+	at nextflow.cli.Launcher.main(Launcher.groovy:639)

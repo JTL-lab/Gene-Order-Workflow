@@ -1,5 +1,6 @@
 process EXTRACTION {
     tag "extraction"
+    
     input:
       path rgi_path
       path gbk_path

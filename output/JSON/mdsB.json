@@ -1,0 +1,1944 @@
+{
+	"clusters": [
+		{
+			"uid": "uzqsrcptjberfjbdmllfpzgvfrzlermbyyda",
+			"name": "SA20153983",
+			"loci": [
+				{
+					"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx",
+					"name": "SA20153983",
+					"start": 387496,
+					"end": 414271,
+					"genes": [
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-0",
+							"name": "oprM",
+							"start": 404795,
+							"end": 406253,
+							"strand": 1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-1",
+							"name": "UID",
+							"start": 406322,
+							"end": 406682,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-2",
+							"name": "UID",
+							"start": 406974,
+							"end": 407502,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-3",
+							"name": "ail_3",
+							"start": 407759,
+							"end": 408284,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-4",
+							"name": "UID",
+							"start": 408684,
+							"end": 409173,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-5",
+							"name": "UID",
+							"start": 409145,
+							"end": 409889,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-6",
+							"name": "pdeN_2",
+							"start": 409988,
+							"end": 411563,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-7",
+							"name": "UID",
+							"start": 411864,
+							"end": 412365,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-8",
+							"name": "UID",
+							"start": 412337,
+							"end": 413072,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-9",
+							"name": "sfaA",
+							"start": 413734,
+							"end": 414271,
+							"strand": 1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-10",
+							"name": "oqxB15",
+							"start": 401611,
+							"end": 404779,
+							"strand": 1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-11",
+							"name": "appB_2",
+							"start": 387496,
+							"end": 388507,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-12",
+							"name": "UID",
+							"start": 388503,
+							"end": 389907,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-13",
+							"name": "UID",
+							"start": 390023,
+							"end": 390125,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-14",
+							"name": "UID",
+							"start": 390401,
+							"end": 393374,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-15",
+							"name": "UID",
+							"start": 393383,
+							"end": 395342,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-16",
+							"name": "yjhB_2",
+							"start": 395530,
+							"end": 396784,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-17",
+							"name": "UID",
+							"start": 397075,
+							"end": 397270,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-18",
+							"name": "hmrR",
+							"start": 397347,
+							"end": 397812,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-19",
+							"name": "actP_1",
+							"start": 397808,
+							"end": 400112,
+							"strand": -1
+						},
+						{
+							"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-20",
+							"name": "bepF",
+							"start": 400388,
+							"end": 401615,
+							"strand": 1
+						}
+					]
+				}
+			]
+		},
+		{
+			"uid": "rhmchumbyzvuyzxayrjdieyletuviibiwjir",
+			"name": "SA20153980",
+			"loci": [
+				{
+					"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc",
+					"name": "SA20153980",
+					"start": 15493,
+					"end": 42266,
+					"genes": [
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-0",
+							"name": "bepF",
+							"start": 28385,
+							"end": 29612,
+							"strand": 1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-1",
+							"name": "actP_1",
+							"start": 25820,
+							"end": 28109,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-2",
+							"name": "hmrR",
+							"start": 25344,
+							"end": 25809,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-3",
+							"name": "UID",
+							"start": 25072,
+							"end": 25267,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-4",
+							"name": "yjhB_1",
+							"start": 23527,
+							"end": 24781,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-5",
+							"name": "UID",
+							"start": 21380,
+							"end": 23339,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-6",
+							"name": "UID",
+							"start": 18398,
+							"end": 21371,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-7",
+							"name": "UID",
+							"start": 18020,
+							"end": 18122,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-8",
+							"name": "UID",
+							"start": 16500,
+							"end": 17904,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-9",
+							"name": "appB_2",
+							"start": 15493,
+							"end": 16504,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-10",
+							"name": "oqxB15",
+							"start": 29608,
+							"end": 32776,
+							"strand": 1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-11",
+							"name": "sfaA",
+							"start": 41729,
+							"end": 42266,
+							"strand": 1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-12",
+							"name": "UID",
+							"start": 40331,
+							"end": 41066,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-13",
+							"name": "UID",
+							"start": 39858,
+							"end": 40359,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-14",
+							"name": "pdeN_1",
+							"start": 37984,
+							"end": 39559,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-15",
+							"name": "UID",
+							"start": 37141,
+							"end": 37885,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-16",
+							"name": "UID",
+							"start": 36680,
+							"end": 37169,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-17",
+							"name": "ail_3",
+							"start": 35756,
+							"end": 36281,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-18",
+							"name": "UID",
+							"start": 34971,
+							"end": 35499,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-19",
+							"name": "UID",
+							"start": 34319,
+							"end": 34679,
+							"strand": -1
+						},
+						{
+							"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-20",
+							"name": "oprM",
+							"start": 32792,
+							"end": 34250,
+							"strand": 1
+						}
+					]
+				}
+			]
+		}
+	],
+	"links": [
+		{
+			"uid": "link0_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-0",
+				"name": "oprM-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-20",
+				"name": "oprM-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link1_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-3",
+				"name": "ail_3-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-17",
+				"name": "ail_3-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link2_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-9",
+				"name": "sfaA-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-11",
+				"name": "sfaA-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link3_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-10",
+				"name": "oqxB15-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-10",
+				"name": "oqxB15-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link4_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-11",
+				"name": "appB_2-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-9",
+				"name": "appB_2-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link5_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-18",
+				"name": "hmrR-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-2",
+				"name": "hmrR-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link6_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-19",
+				"name": "actP_1-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-1",
+				"name": "actP_1-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link7_SA20153983_SA20153980",
+			"target": {
+				"uid": "wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-20",
+				"name": "bepF-1"
+			},
+			"query": {
+				"uid": "jyaloihovfswsxpllzkhxbunttishkhqiazc-0",
+				"name": "bepF-2"
+			},
+			"identity": "0.5"
+		}
+	],
+	"groups": [
+		{
+			"uid": "group0",
+			"label": "oprM",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-0", "jyaloihovfswsxpllzkhxbunttishkhqiazc-20"]
+		},
+		{
+			"uid": "group2",
+			"label": "ail_3",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-3", "jyaloihovfswsxpllzkhxbunttishkhqiazc-17"]
+		},
+		{
+			"uid": "group3",
+			"label": "pdeN_2",
+			"genes": []
+		},
+		{
+			"uid": "group4",
+			"label": "sfaA",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-9", "jyaloihovfswsxpllzkhxbunttishkhqiazc-11"]
+		},
+		{
+			"uid": "group5",
+			"label": "oqxB15",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-10", "jyaloihovfswsxpllzkhxbunttishkhqiazc-10"]
+		},
+		{
+			"uid": "group6",
+			"label": "appB_2",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-11", "jyaloihovfswsxpllzkhxbunttishkhqiazc-9"]
+		},
+		{
+			"uid": "group7",
+			"label": "yjhB_2",
+			"genes": []
+		},
+		{
+			"uid": "group8",
+			"label": "hmrR",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-18", "jyaloihovfswsxpllzkhxbunttishkhqiazc-2"]
+		},
+		{
+			"uid": "group9",
+			"label": "actP_1",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-19", "jyaloihovfswsxpllzkhxbunttishkhqiazc-1"]
+		},
+		{
+			"uid": "group10",
+			"label": "bepF",
+			"genes": ["wjeccedxezjyxckzbmukmzxtkqnvnpjljlbx-20", "jyaloihovfswsxpllzkhxbunttishkhqiazc-0"]
+		},
+		{
+			"uid": "group11",
+			"label": "yjhB_1",
+			"genes": []
+		},
+		{
+			"uid": "group12",
+			"label": "pdeN_1",
+			"genes": []
+		}
+	]
+}
+{
+	"clusters": [
+		{
+			"uid": "xfggujttonhrdyzvvjwnruclqpizxupnfaga",
+			"name": "SA20153983",
+			"loci": [
+				{
+					"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf",
+					"name": "SA20153983",
+					"start": 387496,
+					"end": 414271,
+					"genes": [
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-0",
+							"name": "oprM",
+							"start": 404795,
+							"end": 406253,
+							"strand": 1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-1",
+							"name": "UID",
+							"start": 406322,
+							"end": 406682,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-2",
+							"name": "UID",
+							"start": 406974,
+							"end": 407502,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-3",
+							"name": "ail_3",
+							"start": 407759,
+							"end": 408284,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-4",
+							"name": "UID",
+							"start": 408684,
+							"end": 409173,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-5",
+							"name": "UID",
+							"start": 409145,
+							"end": 409889,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-6",
+							"name": "pdeN_2",
+							"start": 409988,
+							"end": 411563,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-7",
+							"name": "UID",
+							"start": 411864,
+							"end": 412365,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-8",
+							"name": "UID",
+							"start": 412337,
+							"end": 413072,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-9",
+							"name": "sfaA",
+							"start": 413734,
+							"end": 414271,
+							"strand": 1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-10",
+							"name": "oqxB15",
+							"start": 401611,
+							"end": 404779,
+							"strand": 1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-11",
+							"name": "appB_2",
+							"start": 387496,
+							"end": 388507,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-12",
+							"name": "UID",
+							"start": 388503,
+							"end": 389907,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-13",
+							"name": "UID",
+							"start": 390023,
+							"end": 390125,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-14",
+							"name": "UID",
+							"start": 390401,
+							"end": 393374,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-15",
+							"name": "UID",
+							"start": 393383,
+							"end": 395342,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-16",
+							"name": "yjhB_2",
+							"start": 395530,
+							"end": 396784,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-17",
+							"name": "UID",
+							"start": 397075,
+							"end": 397270,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-18",
+							"name": "hmrR",
+							"start": 397347,
+							"end": 397812,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-19",
+							"name": "actP_1",
+							"start": 397808,
+							"end": 400112,
+							"strand": -1
+						},
+						{
+							"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-20",
+							"name": "bepF",
+							"start": 400388,
+							"end": 401615,
+							"strand": 1
+						}
+					]
+				}
+			]
+		},
+		{
+			"uid": "siohizsabupreexgpwjgilhxvdlsttbdnskp",
+			"name": "SA20153980",
+			"loci": [
+				{
+					"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood",
+					"name": "SA20153980",
+					"start": 15493,
+					"end": 42266,
+					"genes": [
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-0",
+							"name": "bepF",
+							"start": 28385,
+							"end": 29612,
+							"strand": 1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-1",
+							"name": "actP_1",
+							"start": 25820,
+							"end": 28109,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-2",
+							"name": "hmrR",
+							"start": 25344,
+							"end": 25809,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-3",
+							"name": "UID",
+							"start": 25072,
+							"end": 25267,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-4",
+							"name": "yjhB_1",
+							"start": 23527,
+							"end": 24781,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-5",
+							"name": "UID",
+							"start": 21380,
+							"end": 23339,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-6",
+							"name": "UID",
+							"start": 18398,
+							"end": 21371,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-7",
+							"name": "UID",
+							"start": 18020,
+							"end": 18122,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-8",
+							"name": "UID",
+							"start": 16500,
+							"end": 17904,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-9",
+							"name": "appB_2",
+							"start": 15493,
+							"end": 16504,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-10",
+							"name": "oqxB15",
+							"start": 29608,
+							"end": 32776,
+							"strand": 1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-11",
+							"name": "sfaA",
+							"start": 41729,
+							"end": 42266,
+							"strand": 1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-12",
+							"name": "UID",
+							"start": 40331,
+							"end": 41066,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-13",
+							"name": "UID",
+							"start": 39858,
+							"end": 40359,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-14",
+							"name": "pdeN_1",
+							"start": 37984,
+							"end": 39559,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-15",
+							"name": "UID",
+							"start": 37141,
+							"end": 37885,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-16",
+							"name": "UID",
+							"start": 36680,
+							"end": 37169,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-17",
+							"name": "ail_3",
+							"start": 35756,
+							"end": 36281,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-18",
+							"name": "UID",
+							"start": 34971,
+							"end": 35499,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-19",
+							"name": "UID",
+							"start": 34319,
+							"end": 34679,
+							"strand": -1
+						},
+						{
+							"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-20",
+							"name": "oprM",
+							"start": 32792,
+							"end": 34250,
+							"strand": 1
+						}
+					]
+				}
+			]
+		}
+	],
+	"links": [
+		{
+			"uid": "link0_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-0",
+				"name": "oprM-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-20",
+				"name": "oprM-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link1_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-3",
+				"name": "ail_3-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-17",
+				"name": "ail_3-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link2_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-9",
+				"name": "sfaA-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-11",
+				"name": "sfaA-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link3_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-10",
+				"name": "oqxB15-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-10",
+				"name": "oqxB15-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link4_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-11",
+				"name": "appB_2-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-9",
+				"name": "appB_2-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link5_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-18",
+				"name": "hmrR-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-2",
+				"name": "hmrR-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link6_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-19",
+				"name": "actP_1-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-1",
+				"name": "actP_1-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link7_SA20153983_SA20153980",
+			"target": {
+				"uid": "fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-20",
+				"name": "bepF-1"
+			},
+			"query": {
+				"uid": "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-0",
+				"name": "bepF-2"
+			},
+			"identity": "0.5"
+		}
+	],
+	"groups": [
+		{
+			"uid": "group0",
+			"label": "oprM",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-0", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-20"]
+		},
+		{
+			"uid": "group2",
+			"label": "ail_3",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-3", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-17"]
+		},
+		{
+			"uid": "group3",
+			"label": "pdeN_2",
+			"genes": []
+		},
+		{
+			"uid": "group4",
+			"label": "sfaA",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-9", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-11"]
+		},
+		{
+			"uid": "group5",
+			"label": "oqxB15",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-10", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-10"]
+		},
+		{
+			"uid": "group6",
+			"label": "appB_2",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-11", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-9"]
+		},
+		{
+			"uid": "group7",
+			"label": "yjhB_2",
+			"genes": []
+		},
+		{
+			"uid": "group8",
+			"label": "hmrR",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-18", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-2"]
+		},
+		{
+			"uid": "group9",
+			"label": "actP_1",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-19", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-1"]
+		},
+		{
+			"uid": "group10",
+			"label": "bepF",
+			"genes": ["fxutprkthzebvkfcmtkpyyefnqjelqqwaduf-20", "cuvpnxtbcyirdgnbbkunyboxsibnyofveood-0"]
+		},
+		{
+			"uid": "group11",
+			"label": "yjhB_1",
+			"genes": []
+		},
+		{
+			"uid": "group12",
+			"label": "pdeN_1",
+			"genes": []
+		}
+	]
+}
+{
+	"clusters": [
+		{
+			"uid": "gtvqeovkpeteazcqlmqittpbbuuutsghogcg",
+			"name": "SA20153983",
+			"loci": [
+				{
+					"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak",
+					"name": "SA20153983",
+					"start": 387496,
+					"end": 414271,
+					"genes": [
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-0",
+							"name": "oprM",
+							"start": 404795,
+							"end": 406253,
+							"strand": 1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-1",
+							"name": "UID",
+							"start": 406322,
+							"end": 406682,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-2",
+							"name": "UID",
+							"start": 406974,
+							"end": 407502,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-3",
+							"name": "ail_3",
+							"start": 407759,
+							"end": 408284,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-4",
+							"name": "UID",
+							"start": 408684,
+							"end": 409173,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-5",
+							"name": "UID",
+							"start": 409145,
+							"end": 409889,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-6",
+							"name": "pdeN_2",
+							"start": 409988,
+							"end": 411563,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-7",
+							"name": "UID",
+							"start": 411864,
+							"end": 412365,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-8",
+							"name": "UID",
+							"start": 412337,
+							"end": 413072,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-9",
+							"name": "sfaA",
+							"start": 413734,
+							"end": 414271,
+							"strand": 1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-10",
+							"name": "oqxB15",
+							"start": 401611,
+							"end": 404779,
+							"strand": 1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-11",
+							"name": "appB_2",
+							"start": 387496,
+							"end": 388507,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-12",
+							"name": "UID",
+							"start": 388503,
+							"end": 389907,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-13",
+							"name": "UID",
+							"start": 390023,
+							"end": 390125,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-14",
+							"name": "UID",
+							"start": 390401,
+							"end": 393374,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-15",
+							"name": "UID",
+							"start": 393383,
+							"end": 395342,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-16",
+							"name": "yjhB_2",
+							"start": 395530,
+							"end": 396784,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-17",
+							"name": "UID",
+							"start": 397075,
+							"end": 397270,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-18",
+							"name": "hmrR",
+							"start": 397347,
+							"end": 397812,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-19",
+							"name": "actP_1",
+							"start": 397808,
+							"end": 400112,
+							"strand": -1
+						},
+						{
+							"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-20",
+							"name": "bepF",
+							"start": 400388,
+							"end": 401615,
+							"strand": 1
+						}
+					]
+				}
+			]
+		},
+		{
+			"uid": "wyzolzphakdmevlzghuprwpssthnsvtxfwpr",
+			"name": "SA20153980",
+			"loci": [
+				{
+					"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda",
+					"name": "SA20153980",
+					"start": 15493,
+					"end": 42266,
+					"genes": [
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-0",
+							"name": "bepF",
+							"start": 28385,
+							"end": 29612,
+							"strand": 1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-1",
+							"name": "actP_1",
+							"start": 25820,
+							"end": 28109,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-2",
+							"name": "hmrR",
+							"start": 25344,
+							"end": 25809,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-3",
+							"name": "UID",
+							"start": 25072,
+							"end": 25267,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-4",
+							"name": "yjhB_1",
+							"start": 23527,
+							"end": 24781,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-5",
+							"name": "UID",
+							"start": 21380,
+							"end": 23339,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-6",
+							"name": "UID",
+							"start": 18398,
+							"end": 21371,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-7",
+							"name": "UID",
+							"start": 18020,
+							"end": 18122,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-8",
+							"name": "UID",
+							"start": 16500,
+							"end": 17904,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-9",
+							"name": "appB_2",
+							"start": 15493,
+							"end": 16504,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-10",
+							"name": "oqxB15",
+							"start": 29608,
+							"end": 32776,
+							"strand": 1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-11",
+							"name": "sfaA",
+							"start": 41729,
+							"end": 42266,
+							"strand": 1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-12",
+							"name": "UID",
+							"start": 40331,
+							"end": 41066,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-13",
+							"name": "UID",
+							"start": 39858,
+							"end": 40359,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-14",
+							"name": "pdeN_1",
+							"start": 37984,
+							"end": 39559,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-15",
+							"name": "UID",
+							"start": 37141,
+							"end": 37885,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-16",
+							"name": "UID",
+							"start": 36680,
+							"end": 37169,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-17",
+							"name": "ail_3",
+							"start": 35756,
+							"end": 36281,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-18",
+							"name": "UID",
+							"start": 34971,
+							"end": 35499,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-19",
+							"name": "UID",
+							"start": 34319,
+							"end": 34679,
+							"strand": -1
+						},
+						{
+							"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-20",
+							"name": "oprM",
+							"start": 32792,
+							"end": 34250,
+							"strand": 1
+						}
+					]
+				}
+			]
+		}
+	],
+	"links": [
+		{
+			"uid": "link0_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-0",
+				"name": "oprM-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-20",
+				"name": "oprM-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link1_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-3",
+				"name": "ail_3-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-17",
+				"name": "ail_3-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link2_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-9",
+				"name": "sfaA-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-11",
+				"name": "sfaA-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link3_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-10",
+				"name": "oqxB15-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-10",
+				"name": "oqxB15-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link4_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-11",
+				"name": "appB_2-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-9",
+				"name": "appB_2-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link5_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-18",
+				"name": "hmrR-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-2",
+				"name": "hmrR-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link6_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-19",
+				"name": "actP_1-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-1",
+				"name": "actP_1-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link7_SA20153983_SA20153980",
+			"target": {
+				"uid": "afibehhxictnqmnxvhdeemxtycktmztorcak-20",
+				"name": "bepF-1"
+			},
+			"query": {
+				"uid": "fucwkkkwjhnapyziweyqrpmapvntmmocchda-0",
+				"name": "bepF-2"
+			},
+			"identity": "0.5"
+		}
+	],
+	"groups": [
+		{
+			"uid": "group0",
+			"label": "oprM",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-0", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-20"]
+		},
+		{
+			"uid": "group2",
+			"label": "ail_3",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-3", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-17"]
+		},
+		{
+			"uid": "group3",
+			"label": "pdeN_2",
+			"genes": []
+		},
+		{
+			"uid": "group4",
+			"label": "sfaA",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-9", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-11"]
+		},
+		{
+			"uid": "group5",
+			"label": "oqxB15",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-10", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-10"]
+		},
+		{
+			"uid": "group6",
+			"label": "appB_2",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-11", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-9"]
+		},
+		{
+			"uid": "group7",
+			"label": "yjhB_2",
+			"genes": []
+		},
+		{
+			"uid": "group8",
+			"label": "hmrR",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-18", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-2"]
+		},
+		{
+			"uid": "group9",
+			"label": "actP_1",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-19", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-1"]
+		},
+		{
+			"uid": "group10",
+			"label": "bepF",
+			"genes": ["afibehhxictnqmnxvhdeemxtycktmztorcak-20", "fucwkkkwjhnapyziweyqrpmapvntmmocchda-0"]
+		},
+		{
+			"uid": "group11",
+			"label": "yjhB_1",
+			"genes": []
+		},
+		{
+			"uid": "group12",
+			"label": "pdeN_1",
+			"genes": []
+		}
+	]
+}
+{
+	"clusters": [
+		{
+			"uid": "oalqaqpmxcsafhwohwxdvxvavoxauamubyad",
+			"name": "SA20153983",
+			"loci": [
+				{
+					"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx",
+					"name": "SA20153983",
+					"start": 387496,
+					"end": 414271,
+					"genes": [
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-0",
+							"name": "oprM",
+							"start": 404795,
+							"end": 406253,
+							"strand": 1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-1",
+							"name": "UID",
+							"start": 406322,
+							"end": 406682,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-2",
+							"name": "UID",
+							"start": 406974,
+							"end": 407502,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-3",
+							"name": "ail_3",
+							"start": 407759,
+							"end": 408284,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-4",
+							"name": "UID",
+							"start": 408684,
+							"end": 409173,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-5",
+							"name": "UID",
+							"start": 409145,
+							"end": 409889,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-6",
+							"name": "pdeN_2",
+							"start": 409988,
+							"end": 411563,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-7",
+							"name": "UID",
+							"start": 411864,
+							"end": 412365,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-8",
+							"name": "UID",
+							"start": 412337,
+							"end": 413072,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-9",
+							"name": "sfaA",
+							"start": 413734,
+							"end": 414271,
+							"strand": 1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-10",
+							"name": "oqxB15",
+							"start": 401611,
+							"end": 404779,
+							"strand": 1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-11",
+							"name": "appB_2",
+							"start": 387496,
+							"end": 388507,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-12",
+							"name": "UID",
+							"start": 388503,
+							"end": 389907,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-13",
+							"name": "UID",
+							"start": 390023,
+							"end": 390125,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-14",
+							"name": "UID",
+							"start": 390401,
+							"end": 393374,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-15",
+							"name": "UID",
+							"start": 393383,
+							"end": 395342,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-16",
+							"name": "yjhB_2",
+							"start": 395530,
+							"end": 396784,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-17",
+							"name": "UID",
+							"start": 397075,
+							"end": 397270,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-18",
+							"name": "hmrR",
+							"start": 397347,
+							"end": 397812,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-19",
+							"name": "actP_1",
+							"start": 397808,
+							"end": 400112,
+							"strand": -1
+						},
+						{
+							"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-20",
+							"name": "bepF",
+							"start": 400388,
+							"end": 401615,
+							"strand": 1
+						}
+					]
+				}
+			]
+		},
+		{
+			"uid": "zjjllpfvhasmrakccovahrnfqafmqqmtivia",
+			"name": "SA20153980",
+			"loci": [
+				{
+					"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok",
+					"name": "SA20153980",
+					"start": 15493,
+					"end": 42266,
+					"genes": [
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-0",
+							"name": "bepF",
+							"start": 28385,
+							"end": 29612,
+							"strand": 1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-1",
+							"name": "actP_1",
+							"start": 25820,
+							"end": 28109,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-2",
+							"name": "hmrR",
+							"start": 25344,
+							"end": 25809,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-3",
+							"name": "UID",
+							"start": 25072,
+							"end": 25267,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-4",
+							"name": "yjhB_1",
+							"start": 23527,
+							"end": 24781,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-5",
+							"name": "UID",
+							"start": 21380,
+							"end": 23339,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-6",
+							"name": "UID",
+							"start": 18398,
+							"end": 21371,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-7",
+							"name": "UID",
+							"start": 18020,
+							"end": 18122,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-8",
+							"name": "UID",
+							"start": 16500,
+							"end": 17904,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-9",
+							"name": "appB_2",
+							"start": 15493,
+							"end": 16504,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-10",
+							"name": "oqxB15",
+							"start": 29608,
+							"end": 32776,
+							"strand": 1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-11",
+							"name": "sfaA",
+							"start": 41729,
+							"end": 42266,
+							"strand": 1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-12",
+							"name": "UID",
+							"start": 40331,
+							"end": 41066,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-13",
+							"name": "UID",
+							"start": 39858,
+							"end": 40359,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-14",
+							"name": "pdeN_1",
+							"start": 37984,
+							"end": 39559,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-15",
+							"name": "UID",
+							"start": 37141,
+							"end": 37885,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-16",
+							"name": "UID",
+							"start": 36680,
+							"end": 37169,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-17",
+							"name": "ail_3",
+							"start": 35756,
+							"end": 36281,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-18",
+							"name": "UID",
+							"start": 34971,
+							"end": 35499,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-19",
+							"name": "UID",
+							"start": 34319,
+							"end": 34679,
+							"strand": -1
+						},
+						{
+							"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-20",
+							"name": "oprM",
+							"start": 32792,
+							"end": 34250,
+							"strand": 1
+						}
+					]
+				}
+			]
+		}
+	],
+	"links": [
+		{
+			"uid": "link0_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-0",
+				"name": "oprM-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-20",
+				"name": "oprM-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link1_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-3",
+				"name": "ail_3-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-17",
+				"name": "ail_3-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link2_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-9",
+				"name": "sfaA-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-11",
+				"name": "sfaA-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link3_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-10",
+				"name": "oqxB15-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-10",
+				"name": "oqxB15-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link4_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-11",
+				"name": "appB_2-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-9",
+				"name": "appB_2-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link5_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-18",
+				"name": "hmrR-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-2",
+				"name": "hmrR-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link6_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-19",
+				"name": "actP_1-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-1",
+				"name": "actP_1-2"
+			},
+			"identity": "0.5"
+		},
+		{
+			"uid": "link7_SA20153983_SA20153980",
+			"target": {
+				"uid": "tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-20",
+				"name": "bepF-1"
+			},
+			"query": {
+				"uid": "olberogvsouoxrazcawpcqeifpzyxhmjbiok-0",
+				"name": "bepF-2"
+			},
+			"identity": "0.5"
+		}
+	],
+	"groups": [
+		{
+			"uid": "group0",
+			"label": "oprM",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-0", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-20"]
+		},
+		{
+			"uid": "group2",
+			"label": "ail_3",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-3", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-17"]
+		},
+		{
+			"uid": "group3",
+			"label": "pdeN_2",
+			"genes": []
+		},
+		{
+			"uid": "group4",
+			"label": "sfaA",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-9", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-11"]
+		},
+		{
+			"uid": "group5",
+			"label": "oqxB15",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-10", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-10"]
+		},
+		{
+			"uid": "group6",
+			"label": "appB_2",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-11", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-9"]
+		},
+		{
+			"uid": "group7",
+			"label": "yjhB_2",
+			"genes": []
+		},
+		{
+			"uid": "group8",
+			"label": "hmrR",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-18", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-2"]
+		},
+		{
+			"uid": "group9",
+			"label": "actP_1",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-19", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-1"]
+		},
+		{
+			"uid": "group10",
+			"label": "bepF",
+			"genes": ["tqclsibqxdtmputgfasqmmkkmwaqtngfkrbx-20", "olberogvsouoxrazcawpcqeifpzyxhmjbiok-0"]
+		},
+		{
+			"uid": "group11",
+			"label": "yjhB_1",
+			"genes": []
+		},
+		{
+			"uid": "group12",
+			"label": "pdeN_1",
+			"genes": []
+		}
+	]
+}

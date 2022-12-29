@@ -1,0 +1,38 @@
+Nov.-28 15:22:35.387 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf -profile docker --rgi_path sample_data/RGI --gbk_path sample_data/GBK --output_path output
+Nov.-28 15:22:35.492 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.0
+Nov.-28 15:22:35.581 [main] INFO  nextflow.cli.CmdRun - Launching `main.nf` [lonely_panini] DSL2 - revision: 36eca505f8
+Nov.-28 15:22:35.594 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/julia/.nextflow/plugins; core-plugins: nf-amazon@1.7.1,nf-azure@0.13.1,nf-console@1.0.3,nf-ga4gh@1.0.3,nf-google@1.1.4,nf-sqldb@0.4.0,nf-tower@1.4.0
+Nov.-28 15:22:35.595 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Nov.-28 15:22:35.604 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Nov.-28 15:22:35.605 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Nov.-28 15:22:35.608 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Nov.-28 15:22:35.618 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Nov.-28 15:22:35.665 [main] DEBUG nextflow.Session - Session uuid: 5fcd2f7e-175d-4ad7-8e2b-b451f38d20a3
+Nov.-28 15:22:35.666 [main] DEBUG nextflow.Session - Run name: lonely_panini
+Nov.-28 15:22:35.667 [main] DEBUG nextflow.Session - Executor pool size: 8
+Nov.-28 15:22:35.703 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 22.04.0 build 5697
+  Created: 23-04-2022 18:00 UTC (15:00 ADT)
+  System: Linux 5.4.0-54-generic
+  Runtime: Groovy 3.0.10 on OpenJDK 64-Bit Server VM 11.0.17+8-post-Ubuntu-1ubuntu220.04
+  Encoding: UTF-8 (UTF-8)
+  Process: 1545784@cerberus [127.0.1.1]
+  CPUs: 8 - Mem: 15.4 GB (185.1 MB) - Swap: 2 GB (1.9 GB)
+Nov.-28 15:22:35.724 [main] DEBUG nextflow.Session - Work-dir: /home/julia/Documents/GIT/Gene-Order-Workflow/work [ext2/ext3]
+Nov.-28 15:22:35.760 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Nov.-28 15:22:35.770 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Nov.-28 15:22:35.801 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Nov.-28 15:22:35.810 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
+Nov.-28 15:22:35.874 [main] DEBUG nextflow.Session - Session start invoked
+Nov.-28 15:22:35.887 [main] DEBUG nextflow.Session - Using default localLib path: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
+Nov.-28 15:22:35.891 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib
+Nov.-28 15:22:35.892 [main] DEBUG nextflow.Session - Adding to the classpath library: /home/julia/Documents/GIT/Gene-Order-Workflow/lib/nfcore_external_java_deps.jar
+Nov.-28 15:22:36.362 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Nov.-28 15:22:37.993 [main] ERROR nextflow.cli.Launcher - Module compilation error
+- file : /home/julia/Documents/GIT/Gene-Order-Workflow/./workflows/../subworkflows/local/run_DIAMOND.nf
+- cause: Unexpected input: '{' @ line 77, column 22.
+   workflow RUN_DIAMOND {
+                        ^
+
+1 error
+
