@@ -1,0 +1,327 @@
+Dec.-30 18:58:33.021 [main] DEBUG nextflow.cli.Launcher - $> nextflow run gene_neighborhoods.nf --rgi_path 20x5_data/rgi --gbk_path 20x5_data/gbk --output_path 20x5-output --blast_path 20x5-output/blast -resume
+Dec.-30 18:58:33.115 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.0
+Dec.-30 18:58:33.244 [main] INFO  nextflow.cli.CmdRun - Launching `gene_neighborhoods.nf` [compassionate_meninsky] DSL2 - revision: 5cb3a19ba5
+Dec.-30 18:58:33.260 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/julia/.nextflow/plugins; core-plugins: nf-amazon@1.7.1,nf-azure@0.13.1,nf-console@1.0.3,nf-ga4gh@1.0.3,nf-google@1.1.4,nf-sqldb@0.4.0,nf-tower@1.4.0
+Dec.-30 18:58:33.262 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Dec.-30 18:58:33.275 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Dec.-30 18:58:33.276 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Dec.-30 18:58:33.282 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Dec.-30 18:58:33.305 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Dec.-30 18:58:33.371 [main] DEBUG nextflow.Session - Session uuid: 368c7225-7b25-4e72-8f71-b9646f454cf4
+Dec.-30 18:58:33.371 [main] DEBUG nextflow.Session - Run name: compassionate_meninsky
+Dec.-30 18:58:33.373 [main] DEBUG nextflow.Session - Executor pool size: 8
+Dec.-30 18:58:33.419 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 22.04.0 build 5697
+  Created: 23-04-2022 18:00 UTC (15:00 ADT)
+  System: Linux 5.4.0-54-generic
+  Runtime: Groovy 3.0.10 on OpenJDK 64-Bit Server VM 11.0.17+8-post-Ubuntu-1ubuntu220.04
+  Encoding: UTF-8 (UTF-8)
+  Process: 699625@cerberus [127.0.1.1]
+  CPUs: 8 - Mem: 15.4 GB (6 GB) - Swap: 2 GB (1.8 GB)
+Dec.-30 18:58:33.451 [main] DEBUG nextflow.Session - Work-dir: /home/julia/Documents/GIT/Gene-Order-Workflow/work [ext2/ext3]
+Dec.-30 18:58:33.496 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Dec.-30 18:58:33.507 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Dec.-30 18:58:33.535 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Dec.-30 18:58:33.547 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
+Dec.-30 18:58:33.670 [main] DEBUG nextflow.Session - Session start invoked
+Dec.-30 18:58:34.537 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Dec.-30 18:58:34.697 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Dec.-30 18:58:34.697 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Dec.-30 18:58:34.703 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Dec.-30 18:58:34.710 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=8; memory=15.4 GB; capacity=8; pollInterval=100ms; dumpInterval=5m
+Dec.-30 18:58:34.827 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Dec.-30 18:58:34.828 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Dec.-30 18:58:34.833 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: NEIGHBORHOOD_EXTRACTION, NEIGHBORHOOD_CLUSTERING
+Dec.-30 18:58:34.833 [main] DEBUG nextflow.Session - Ignite dataflow network (6)
+Dec.-30 18:58:34.842 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NEIGHBORHOOD_EXTRACTION
+Dec.-30 18:58:34.848 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NEIGHBORHOOD_CLUSTERING
+Dec.-30 18:58:34.850 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
+Dec.-30 18:58:34.850 [main] DEBUG nextflow.Session - Session await
+Dec.-30 18:58:35.029 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec.-30 18:58:35.034 [Task submitter] INFO  nextflow.Session - [7a/d620c2] Submitted process > NEIGHBORHOOD_EXTRACTION (1)
+Dec.-30 19:03:34.834 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:08:34.892 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:13:34.909 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:18:34.930 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:23:34.943 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:28:34.960 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:33:34.972 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:38:34.988 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:43:35.013 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:48:35.034 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:53:35.059 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 19:58:35.090 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:03:35.121 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:08:35.160 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:13:35.164 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:18:35.176 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:23:35.199 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:28:35.219 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:33:35.248 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:38:35.274 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:43:35.303 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:48:35.320 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:53:35.350 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 20:58:35.371 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:03:35.374 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:08:35.377 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:13:35.400 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:18:35.416 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:23:35.443 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:28:35.467 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:33:35.513 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:38:35.566 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:43:35.600 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:48:35.640 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:53:35.690 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 21:58:35.733 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:03:35.774 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:08:35.808 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:13:35.864 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:18:35.900 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:23:35.948 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:28:35.985 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:33:36.038 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:38:36.073 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:43:36.111 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:48:36.160 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:53:36.196 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 22:58:36.222 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:03:36.258 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:08:36.289 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:13:36.311 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:18:36.360 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:23:36.409 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:28:36.453 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:33:36.489 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:38:36.527 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:43:36.579 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:48:36.603 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:53:36.652 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-30 23:58:36.697 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-31 00:03:36.742 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-31 00:08:36.780 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-31 00:13:36.817 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-31 00:18:36.855 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-31 00:23:36.894 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-31 00:26:09.402 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: NEIGHBORHOOD_EXTRACTION (1); status: COMPLETED; exit: 0; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/7a/d620c2b946aa369ef165753bd3f4a8]
+Dec.-31 00:26:09.429 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec.-31 00:26:09.429 [Task submitter] INFO  nextflow.Session - [ac/9e8561] Submitted process > NEIGHBORHOOD_CLUSTERING (1)
+Dec.-31 00:28:36.979 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 00:33:37.035 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 00:38:37.075 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 00:43:37.093 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 00:48:37.106 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 00:53:37.125 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 00:58:37.151 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:03:37.173 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:08:37.201 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:13:37.231 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:18:37.241 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:23:37.250 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:28:37.271 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:33:37.298 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:38:37.340 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:43:37.375 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:48:37.395 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:53:37.410 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 01:58:37.446 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:03:37.462 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:08:37.491 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:13:37.523 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:18:37.555 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:23:37.586 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:28:37.607 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:33:37.628 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:38:37.653 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:43:37.678 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:48:37.697 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:53:37.718 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 02:58:37.757 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 03:03:37.786 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 03:08:37.830 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: RUNNING; exit: -; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 03:12:53.720 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: COMPLETED; exit: 1; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b]
+Dec.-31 03:12:53.749 [Task monitor] ERROR nextflow.processor.TaskProcessor - Error executing process > 'NEIGHBORHOOD_CLUSTERING (1)'
+
+Caused by:
+  Process `NEIGHBORHOOD_CLUSTERING (1)` terminated with an error exit status (1)
+
+Command executed:
+
+  clustering.py fasta blast 20x5-output
+
+Command exit status:
+  1
+
+Command output:
+  
+  Building a new DB, current time: 12/31/2022 03:12:52
+  New DB name:   fasta/vanC/SAMEA69796168.fasta
+  New DB title:  fasta/vanC/SAMEA69796168.fasta
+  Sequence type: Protein
+  Keep MBits: T
+  Maximum file size: 1000000000B
+  Adding sequences from FASTA; added 21 sequences in 0.000657082 seconds.
+  
+  
+  Building a new DB, current time: 12/31/2022 03:12:52
+  New DB name:   fasta/vanC/SAMEA69796168.fasta
+  New DB title:  fasta/vanC/SAMEA69796168.fasta
+  Sequence type: Protein
+  Deleted existing Protein BLAST database named fasta/vanC/SAMEA69796168.fasta
+  Keep MBits: T
+  Maximum file size: 1000000000B
+  Adding sequences from FASTA; added 21 sequences in 0.000543118 seconds.
+  
+  
+  Building a new DB, current time: 12/31/2022 03:12:53
+  New DB name:   fasta/vanC/SAMEA2273149.fasta
+  New DB title:  fasta/vanC/SAMEA2273149.fasta
+  Sequence type: Protein
+  Keep MBits: T
+  Maximum file size: 1000000000B
+  Adding sequences from FASTA; added 21 sequences in 0.000553131 seconds.
+  
+  Blasting All-vs-All for fasta/vanC/SAMN04339713.fasta vs fasta/vanC/SAMEA3724447.fasta...
+  Moving SAMN04339713_SAMEA3724447.blast.txt to blast/vanC/SAMN04339713_SAMEA3724447.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMN10061307.fasta vs fasta/vanC/SAMN07551792.fasta...
+  Moving SAMN10061307_SAMN07551792.blast.txt to blast/vanC/SAMN10061307_SAMN07551792.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMN10061307.fasta vs fasta/vanC/SAMEA69796168.fasta...
+  Moving SAMN10061307_SAMEA69796168.blast.txt to blast/vanC/SAMN10061307_SAMEA69796168.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMN10061307.fasta vs fasta/vanC/SAMEA2273149.fasta...
+  Moving SAMN10061307_SAMEA2273149.blast.txt to blast/vanC/SAMN10061307_SAMEA2273149.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMN10061307.fasta vs fasta/vanC/SAMEA3724447.fasta...
+  Moving SAMN10061307_SAMEA3724447.blast.txt to blast/vanC/SAMN10061307_SAMEA3724447.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMN07551792.fasta vs fasta/vanC/SAMEA69796168.fasta...
+  Moving SAMN07551792_SAMEA69796168.blast.txt to blast/vanC/SAMN07551792_SAMEA69796168.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMN07551792.fasta vs fasta/vanC/SAMEA2273149.fasta...
+  Moving SAMN07551792_SAMEA2273149.blast.txt to blast/vanC/SAMN07551792_SAMEA2273149.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMN07551792.fasta vs fasta/vanC/SAMEA3724447.fasta...
+  Moving SAMN07551792_SAMEA3724447.blast.txt to blast/vanC/SAMN07551792_SAMEA3724447.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMEA69796168.fasta vs fasta/vanC/SAMEA2273149.fasta...
+  Moving SAMEA69796168_SAMEA2273149.blast.txt to blast/vanC/SAMEA69796168_SAMEA2273149.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMEA69796168.fasta vs fasta/vanC/SAMEA3724447.fasta...
+  Moving SAMEA69796168_SAMEA3724447.blast.txt to blast/vanC/SAMEA69796168_SAMEA3724447.blast.txt...
+  Blasting All-vs-All for fasta/vanC/SAMEA2273149.fasta vs fasta/vanC/SAMEA3724447.fasta...
+  Moving SAMEA2273149_SAMEA3724447.blast.txt to blast/vanC/SAMEA2273149_SAMEA3724447.blast.txt...
+
+Command error:
+  Traceback (most recent call last):
+    File "/home/julia/Documents/GIT/Gene-Order-Workflow/bin/clustering.py", line 660, in <module>
+      sys.exit(main())
+    File "/home/julia/Documents/GIT/Gene-Order-Workflow/bin/clustering.py", line 656, in main
+      cluster_neighborhoods(args.FASTA_PATH, args.BLAST_PATH, args.OUTPUT_PATH, args.n)
+    File "/home/julia/Documents/GIT/Gene-Order-Workflow/bin/clustering.py", line 528, in cluster_neighborhoods
+      full_genome_paths = get_full_filepaths(root_path)
+    File "/home/julia/Documents/GIT/Gene-Order-Workflow/bin/utils.py", line 26, in get_full_filepaths
+      filenames = os.listdir(dir_path)
+  FileNotFoundError: [Errno 2] No such file or directory: 'fasta/MCR_5'
+
+Work dir:
+  /home/julia/Documents/GIT/Gene-Order-Workflow/work/ac/9e8561e66b29c62c0d328b0659380b
+
+Tip: you can replicate the issue by changing to the process work dir and entering the command `bash .command.run`
+Dec.-31 03:12:53.754 [main] DEBUG nextflow.Session - Session await > all process finished
+Dec.-31 03:12:53.758 [Task monitor] DEBUG nextflow.Session - Session aborted -- Cause: Process `NEIGHBORHOOD_CLUSTERING (1)` terminated with an error exit status (1)
+Dec.-31 03:12:53.782 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Dec.-31 03:12:53.791 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=1; failedCount=1; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=5h 27m 34s; failedDuration=2h 46m 44s; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=0; ]
+Dec.-31 03:12:53.973 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Dec.-31 03:12:53.981 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

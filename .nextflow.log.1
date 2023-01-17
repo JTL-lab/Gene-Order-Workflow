@@ -1,0 +1,78 @@
+Dec.-31 19:24:24.120 [main] DEBUG nextflow.cli.Launcher - $> nextflow run gene_neighborhoods.nf --rgi_path 20x5_data/rgi --gbk_path 20x5_data/gbk --output_path 20x5-output --blast_path 20x5-output/blast -resume
+Dec.-31 19:24:24.311 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 22.04.0
+Dec.-31 19:24:24.686 [main] INFO  nextflow.cli.CmdRun - Launching `gene_neighborhoods.nf` [extravagant_hodgkin] DSL2 - revision: 5cb3a19ba5
+Dec.-31 19:24:24.746 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/home/julia/.nextflow/plugins; core-plugins: nf-amazon@1.7.1,nf-azure@0.13.1,nf-console@1.0.3,nf-ga4gh@1.0.3,nf-google@1.1.4,nf-sqldb@0.4.0,nf-tower@1.4.0
+Dec.-31 19:24:24.757 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Dec.-31 19:24:24.790 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Dec.-31 19:24:24.792 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Dec.-31 19:24:24.809 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Dec.-31 19:24:24.856 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Dec.-31 19:24:25.053 [main] DEBUG nextflow.Session - Session uuid: 368c7225-7b25-4e72-8f71-b9646f454cf4
+Dec.-31 19:24:25.054 [main] DEBUG nextflow.Session - Run name: extravagant_hodgkin
+Dec.-31 19:24:25.060 [main] DEBUG nextflow.Session - Executor pool size: 8
+Dec.-31 19:24:25.175 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 22.04.0 build 5697
+  Created: 23-04-2022 18:00 UTC (15:00 ADT)
+  System: Linux 5.4.0-54-generic
+  Runtime: Groovy 3.0.10 on OpenJDK 64-Bit Server VM 11.0.17+8-post-Ubuntu-1ubuntu220.04
+  Encoding: UTF-8 (UTF-8)
+  Process: 1665550@cerberus [127.0.1.1]
+  CPUs: 8 - Mem: 15.4 GB (6.4 GB) - Swap: 2 GB (1.3 GB)
+Dec.-31 19:24:25.272 [main] DEBUG nextflow.Session - Work-dir: /home/julia/Documents/GIT/Gene-Order-Workflow/work [ext2/ext3]
+Dec.-31 19:24:25.380 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Dec.-31 19:24:25.408 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Dec.-31 19:24:25.476 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Dec.-31 19:24:25.510 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
+Dec.-31 19:24:25.857 [main] DEBUG nextflow.Session - Session start invoked
+Dec.-31 19:24:27.847 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Dec.-31 19:24:28.276 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Dec.-31 19:24:28.277 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Dec.-31 19:24:28.300 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Dec.-31 19:24:28.321 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=8; memory=15.4 GB; capacity=8; pollInterval=100ms; dumpInterval=5m
+Dec.-31 19:24:28.631 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Dec.-31 19:24:28.632 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Dec.-31 19:24:28.645 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: NEIGHBORHOOD_EXTRACTION, NEIGHBORHOOD_CLUSTERING
+Dec.-31 19:24:28.647 [main] DEBUG nextflow.Session - Ignite dataflow network (6)
+Dec.-31 19:24:28.683 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NEIGHBORHOOD_EXTRACTION
+Dec.-31 19:24:28.698 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NEIGHBORHOOD_CLUSTERING
+Dec.-31 19:24:28.701 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
+Dec.-31 19:24:28.701 [main] DEBUG nextflow.Session - Session await
+Dec.-31 19:24:29.264 [Actor Thread 4] INFO  nextflow.processor.TaskProcessor - [d5/e6527b] Cached process > NEIGHBORHOOD_EXTRACTION (1)
+Dec.-31 19:24:29.497 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec.-31 19:24:29.527 [Task submitter] INFO  nextflow.Session - [4e/501572] Submitted process > NEIGHBORHOOD_CLUSTERING (1)
+Dec.-31 19:24:33.712 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: NEIGHBORHOOD_CLUSTERING (1); status: COMPLETED; exit: 1; error: -; workDir: /home/julia/Documents/GIT/Gene-Order-Workflow/work/4e/501572f3af602e3d9e944b964776b6]
+Dec.-31 19:24:33.793 [Task monitor] ERROR nextflow.processor.TaskProcessor - Error executing process > 'NEIGHBORHOOD_CLUSTERING (1)'
+
+Caused by:
+  Process `NEIGHBORHOOD_CLUSTERING (1)` terminated with an error exit status (1)
+
+Command executed:
+
+  clustering.py fasta blast 20x5-output
+
+Command exit status:
+  1
+
+Command output:
+  (empty)
+
+Command error:
+  Traceback (most recent call last):
+    File "/home/julia/Documents/GIT/Gene-Order-Workflow/bin/clustering.py", line 661, in <module>
+      sys.exit(main())
+    File "/home/julia/Documents/GIT/Gene-Order-Workflow/bin/clustering.py", line 657, in main
+      cluster_neighborhoods(args.FASTA_PATH, args.BLAST_PATH, args.OUTPUT_PATH, args.n)
+    File "/home/julia/Documents/GIT/Gene-Order-Workflow/bin/clustering.py", line 518, in cluster_neighborhoods
+      AMR_gene_name = get_fasta_filename(AMR_gene_subdir)
+  NameError: name 'get_fasta_filename' is not defined
+
+Work dir:
+  /home/julia/Documents/GIT/Gene-Order-Workflow/work/4e/501572f3af602e3d9e944b964776b6
+
+Tip: you can try to figure out what's wrong by changing to the process work dir and showing the script file named `.command.sh`
+Dec.-31 19:24:33.807 [main] DEBUG nextflow.Session - Session await > all process finished
+Dec.-31 19:24:33.816 [Task monitor] DEBUG nextflow.Session - Session aborted -- Cause: Process `NEIGHBORHOOD_CLUSTERING (1)` terminated with an error exit status (1)
+Dec.-31 19:24:33.875 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Dec.-31 19:24:33.912 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=1; ignoredCount=0; cachedCount=1; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=0ms; failedDuration=4.1s; cachedDuration=5h 55m 48s;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=0; ]
+Dec.-31 19:24:34.073 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Dec.-31 19:24:34.100 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
