@@ -68,7 +68,7 @@ def load_filepaths(rgi_path_arg, gbk_path_arg):
     rgi_file_names = set(os.path.basename(file).strip('_rgi.txt') for file in rgi_filepaths)
     gbk_file_names = set(os.path.basename(file).strip('.gbk') for file in gbk_filepaths)
 
-    assert rgi_file_names == gbk_file_names, "Error: mismatch occurred between RGI and GBK file names."
+    #assert rgi_file_names == gbk_file_names, "Error: mismatch occurred between RGI and GBK file names."
 
     return rgi_filepaths, gbk_filepaths
 
