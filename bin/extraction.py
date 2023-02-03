@@ -1078,7 +1078,7 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
         write_neighborhood_JSON(neighborhood_JSON_dict, AMR_gene, output_path)
         write_neighborhood_JSON(filtered_neighborhood_JSON_dict, AMR_gene, output_path, True)
 
-    sample_data_path = '../../../sample_data'
+    sample_data_path = '../sample_data'
     make_AMR_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
 
     neighborhoods_dict = {}
