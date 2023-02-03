@@ -832,7 +832,7 @@ def make_gene_neighborhood_JSON(AMR_gene_neighborhoods_dict, neighborhood_indice
         outfile.write('}\n')
 
         # Make HTML index file with appropriate JSON
-        with open(out_path + '/' + AMR_gene + '.html', 'a') as html_outfile, open('../../../sample_data/index.html') as template:
+        with open(out_path + '/' + AMR_gene + '.html', 'a') as html_outfile, open('../sample_data/index.html') as template:
             for line in template:
                 html_outfile.write(line)
 
