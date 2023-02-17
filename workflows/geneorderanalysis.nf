@@ -4,13 +4,13 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
+//def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Validate input parameters
 //WorkflowGeneorderanalysis.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.rgi_path, params.gbk_path, params.output_path ]
+def checkPathParamList = [ params.assembly_path, params.rgi_path, params.gbk_path, params.output_path ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
@@ -34,13 +34,13 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { EXTRACTION } from '../modules/local/extraction'
 include { MAKE_GENOME_FILEPAIRS } from '../modules/local/make_genome_filepairs'
-include { RUN_DIAMOND } from '../subworkflows/local/run_diamond'
 include { CLUSTERING } from '../modules/local/clustering'
-
-include { DIAMOND_BLASTP } from '../modules/nf-core/modules/diamond/blastp/main'  addParams( options: [args:'--task blastp --outfmt 6 --max-hsps 1'] )
+include { DIAMOND_BLASTP } from '../modules/nf-core/modules/nf-core/diamond/blastp/main'
+include { DIAMOND_MAKEDB } from '../modules/nf-core/modules/nf-core/diamond/makedb/main' addParams( options: [args:'--task blastp --outfmt 6 --max-hsps 1'] )
+include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { RUN_DIAMOND } from '../subworkflows/local/run_diamond'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,13 +49,14 @@ include { DIAMOND_BLASTP } from '../modules/nf-core/modules/diamond/blastp/main'
 */
 
 // Info required for completion email and summary
-def multiqc_report = []
+//def multiqc_report = []
 
 workflow GENEORDERANALYSIS {
 
     //ch_versions = Channel.empty()
 
     // Initialize channels from provided paths
+    def assembly_ch = Channel.fromPath(params.assembly_path)
     def rgi_ch = Channel.fromPath(params.rgi_path)
     def gbk_ch = Channel.fromPath(params.gbk_path)
     def output_ch = Channel.fromPath(params.output_path)
@@ -76,39 +77,29 @@ workflow GENEORDERANALYSIS {
     def blast_path = EXTRACTION.out.blast_path
     
     MAKE_GENOME_FILEPAIRS (
-        fasta_path,
-        blast_path,
+        assembly_ch,
         output_ch
     )
-    
+
     csv_path = MAKE_GENOME_FILEPAIRS.out.csv_path
     
     //def fasta_filepaths = Channel.from('$fasta_path/*.fasta', chec)
     //RUN_DIAMOND (
     //    csv_path,
-    //	fasta_path,
     //	blast_path
     //)
 
-    //DIAMOND_BLASTP (
-    //	tuple(val/path),
-    //	path db,
-    //	val out_ext
-    //	val blast_columns
-    //)
+    RUN_DIAMOND(csv_path)
 
     //
     // MODULE: Run clustering
     //
     
     CLUSTERING (
+        assembly_ch,
     	EXTRACTION.out.fasta_path,
     	EXTRACTION.out.blast_path,
     	output_ch
-    )
-    
-    VISUALIZATION (
-    
     )
     
     //workflow_summary    = WorkflowGeneorderanalysis.paramsSummaryMultiqc(workflow, summary_params)
@@ -134,12 +125,12 @@ workflow GENEORDERANALYSIS {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow.onComplete {
-    if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
-    }
-    NfcoreTemplate.summary(workflow, params, log)
-}
+//workflow.onComplete {
+//    if (params.email || params.email_on_fail) {
+//        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+//    }
+//    NfcoreTemplate.summary(workflow, params, log)
+//}
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

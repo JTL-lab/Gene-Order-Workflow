@@ -7,8 +7,7 @@ process MAKE_GENOME_FILEPAIRS {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    path fasta_path
-    path blast_path
+    path assembly_path
     path output_path
 
     output:
@@ -16,6 +15,6 @@ process MAKE_GENOME_FILEPAIRS {
 
     script: // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin/
     """
-    make_genome_filepairs.py $fasta_path $blast_path $output_path
+    make_genome_filepairs.py $assembly_path $output_path
     """
 }

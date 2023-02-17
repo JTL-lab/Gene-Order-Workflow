@@ -1,0 +1,14 @@
+{
+    "name": "",
+    "homePage": "",
+    "repos": {
+        "nf-core/modules": {
+            "nf-core/diamond/blastp": {
+                "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c"
+            },
+            "nf-core/diamond/makedb": {
+                "git_sha": "c8e35eb2055c099720a75538d1b8adb3fb5a464c"
+            }
+        }
+    }
+}

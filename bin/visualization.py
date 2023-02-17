@@ -3,6 +3,8 @@
 import os
 import numpy as np
 import pandas as pd
+import random
+
 from scipy.cluster import hierarchy
 from skbio.stats.ordination import pcoa
 
@@ -17,6 +19,15 @@ from plotly.figure_factory import create_dendrogram
 
 import networkx as nx
 from matplotlib.pylab import savefig, cm, axis
+
+colours = ['#6e40aa', '#b83cb0', '#c33dad', '#ff4f7c', '#f6478d', '#ff6956', '#f59f30', '#c4d93e',
+           '#83f557', '#38f17a', '#22e599', '#19d3b5', '#29a0dd', '#5069d9', '#5f56c9', '#bbbbbb']
+
+for i in range(84):
+    rand_num = random.randrange(0, 2**24)
+    col = hex(rand_num)
+    colours.append('#' + col[2:])
+
 
 def plot_similarity_histogram(similarity_dict, save_path):
     """
@@ -39,8 +50,8 @@ def plot_similarity_histogram(similarity_dict, save_path):
     fracs = N / N.max()
     norm = colors.Normalize(fracs.min(), fracs.max())
     for thisfrac, thispatch in zip(fracs, patches):
-      color = plt.cm.inferno(norm(thisfrac))
-      thispatch.set_facecolor(color)
+        color = plt.cm.inferno(norm(thisfrac))
+        thispatch.set_facecolor(color)
 
     # Set histogram title, axis labels, and ticks
     ax.set_title('Average similarity score for AMR genes across genome neighborhoods')
@@ -63,7 +74,7 @@ def plot_distance_histogram(distance_dict, save_path):
     distances = list(distance_dict.values())
 
     # Number of bins equal to the nearest multiple of 0.05 rounded up
-    num_bins = np.arange(0.05, round(max(distances)/0.05) * 0.05 + 0.05, 0.05)
+    num_bins = np.arange(0.05, round(max(distances) / 0.05) * 0.05 + 0.05, 0.05)
 
     # Defining histogram
     fig, ax = plt.subplots(1, 1)
@@ -73,8 +84,8 @@ def plot_distance_histogram(distance_dict, save_path):
     fracs = N / N.max()
     norm = colors.Normalize(fracs.min(), fracs.max())
     for thisfrac, thispatch in zip(fracs, patches):
-      color = plt.cm.inferno(norm(thisfrac))
-      thispatch.set_facecolor(color)
+        color = plt.cm.inferno(norm(thisfrac))
+        thispatch.set_facecolor(color)
 
     # Set histogram title, axis labels, and ticks
     ax.set_title('Average distance score obtained for AMR gene neighborhood across genomes')
@@ -109,15 +120,15 @@ def plotly_dendrogram(linkage_matrix, labels, AMR_gene, output_path):
     """
     Generates an interactive dendrogram visualization using Plotly figure factory.
     """
-    title = "UPGMA clustering dendrogram for gene {g} neighborhoods".format(g=AMR_gene, n=len(labels))
-    fig = create_dendrogram(linkage_matrix, labels=labels)
-    fig.update_layout(autosize=True, title=title)
+    title = "UPGMA dendrogram for {g}".format(g=AMR_gene, n=len(labels))
+    fig = create_dendrogram(linkage_matrix, labels=labels, colorscale=colours)
+    fig.update_layout(autosize=True, title=title, paper_bgcolor='white', template='plotly_white', width=419, height=316)
     savename = os.path.join(output_path + '/clustering/UPGMA/', AMR_gene + ".html")
     fig.write_html(savename)
-    #plotly.offline.plot(fig, filename=savename)
+    # plotly.offline.plot(fig, filename=savename)
 
 
-def draw_MCL_graph(matrix, clusters, **kwargs):
+def draw_mcl_graph(matrix, clusters, **kwargs):
     """
     Modified version of draw_graph from Guy Allard to save image in specified directory rather than showing it.
     Original Source Code: https://github.com/GuyAllard/markov_clustering/blob/master/markov_clustering/drawing.py
@@ -150,23 +161,39 @@ def draw_MCL_graph(matrix, clusters, **kwargs):
 
 
 def plotly_mcl_network(matrix, clusters, genome_names, AMR_gene, output_path):
-
     # make a networkx graph from the adjacency matrix
     graph = nx.Graph(matrix)
     pos = nx.spring_layout(graph)
 
-    # Determine edge lines between nodes
+    # Get node cluster assignments from MCL
+    cluster_map = {node: i for i, cluster in enumerate(clusters) for node in cluster}
+
+    # Determine edge lines between nodes: only add edges between nodes in the same cluster
     edge_x = []
     edge_y = []
-    for edge in graph.edges():
-        x0, y0 = pos[edge[0]]
-        x1, y1 = pos[edge[1]]
-        edge_x.append(x0)
-        edge_x.append(x1)
-        edge_x.append(None)
-        edge_y.append(y0)
-        edge_y.append(y1)
-        edge_y.append(None)
+
+    for cluster_group in clusters:
+        cluster_nodes = list(cluster_group)
+        for edge in graph.edges(cluster_nodes):
+            if edge[0] in cluster_nodes and edge[1] in cluster_nodes:
+                x0, y0 = pos[edge[0]]
+                x1, y1 = pos[edge[1]]
+                edge_x.append(x0)
+                edge_x.append(x1)
+                edge_x.append(None)
+                edge_y.append(y0)
+                edge_y.append(y1)
+                edge_y.append(None)
+
+    # Assign a random color to every cluster
+    hex_colors = []
+    cluster_colors_dict = {}
+
+    for hex in colours:
+        hex_colors.append(hex)
+
+    for cluster in set(cluster_map.values()):
+        cluster_colors_dict[str(cluster)] = hex_colors[cluster]
 
     # Get graph nodes
     node_x = []
@@ -178,9 +205,8 @@ def plotly_mcl_network(matrix, clusters, genome_names, AMR_gene, output_path):
 
     # Add genome_ID as hover text to allow user to see which node comes from which genome neighborhood
     node_cluster = []
-    node_text = []
+    node_text = {}
 
-    cluster_map = {node: i for i, cluster in enumerate(clusters) for node in cluster}
     node_to_genome_id_map = {}
     for node, genome_id in zip(cluster_map.keys(), genome_names):
         node_to_genome_id_map[node] = genome_id
@@ -188,40 +214,24 @@ def plotly_mcl_network(matrix, clusters, genome_names, AMR_gene, output_path):
     for i, cluster in enumerate(clusters):
         for node in cluster:
             node_cluster.append(i)
-            node_text.append(node_to_genome_id_map[node])
+            node_text[node] = "{g}: Cluster {c}".format(g=node_to_genome_id_map[node], c=cluster_map[node])
 
     # Draw edges
     edge_trace = go.Scatter(
         x=edge_x, y=edge_y,
         line=dict(width=0.5, color='#888'),
+        showlegend=False,
         hoverinfo='none',
-        mode='lines')
+        mode='lines'
+    )
 
-    # Draw graph nodes
-    node_trace = go.Scatter(
-        x=node_x, y=node_y,
-        mode='markers',
-        hoverinfo='text',
-        marker=dict(
-            showscale=True,
-            colorscale='Jet',
-            reversescale=True,
-            color=node_cluster, #color=[]
-            size=10,
-            colorbar=dict(
-                thickness=15,
-                title='MCL Cluster Assignment',
-                xanchor='left',
-                titleside='right'
-            ),
-            line_width=2))
-
-    node_trace.marker.color = node_cluster
-    node_trace.text = node_text
-
-    fig = go.Figure(data=[edge_trace, node_trace],
+    # Baseline figure with graph edges
+    fig = go.Figure(data=edge_trace,
                     layout=go.Layout(
-                        title='MCL network for {} according to neighborhood clusters'.format(AMR_gene),
+                        title='MCL network clusters for {}'.format(AMR_gene),
+                        autosize=False,
+                        width=419,
+                        height=316,
                         showlegend=True,
                         hovermode='closest',
                         margin=dict(b=20, l=5, r=5, t=40),
@@ -229,9 +239,29 @@ def plotly_mcl_network(matrix, clusters, genome_names, AMR_gene, output_path):
                         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
                     )
 
+    # Draw graph nodes: overlay on top of edge traces at respective positions
+    legend_clusters = []
+    for node in graph.nodes():
+        x_pos, y_pos = pos[node]
+        if cluster_map[node] not in legend_clusters:
+            fig.add_trace(
+                go.Scatter(x=[x_pos], y=[y_pos], name=str(cluster_map[node]), mode='markers',
+                           hoverinfo='text', text=[node_text[node]], line=dict(width=2, color='black'),
+                           legendgroup=str(cluster_map[node]), legendrank=cluster_map[node],
+                           marker=dict(color=cluster_colors_dict[str(cluster_map[node])], size=15)))
+            legend_clusters.append(cluster_map[node])
+
+        else:
+            fig.add_trace(
+                go.Scatter(x=[x_pos], y=[y_pos], mode='markers',
+                           hoverinfo='text', text=[node_text[node]],
+                           legendgroup=str(cluster_map[node]), showlegend=False, legendrank=cluster_map[node],
+                           marker=dict(color=cluster_colors_dict[str(cluster_map[node])], size=15)))
+
+    fig.update_layout(legend_title='MCL Cluster', paper_bgcolor='white', template='plotly_white')
+
     savename = os.path.join(output_path + '/clustering/MCL/', AMR_gene + ".html")
     fig.write_html(savename)
-    #plotly.offline.plot(fig, filename=savename)
 
 
 def graph_DBSCAN_clusters(distance_matrix_df, DBSCAN_clusters, labels, AMR_gene, output_path):
@@ -250,7 +280,7 @@ def graph_DBSCAN_clusters(distance_matrix_df, DBSCAN_clusters, labels, AMR_gene,
     cmaplist = [cmap(i) for i in range(cmap.N)]
     cmap = cmap.from_list('custom cmap', cmaplist, cmap.N)
 
-    bounds = np.linspace(0, len(num_clusters), len(num_clusters)+1)
+    bounds = np.linspace(0, len(num_clusters), len(num_clusters) + 1)
     norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
 
     # Visualize PCoA as scatterplot with cluster labels as colors
@@ -258,7 +288,8 @@ def graph_DBSCAN_clusters(distance_matrix_df, DBSCAN_clusters, labels, AMR_gene,
 
     # Add genome labels to points
     for i in range(len(distance_matrix_df.index)):
-        plt.text(pcoa_vals.samples.loc[str(i), 'PC1'], pcoa_vals.samples.loc[str(i), 'PC2'], distance_matrix_df.index[i])
+        plt.text(pcoa_vals.samples.loc[str(i), 'PC1'], pcoa_vals.samples.loc[str(i), 'PC2'],
+                 distance_matrix_df.index[i])
 
     # Create side colorbar legend
     cb = plt.colorbar(scatterplot, spacing='proportional', ticks=bounds)
@@ -291,11 +322,11 @@ def plotly_pcoa(distance_matrix_df, genome_ids, labels, AMR_gene, output_path):
 
     fig = px.scatter(df, x='PC1', y='PC2',
                      color='Cluster',
-                     color_discrete_sequence=px.colors.qualitative.G10,
+                     color_discrete_sequence=colours,
                      hover_name='GenomeID',
-                     title='PCoA plot of {g} neighbourhoods according to DBSCAN clusters'.format(g=AMR_gene))
-    fig.update_traces(marker_size=10)
+                     title='PCoA DBSCAN clusters for {g}'.format(g=AMR_gene))
+    fig.update_traces(marker_size=5, line=dict(width=2, color='black'))
+    fig.update_layout(paper_bgcolor='white', template='plotly_white', width=419, height=316)
 
     savename = os.path.join(output_path + '/clustering/DBSCAN/', AMR_gene + ".html")
     fig.write_html(savename)
-    #plotly.offline.plot(fig, filename=savename)

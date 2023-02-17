@@ -1,13 +1,29 @@
 //
 // Check GBK filepairs samplesheet and get read channels in order to BLAST each pair using DIAMOND
 //
-include { BLASTP } from '../modules/nf-core/modules/diamond/blastp'
-include { MAKE_GENOME_FILEPAIRS } from '../modules/local/make_genome_filepairs'
+include { DIAMOND_BLASTP } from '../../modules/nf-core/modules/nf-core/diamond/blastp/main'
+include { DIAMOND_MAKEDB } from '../../modules/nf-core/modules/nf-core/diamond/makedb/main'
+
+workflow RUN_DIAMOND {
+    take:
+    csv_path
+
+    main:
+    Channel
+        .fromPath( csv_path )
+        .splitCsv( header: true, sep: ',')
+        .map { row-> tuple(path(row.blast_dir), file(row.genome_1), file(row.genome_2)) }
+        .DIAMOND_MAKEDB()
+        .DIAMOND_BLASTP()
+
+    emit:
+    versions = RUN_DIAMOND.out.versions // channel: [ versions.yml ]
+}
 
 process MAKE_FILEPAIRS_DB {
     tag "$make_filepairs_db"
     debug true
-    q
+
     // Dimaond is limited to v2.0.9 because there is not a
     // singularity version higher than this at the current time.
     conda (params.enable_conda ? 'bioconda::diamond=2.0.9' : null)
@@ -16,10 +32,10 @@ process MAKE_FILEPAIRS_DB {
     } else {
         container 'quay.io/biocontainers/diamond:2.0.9--hdcc8f71_0'
     }
-        
+
     input:
-    tuple path(blast_subdir), file(fasta_1), file(fasta_2)
-    
+    tuple path(blast_dir), file(fasta_1), file(fasta_2)
+
     script:
     """
     diamond \\
@@ -34,7 +50,7 @@ process MAKE_FILEPAIRS_DB {
 process BLAST_GENOME_FILEPAIRS {
     tag "$blast_genome_filepairs"
     debug true
-    
+
     // Dimaond is limited to v2.0.9 because there is not a
     // singularity version higher than this at the current time.
     conda (params.enable_conda ? 'bioconda::diamond=2.0.9' : null)
@@ -43,7 +59,7 @@ process BLAST_GENOME_FILEPAIRS {
     } else {
         container 'quay.io/biocontainers/diamond:2.0.9--hdcc8f71_0'
     }
-    
+
     input:
     tuple val(meta), path(fasta)
     path db
@@ -64,15 +80,3 @@ process BLAST_GENOME_FILEPAIRS {
         --out ${prefix}.${out_ext}
     """
 }
-
-workflow (
-    //def fasta_path = params.fasta_path
-    //def blast_path = params.blast_path 
-    //def output_path = params.output_path
-    
-    Channel.fromPath(params.fasta_path \
-        | splitCsv(header:true) \
-        | map { row-> tuple(path(row.blast_subdir), file(row.genome_1), file(row.genome_2)) } \
-        | MAKE_FILEPAIRS_DB 
-        | BLAST_GENOME_FILEPAIRS
-)
