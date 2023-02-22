@@ -9,12 +9,16 @@ workflow RUN_DIAMOND {
     csv_path
 
     main:
+    blast_dbs = Channel.empty()
+    blast_outputs = Channel.empty()
     Channel
         .fromPath( csv_path )
         .splitCsv( header: true, sep: ',')
         .map { row-> tuple(path(row.blast_dir), file(row.genome_1), file(row.genome_2)) }
-        .DIAMOND_MAKEDB()
-        .DIAMOND_BLASTP()
+        .set { genome_pairs }
+       
+    DIAMOND_MAKEDB(genome_pairs).out.db.set{ blast_dbs }
+    DIAMOND_BLASTP(genome_pairs, DIAMOND_MAKEDB.out.db, "txt")
 
     emit:
     versions = RUN_DIAMOND.out.versions // channel: [ versions.yml ]
