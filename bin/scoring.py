@@ -39,13 +39,11 @@ def get_normalized_bitscores(blast_df):
     """
     # Get dataframe containing only rows where the query and comparison sequences are identical
     blast_df_copy = blast_df.copy()
-    identical_df = blast_df_copy[blast_df_copy['query_id'] == blast_df_copy['sub_id']]
 
     # Get dataframe containing only rows where query and comparison sequences are different
     norm_bitscores = []
     for row in blast_df.itertuples():
-        g1_g1_row = identical_df[((identical_df['query_id'] == row.query_id) & (identical_df['sub_id'] == row.query_id))]
-
+        g1_g1_row = blast_df_copy[((blast_df_copy['query_id'] == row.query_id) & (blast_df_copy['sub_id'] == row.query_id))]
         g1_g1_bitscore_row = g1_g1_row['bitscore'].tolist()
         g1_g1_bitscore = g1_g1_bitscore_row[0]
         norm_bitscore = calculate_bitscore(g1_g1_bitscore, row)

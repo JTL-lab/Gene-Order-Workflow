@@ -20,13 +20,14 @@ from plotly.figure_factory import create_dendrogram
 import networkx as nx
 from matplotlib.pylab import savefig, cm, axis
 
-colours = ['#6e40aa', '#b83cb0', '#c33dad', '#ff4f7c', '#f6478d', '#ff6956', '#f59f30', '#c4d93e', '#83f557', '#38f17a',
-           '#22e599', '#19d3b5', '#29a0dd', '#5069d9', '#5f56c9', '#bbbbbb']
+colours = ['#6e40aa', '#b83cb0', '#c33dad', '#ff4f7c', '#f6478d', '#ff6956', '#f59f30', '#c4d93e',
+           '#83f557', '#38f17a', '#22e599', '#19d3b5', '#29a0dd', '#5069d9', '#5f56c9', '#bbbbbb']
 
 for i in range(84):
     rand_num = random.randrange(0, 2**24)
     col = hex(rand_num)
     colours.append('#' + col[2:])
+
 
 def plot_similarity_histogram(similarity_dict, save_path):
     """
@@ -121,14 +122,13 @@ def plotly_dendrogram(linkage_matrix, labels, AMR_gene, output_path):
     """
     title = "UPGMA dendrogram for {g}".format(g=AMR_gene, n=len(labels))
     fig = create_dendrogram(linkage_matrix, labels=labels, colorscale=colours)
-
     fig.update_layout(autosize=True, title=title, paper_bgcolor='white', template='plotly_white', width=419, height=316)
     savename = os.path.join(output_path + '/clustering/UPGMA/', AMR_gene + ".html")
     fig.write_html(savename)
     # plotly.offline.plot(fig, filename=savename)
 
 
-def draw_MCL_graph(matrix, clusters, **kwargs):
+def draw_mcl_graph(matrix, clusters, **kwargs):
     """
     Modified version of draw_graph from Guy Allard to save image in specified directory rather than showing it.
     Original Source Code: https://github.com/GuyAllard/markov_clustering/blob/master/markov_clustering/drawing.py
@@ -171,8 +171,6 @@ def plotly_mcl_network(matrix, clusters, genome_names, AMR_gene, output_path):
     # Determine edge lines between nodes: only add edges between nodes in the same cluster
     edge_x = []
     edge_y = []
-
-    print(clusters)
 
     for cluster_group in clusters:
         cluster_nodes = list(cluster_group)
@@ -332,7 +330,3 @@ def plotly_pcoa(distance_matrix_df, genome_ids, labels, AMR_gene, output_path):
 
     savename = os.path.join(output_path + '/clustering/DBSCAN/', AMR_gene + ".html")
     fig.write_html(savename)
-
-
-def render_gene_order_viz(AMR_gene_JSON):
-    return

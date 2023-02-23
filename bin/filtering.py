@@ -10,7 +10,15 @@ b) If user opts to investigate Loose hits using predictive module, filtering of 
 
 from utils import check_output_path
 
-def filter_neighborhoods(neighborhoods_dict):
+def check_sublist(neighborhood_1_genes, neighborhood_2_genes):
+    length = len(neighborhood_2_genes)
+    for i in range(len(neighborhood_1_genes) - length + 1):
+        if all(neighborhood_2_genes[j] == neighborhood_1_genes[i+j] for j in range(length)):
+            return True
+    return False
+
+
+def filter_neighborhoods(neighborhoods_dict, num_neighbors):
     """
     Given a dictionary containing genome identifiers as keys as neighborhood dataframes as values for an AMR gene, finds
     all identical neighborhood representations and keeps only one to render as a representative sample in the final gene
@@ -21,6 +29,11 @@ def filter_neighborhoods(neighborhoods_dict):
     genome_genes_dict = {}
     for genome, neighborhood_df in neighborhoods_dict.items():
         genes = neighborhood_df['Gene_Name'].tolist()
+        for g in range(len(genes)):
+            gene = genes[g].strip('"')
+            if gene.startswith('UID'):
+                gene = 'UID'
+            genes[g] = gene
         genome_genes_dict[genome] = [genes, False]
 
     # Store representative genomes in dict as: {'representative_genome': ['genomeA', 'genomeB', 'genomeC']}
@@ -33,13 +46,40 @@ def filter_neighborhoods(neighborhoods_dict):
 
             if genome_genes_dict[genome][1] == False:
                 for genome_2 in genomes:
+
                     # If neighborhoods are identical
                     reversed_genome_2 = genome_genes_dict[genome_2][0][::-1]
+                    is_contig_end_fwd = check_sublist(genome, genome_2)
+                    is_contig_end_rev = check_sublist(genome, reversed_genome_2)
+
+                    # Check if it's identical (forward or reversed)
                     if (genome != genome_2) and ((genome_genes_dict[genome][0] == genome_genes_dict[genome_2][0])
                                                  or (genome_genes_dict[genome][0] == reversed_genome_2)):
                         represented_genomes.append(genome_2)
                         genome_genes_dict[genome_2][1] = True
+                    #elif (is_contig_end_fwd or is_contig_end_rev):
+                    #    represented_genomes.append(genome_2)
+                    #    genome_genes_dict[genome_2][1] = True
+
                 representative_genomes[genome] = represented_genomes
+
+    # Ensure we don't represent a genome as a surrogate for itself
+    delete_keys_1 = []
+    for genome, represented_genomes in representative_genomes.items():
+        if len(represented_genomes) == 1 and represented_genomes[0] == genome:
+            delete_keys_1.append(genome)
+
+
+    delete_keys_2 = []
+    for genome, represented_genomes in representative_genomes.items():
+        for i in range(len(represented_genomes)-1):
+            if represented_genomes[i] == genome:
+                del represented_genomes[i]
+
+    for key in delete_keys_1:
+        del representative_genomes[key]
+    #for key_2 in delete_keys_2:
+    #    del representative_genomes[]
 
     return representative_genomes
 

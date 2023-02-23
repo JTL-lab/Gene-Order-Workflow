@@ -1,0 +1,4 @@
+blast_subdir,genome_1,genome_2
+../sample_data/FAA,../sample_data/FAA/SAMEA1486355.contigs.fa,../sample_data/FAA/SAMEA1466699.contigs.fa
+../sample_data/FAA,../sample_data/FAA/SAMEA1486355.contigs.fa,../sample_data/FAA/SAMD00052607.contigs.fa
+../sample_data/FAA,../sample_data/FAA/SAMEA1466699.contigs.fa,../sample_data/FAA/SAMD00052607.contigs.fa
