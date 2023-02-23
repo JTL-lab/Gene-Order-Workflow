@@ -5,7 +5,7 @@ process CLUSTERING {
       path fasta_path
       path blast_path
       path output_path
-      value num_neighbors
+      val num_neighbors
 
     output:
       path "${output_path}/clustering", emit: cluster_path

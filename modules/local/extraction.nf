@@ -5,8 +5,8 @@ process EXTRACTION {
       path rgi_path
       path gbk_path
       path output_path
-      value num_neighbors
-      value percent_cutoff
+      val num_neighbors
+      val percent_cutoff
 
     output:
       path "${output_path}/fasta", emit: fasta_path
