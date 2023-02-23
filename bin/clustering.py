@@ -49,6 +49,12 @@ def parse_args(args=None):
     parser.add_argument('-n', metavar='-neighborhood_size', type=int, default=10, help='Neighborhood window size, i.e. '
                                                                              'number of genes considered upstream and '
                                                                              'downstream of focal gene.')
+    parser.add_argument('-i', metavar='-mcl_inf', type=int, default=2, help='Inflation hyperparameter for Markov \
+                                                                                                           clustering.')
+    parser.add_argument('-e', metavar='-dbscan_eps', type=float, default=0.5, help='Inflation hyperparameter for \
+                                                                                                    DBSCAN clustering.')
+    parser.add_argument('-m', metavar='-dbscan_min', type=int, default=5, help='Minimum samples hyperparameter for \
+                                                                                                    DBSCAN clustering.')
 
     return parser.parse_args(args)
 
@@ -558,14 +564,13 @@ def UPGMA_clustering(condensed_distance_matrix):
  #   return study.best_params.get('inflation')
 
 
-def MCL_clustering(matrix):
+def MCL_clustering(matrix, inflation):
     """
     Performs MCL clustering on a neighborhood sparse similarity or symmetric distance matrix.
     """
     sparse_matrix = get_sparse_matrix(matrix)
     #inflation = MCL_hyperparameter_tuning(sparse_matrix)
-    #result = mcl.run_mcl(sparse_matrix, inflation=inflation)
-    result = mcl.run_mcl(sparse_matrix)
+    result = mcl.run_mcl(sparse_matrix, inflation=inflation)
     clusters = mcl.get_clusters(result)
 
     return clusters
@@ -605,13 +610,13 @@ def MCL_clustering(matrix):
 #    return study.best_params.get('eps'), study.best_params.get('min_samples')
 
 
-def DBSCAN_clustering(np_distance_matrix):
+def DBSCAN_clustering(np_distance_matrix, epsilon, minpts):
     """
     Applies DBSCAN clustering to a neighborhood similarity or symmetric distance matrix.
     """
     #epsilon, min_points = DBSCAN_hyperparameter_tuning(np_distance_matrix)
     distance_matrix = StandardScaler().fit_transform(np_distance_matrix)
-    dbscan = DBSCAN(eps=0.5, min_samples=5).fit(distance_matrix)
+    dbscan = DBSCAN(eps=epsilon, min_samples=minpts).fit(distance_matrix)
 
     return dbscan, dbscan.labels_
 
@@ -820,7 +825,8 @@ def make_representative_UPGMA_cluster_JSON(output_path, AMR_gene, upgma_clusters
     write_clustermap_JSON_HTML(AMR_gene, '../sample_data', output_path, rep_type='upgma')
 
 
-def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path, neighborhood_size=10):
+def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
+                          neighborhood_size=10, inflation=2, epsilon=0.5, minpts=5):
     """
     Driver script for clustering neighborhoods obtained from extraction module.
     """
@@ -971,7 +977,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path, ne
         print("Generating DBSCAN clusters for {g}...".format(g=AMR_gene))
 
         try:
-            dbscan_clusters, labels = DBSCAN_clustering(distance_matrix)
+            dbscan_clusters, labels = DBSCAN_clustering(distance_matrix, epsilon, minpts)
 
             # Plot DBSCAN clusters using distance matrix and PCoA: colour according to cluster assignment
             plotly_pcoa(distance_matrix_df, genome_names, labels, AMR_gene, output_path)
@@ -995,7 +1001,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path, ne
 
             print("Generating Markov clusters for {g}...".format(g=AMR_gene))
 
-            clusters = MCL_clustering(similarity_matrix)
+            clusters = MCL_clustering(similarity_matrix, inflation)
             sparse_sim_matrix = get_sparse_matrix(similarity_matrix)
             plotly_mcl_network(sparse_sim_matrix, clusters, genome_names, AMR_gene, output_path)
 
@@ -1021,7 +1027,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path, ne
 
 def main(args=None):
     args = parse_args(args)
-    cluster_neighborhoods(args.ASSEMBLY_PATH, args.FASTA_PATH, args.BLAST_PATH, args.OUTPUT_PATH, args.n)
+    cluster_neighborhoods(args.ASSEMBLY_PATH, args.FASTA_PATH, args.BLAST_PATH, args.OUTPUT_PATH, args.n, args.i, args.e, args.m)
 
 
 if __name__ == '__main__':

@@ -6,12 +6,15 @@ process CLUSTERING {
       path blast_path
       path output_path
       val num_neighbors
+      val inflation
+      val epsilon
+      val minpts
 
     output:
       path "${output_path}/clustering", emit: cluster_path
 
     script:
     """
-    clustering.py $faa_path $fasta_path $blast_path $output_path -n $num_neighbors
+    clustering.py $faa_path $fasta_path $blast_path $output_path -n $num_neighbors -i $inflation -e $epsilon -m $minpts
     """
 }

@@ -62,8 +62,13 @@ workflow GENEORDERANALYSIS {
     def output_ch = Channel.fromPath(params.output_path)
 
     // Optional extraction params
-    def num_neighbors = Channel.value(params.num_neighbors)
-    def percent_cutoff = Channel.value(params.percent_cutoff)
+    num_neighbors = params.num_neighbors
+    percent_cutoff = params.percent_cutoff
+
+    // Optional clustering params
+    inflation = params.inflation
+    epsilon = params.epsilon
+    minpts = params.minpts
 
     //
     // MODULE: Run extraction 
@@ -106,7 +111,10 @@ workflow GENEORDERANALYSIS {
     	EXTRACTION.out.fasta_path,
     	EXTRACTION.out.blast_path,
     	output_ch,
-    	num_neighbors
+    	num_neighbors,
+    	inflation,
+    	epsilon,
+    	minpts
     )
     
     //workflow_summary    = WorkflowGeneorderanalysis.paramsSummaryMultiqc(workflow, summary_params)
