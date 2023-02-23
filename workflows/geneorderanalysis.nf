@@ -53,7 +53,7 @@ include { RUN_DIAMOND } from '../subworkflows/local/run_diamond'
 
 workflow GENEORDERANALYSIS {
 
-    //ch_versions = Channel.empty()
+    ch_versions = Channel.empty()
 
     // Initialize channels from provided paths
     def assembly_ch = Channel.fromPath(params.assembly_path)
@@ -61,13 +61,19 @@ workflow GENEORDERANALYSIS {
     def gbk_ch = Channel.fromPath(params.gbk_path)
     def output_ch = Channel.fromPath(params.output_path)
 
+    // Optional extraction params
+    def num_neighbors_ch = Channel.value(params.num_neighbors)
+    def percent_cutoff_ch = Channel.value(params.percent_cutoff)
+
     //
     // MODULE: Run extraction 
     //
     EXTRACTION (
-    	rgi_ch,
+        rgi_ch,
     	gbk_ch,
-    	output_ch
+    	output_ch,
+    	num_neighbors_ch,
+    	percent_cutoff_ch
     )
     
     //
@@ -99,7 +105,8 @@ workflow GENEORDERANALYSIS {
         assembly_ch,
     	EXTRACTION.out.fasta_path,
     	EXTRACTION.out.blast_path,
-    	output_ch
+    	output_ch,
+    	num_neighbors_ch
     )
     
     //workflow_summary    = WorkflowGeneorderanalysis.paramsSummaryMultiqc(workflow, summary_params)
