@@ -211,7 +211,10 @@ def manipulate_GBK_contigs(df, genome_name):
     df.reset_index(drop=True, inplace=True)
     for index in range(len(df)):
         temp_name = df['Best_Hit_ARO'][index]
-        name = shorten_gene_identifier(temp_name)
+        try:
+            name = shorten_gene_identifier(temp_name)
+        except IndexError:
+            name = temp_name
         final_name = clean_gene_identifier(name)
         RGI_names.append(final_name)
 
