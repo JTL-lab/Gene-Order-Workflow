@@ -846,19 +846,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
 
     # Make BLAST dataframe dictionary
     print("Fetching relevant BLAST data from DIAMOND outputs for each respective neighborhood...")
-    #BLAST_df_dict = get_blast_dict_whole_genomes(fasta_path, blast_path)
-
-    blast_folder_paths = get_full_filepaths(blast_path)
-
-    BLAST_df_dict = {}
-    for blast_amr_subdir in blast_folder_paths:
-
-        # For each gene, get dictionary of all blast results above %ID criterion
-        blast_gene_dict = make_BLAST_df_dict(blast_amr_subdir)
-
-        # Store data
-        AMR_gene = get_filename(blast_amr_subdir).split('.')[0]
-        BLAST_df_dict[AMR_gene] = blast_gene_dict
+    BLAST_df_dict = get_blast_dict_whole_genomes(fasta_path, blast_path)
 
     # Calculate normalized bitscores and save as column
     print("Calculating normalized bitscores for downstream scoring...")
