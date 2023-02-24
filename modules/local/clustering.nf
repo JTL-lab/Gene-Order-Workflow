@@ -1,5 +1,8 @@
 process CLUSTERING {
     tag "clustering"
+    label 'process_high'
+    label 'process_high_memory'
+
     input:
       path faa_path
       path fasta_path

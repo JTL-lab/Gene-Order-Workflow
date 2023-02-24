@@ -100,7 +100,7 @@ workflow GENEORDERANALYSIS {
     //	blast_path
     //)
 
-    RUN_DIAMOND(csv_path)
+    //RUN_DIAMOND(csv_path)
 
     //
     // MODULE: Run clustering

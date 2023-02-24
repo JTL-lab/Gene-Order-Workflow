@@ -1,5 +1,6 @@
 process EXTRACTION {
     tag "extraction"
+    label 'process_medium'
     
     input:
       path rgi_path

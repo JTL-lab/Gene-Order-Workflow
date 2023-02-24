@@ -1,10 +1,6 @@
 process MAKE_GENOME_FILEPAIRS {
     tag "$make_genome_filepairs"
-
-    conda (params.enable_conda ? "conda-forge::python=3.8.3" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.8.3' :
-        'quay.io/biocontainers/python:3.8.3' }"
+    label 'process:low'
 
     input:
     path assembly_path
