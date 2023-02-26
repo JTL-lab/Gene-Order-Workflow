@@ -208,6 +208,7 @@ def manipulate_GBK_contigs(df, genome_name):
     """
     locus_tags = []
     RGI_names = []
+    gene_name_identifiers = {}
 
     df.reset_index(drop=True, inplace=True)
     for index in range(len(df)):
@@ -219,10 +220,13 @@ def manipulate_GBK_contigs(df, genome_name):
         final_name = clean_gene_identifier(name)
         RGI_names.append(final_name)
 
+        # Keep track of original gene name and the modified version (if any)
+        gene_name_identifiers[temp_name] = final_name
+
         locus_tags.append(genome_name + '(' + final_name + ')' + df['Cut_Off'][index][0] +
                           '_' + str(df['Best_Identities'][index]))
 
-    return locus_tags, RGI_names
+    return locus_tags, RGI_names, gene_name_identifiers
 
 
 def partition_contig_name(contig_str):
@@ -640,7 +644,8 @@ def get_AMR_gene_statistics(rgi_dataframes):
     return amr_gene_statistics
 
 
-def write_summary_file(output_dir, gbk_dataframes, neighborhood_size, ARO_union, amr_gene_statistics):
+def write_summary_file(output_dir, gbk_dataframes, neighborhood_size, ARO_union,
+                       amr_gene_statistics, gene_name_identifiers_dict):
     """
     Writes summary data of neighborhood extraction for the set of genomes being analyzed to
     output/Neighborhoods_Extraction_Summary.txt.
@@ -655,7 +660,12 @@ def write_summary_file(output_dir, gbk_dataframes, neighborhood_size, ARO_union,
         outfile.write('----------------------------------------------------------------------------------------' + '\n')
         outfile.write('Number of genomes analyzed: {}'.format(len(gbk_dataframes.keys())) + '\n')
         outfile.write('Neighborhood size extracted: {}'.format(neighborhood_size) + '\n')
-        outfile.write('Number of AMR gene models extracted: {}'.format(len(ARO_union)) + '\n\n')
+        outfile.write('Number of genes whose neighborhoods were extracted: {}'.format(len(ARO_union)) + '\n\n')
+        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        outfile.write('Original Gene Names and Simplified Names' + '\n')
+        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        for gene_name, simplified_gene_name in sorted(gene_name_identifiers_dict.items()):
+            outfile.write(gene_name + '\t--->\t' + simplified_gene_name + '\n')
         outfile.write('----------------------------------------------------------------------------------------' + '\n')
         outfile.write('AMR Gene Details Per Genome' + '\n')
         outfile.write('----------------------------------------------------------------------------------------' + '\n')
@@ -1210,7 +1220,7 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
         # Add locus tag and contig details to the RGI dataframes
         rgi_dataframes[rgi_filename] = make_RGI_df_contig_col(rgi_df)
         rgi_dataframes[rgi_filename]['Locus_Tag'], rgi_dataframes[rgi_filename][
-            'Best_Hit_ARO'] = manipulate_GBK_contigs(rgi_df, rgi_filename)
+            'Best_Hit_ARO'], gene_name_identifiers_dict = manipulate_GBK_contigs(rgi_df, rgi_filename)
 
         # Preprocess all bracketed columns to remove brackets
         for col in rgi_df:
@@ -1259,7 +1269,7 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
 
     # 9) Make neighborhoods summary textfile in output dir
     print("Making extraction summary file...")
-    write_summary_file(output_path, gbk_dataframes, num_neighbors, ARO_union, amr_statistics)
+    write_summary_file(output_path, gbk_dataframes, num_neighbors, ARO_union, amr_statistics, gene_name_identifiers_dict)
 
     # 10) Save gene neighborhoods and indices in textfile: needed for JSON representations downstream
     for AMR_gene, neighborhood_data in neighborhoods.items():
