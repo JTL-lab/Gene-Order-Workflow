@@ -3,6 +3,8 @@ process CLUSTERING {
     label 'process_high'
     label 'process_high_memory'
 
+    publishDir "${params.output_path}"
+
     input:
       path faa_path
       path fasta_path

@@ -1,7 +1,9 @@
 process EXTRACTION {
     tag "extraction"
     label 'process_medium'
-    
+
+    publishDir "${params.output_path}"
+
     input:
       path rgi_path
       path gbk_path

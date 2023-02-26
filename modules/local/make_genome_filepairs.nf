@@ -2,6 +2,8 @@ process MAKE_GENOME_FILEPAIRS {
     tag "$make_genome_filepairs"
     label 'process:low'
 
+    publishDir "${params.output_path}"
+
     input:
     path assembly_path
     path output_path

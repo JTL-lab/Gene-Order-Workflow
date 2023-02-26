@@ -174,12 +174,13 @@ def make_fasta_contig_dict(fasta_path, AMR_gene):
     return fasta_dict
 
 
-def get_blast_dict_whole_genomes(fasta_path, blast_path):
+def get_blast_dict_whole_genomes(fasta_path, output_path):
     """
     Creates dictionary for all AMR genes where each key is an AMR gene name (str) and each value is the dictionary
     containing genome combinations that were blasted together as keys and their accompanying blast file data in a
     dataframe as values.
     """
+    blast_path = '../../../' + output_path + '/blast'
     AMR_genes = os.listdir(fasta_path)
 
     BLAST_df_dict = {}
@@ -637,9 +638,9 @@ def load_JSON_data(output_path, AMR_gene, surrogates=False):
     """
     json_data = ''
     if surrogates:
-        gene_path = output_path + '/JSON/' + AMR_gene + '_surrogates.json'
+        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '_surrogates.json
     else:
-        gene_path = output_path + '/JSON/' + AMR_gene + '.json'
+        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '.json'
 
     print(gene_path)
     with open(gene_path, 'r') as infile:
@@ -846,7 +847,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
 
     # Make BLAST dataframe dictionary
     print("Fetching relevant BLAST data from DIAMOND outputs for each respective neighborhood...")
-    BLAST_df_dict = get_blast_dict_whole_genomes(fasta_path, blast_path)
+    BLAST_df_dict = get_blast_dict_whole_genomes(fasta_path, output_path)
 
     # Calculate normalized bitscores and save as column
     print("Calculating normalized bitscores for downstream scoring...")

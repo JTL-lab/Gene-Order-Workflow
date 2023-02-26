@@ -15,7 +15,8 @@ import argparse
 import itertools
 from filtering import filter_neighborhoods, write_filtered_genomes_textfile
 from utils import get_filename, check_output_path, strip_brackets, generate_alphanumeric_string, \
-                  write_clustermap_JSON_HTML
+    write_clustermap_JSON_HTML
+
 
 def parse_args(args=None):
     Description = "Extract AMR gene neighborhoods according to fixed window size of N genes upstream and downstream."
@@ -74,7 +75,7 @@ def load_filepaths(rgi_path_arg, gbk_path_arg):
     rgi_file_names = set(rgi_list)
     gbk_file_names = set(os.path.basename(file).strip('.gbk') for file in gbk_filepaths)
 
-    #assert rgi_file_names == gbk_file_names, "Error: mismatch occurred between RGI and GBK file names."
+    # assert rgi_file_names == gbk_file_names, "Error: mismatch occurred between RGI and GBK file names."
 
     return rgi_filepaths, gbk_filepaths
 
@@ -141,14 +142,14 @@ def make_GBK_dataframe(GBK_file_path):
     return gbk_df, unique_contig_names
 
 
-def make_RGI_dataframe(rgi_filepath):
+def make_extraction_dataframe(input_file_path):
     """
-    Input: path to RGI file
+    Input: Path to tab-delimited file listing
     Returns a dataframe containing RGI data from RGI
     """
-    rgi_df = pd.read_csv(rgi_filepath, sep='\t', header=0)
+    extraction_df = pd.read_csv(input_file_path, sep='\t', header=0)
 
-    return rgi_df
+    return extraction_df
 
 
 def adjust_RGI_df_orientation(rgi_df):
@@ -168,7 +169,7 @@ def swap_neighborhood_orientation(df):
     """
     df['Gene_Strand'] = df['Gene_Strand'].map({-1: +1,
                                                +1: -1},
-                                               na_action=None)
+                                              na_action=None)
 
     return df
 
@@ -196,8 +197,8 @@ def clean_gene_identifier(name):
     """
     Preprocesses gene names for additional shortening/simplification by removing extraneous characters.
     """
-    clean_name = name.replace("'", "").replace("-", "_").replace("(","_").replace(")","_").replace("/", "-")\
-                 .replace(" ", "_").replace(".","-").strip('-')
+    clean_name = name.replace("'", "").replace("-", "_").replace("(", "").replace(")", "").replace("/", "-") \
+        .replace(" ", "_").replace(".", "-").replace('"', '').strip('-').strip('"')
     return clean_name
 
 
@@ -236,7 +237,7 @@ def process_GBK_df_for_BLAST(gbk_df):
     Given a dataframe for a GBK file, removes bracket formatting for easier processing and readability later
     """
     gbk_df['Locus_Tag'] = gbk_df['Locus_Tag'].apply(lambda i: str(i).replace("[", "").replace("]", "").replace("'", ""))
-    gbk_df['Gene_Name'] = gbk_df['Gene_Name'].apply(lambda i: str(i).replace("[", "").replace("]", "")\
+    gbk_df['Gene_Name'] = gbk_df['Gene_Name'].apply(lambda i: str(i).replace("[", "").replace("]", "") \
                                                     .replace("'", "").replace('"', ''))
     gbk_df['ProteinSequence'] = gbk_df['ProteinSequence'].str.strip('[]')
 
@@ -300,8 +301,6 @@ def rename_duplicate_genes(rgi_dataframes):
                 unique_genes.append(rgi_df['Best_Hit_ARO'][val])
                 print("Added gene {}!".format(rgi_df['Best_Hit_ARO'][val]))
 
-
-
     return
 
 
@@ -320,38 +319,38 @@ def find_union_AMR_genes(rgi_dataframes):
         for val in range(len(rgi_df)):
 
             # Case 1: First time the gene has occurred in the genome
-            #unique_best_hits_set = set([val.split('_')[0] for val in unique_best_hits])
-            #if rgi_df['Best_Hit_ARO'][val] not in unique_best_hits and rgi_df['Cut_Off'][val] != 'Loose':
+            # unique_best_hits_set = set([val.split('_')[0] for val in unique_best_hits])
+            # if rgi_df['Best_Hit_ARO'][val] not in unique_best_hits and rgi_df['Cut_Off'][val] != 'Loose':
             if rgi_df['Best_Hit_ARO'][val] not in unique_best_hits:
                 unique_best_hits.append(rgi_df['Best_Hit_ARO'][val])
                 print("Added gene {}!".format(rgi_df['Best_Hit_ARO'][val]))
 
             # Case 2-3: same gene is present multiple times, need to number them to indicate distinct instances
-            #else:
-                # Determine the count (look for substring) and update the new gene with the proper indice accordingly
+            # else:
+            # Determine the count (look for substring) and update the new gene with the proper indice accordingly
             #    same_genes = [unique_best_hits[g] for g in range(len(unique_best_hits)) \
             #                  if rgi_df['Best_Hit_ARO'][val] in unique_best_hits[g]]
             #    print(same_genes)
             #    df_copy = rgi_df.copy()
 
-                # Case 2: If only one other gene, label them 1 and 2 and modify dataframes accordingly
+            # Case 2: If only one other gene, label them 1 and 2 and modify dataframes accordingly
             #    if len(same_genes) == 1:
 
-                   # Number the first instance accordingly
-                    #numbered_gene = df_copy['Best_Hit_ARO'][same_genes[0]] + '_1'
-                    #rgi_df.loc[:, ('Best_Hit_ARO', same_genes[0])] = numbered_gene
+            # Number the first instance accordingly
+            # numbered_gene = df_copy['Best_Hit_ARO'][same_genes[0]] + '_1'
+            # rgi_df.loc[:, ('Best_Hit_ARO', same_genes[0])] = numbered_gene
 
-                    # Update the second instance
+            # Update the second instance
             #        new_gene_name = df_copy['Best_Hit_ARO'][val] + '_2'
             #        rgi_df.loc[:, ('Best_Hit_ARO', val)] = new_gene_name
             #        print("Renamed gene: {}".format(rgi_df['Best_Hit_ARO'][val]))
             #        print("Now we've got {a} and {b}!".format(a=same_genes[0],
             #                                                  b=rgi_df['Best_Hit_ARO'][val]))
 
-                    # Add the newly named gene
+            # Add the newly named gene
             #        unique_best_hits.append(new_gene_name)
 
-                # 3) If more than two instances already, get the last numbered gene and increment the new one's name
+            # 3) If more than two instances already, get the last numbered gene and increment the new one's name
             #    elif len(same_genes) > 1:
             #        numbered_gene = df_copy['Best_Hit_ARO'][same_genes[len(same_genes) - 1]]
             #        numbered_gene_tokens = numbered_gene.split('_')
@@ -630,10 +629,13 @@ def get_AMR_gene_statistics(rgi_dataframes):
     """
     amr_gene_statistics = {}
     for genome, rgi_df in rgi_dataframes.items():
-        perfect_count = len(rgi_df[rgi_df["Cut_Off"] == "Perfect"])
-        strict_count = len(rgi_df[rgi_df["Cut_Off"] == "Strict"])
-        loose_count = len(rgi_df[rgi_df["Cut_Off"] == "Loose"])
-        amr_gene_statistics[genome] = [perfect_count, strict_count, loose_count]
+        try:
+            perfect_count = len(rgi_df[rgi_df["Cut_Off"] == "Perfect"])
+            strict_count = len(rgi_df[rgi_df["Cut_Off"] == "Strict"])
+            loose_count = len(rgi_df[rgi_df["Cut_Off"] == "Loose"])
+            amr_gene_statistics[genome] = [perfect_count, strict_count, loose_count]
+        except IndexError:
+            pass
 
     return amr_gene_statistics
 
@@ -756,9 +758,9 @@ def make_neighborhood_JSON_data(AMR_gene_neighborhoods_dict, AMR_gene):
         for i in neighborhood_df.index:
             gene_data = {}
             gene_data["uid"] = loci_data["uid"] + '-' + str(i)
-            gene_data["name"] = neighborhood_df['Gene_Name'][i]
+            gene_data["name"] = neighborhood_df['Gene_Name'][i].replace('"','')
             if neighborhood_df['Gene_Name'][i].replace("'", "") not in unique_genes:
-                unique_genes.append(neighborhood_df['Gene_Name'][i].replace("'", ""))
+                unique_genes.append(neighborhood_df['Gene_Name'][i].replace("'", "").replace('"', ''))
             gene_data["start"] = neighborhood_df['Gene_Start'][i]
             gene_data["end"] = neighborhood_df['Gene_End'][i]
             gene_data["strand"] = neighborhood_df['Gene_Strand'][i]
@@ -1138,7 +1140,6 @@ def make_AMR_gene_HTML(AMR_genes_list, sample_data_path, out_path):
     """
 
     for AMR_gene in AMR_genes_list:
-
         # Make HTML index file with appropriate JSON
         write_clustermap_JSON_HTML(AMR_gene, sample_data_path, out_path)
 
@@ -1198,7 +1199,7 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
 
     for rgi_filepath in rgi_filepaths:
         rgi_filename = get_filename(rgi_filepath, rgi=True)
-        rgi_df = make_RGI_dataframe(rgi_filepath)
+        rgi_df = make_extraction_dataframe(rgi_filepath)
         rgi_dataframes[rgi_filename] = rgi_df
 
     for rgi_filename, rgi_df in rgi_dataframes.items():
@@ -1223,8 +1224,8 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
     ARO_best_terms, ARO_union = find_union_AMR_genes(rgi_dataframes)
 
     # 5) Get AMR dict for all genomes
-    #rgi_modified_dataframes, unique_ARO = check_duplicate_genes(rgi_dataframes, ARO_union)
-    #genomes_AMR_dict = make_AMR_dict(rgi_modified_dataframes, unique_ARO)
+    # rgi_modified_dataframes, unique_ARO = check_duplicate_genes(rgi_dataframes, ARO_union)
+    # genomes_AMR_dict = make_AMR_dict(rgi_modified_dataframes, unique_ARO)
     genomes_AMR_dict = {}
     for AMR_gene in ARO_union:
         # Make entry for gene occurrences
@@ -1262,11 +1263,10 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
 
     # 10) Save gene neighborhoods and indices in textfile: needed for JSON representations downstream
     for AMR_gene, neighborhood_data in neighborhoods.items():
-
         # Filter neighborhoods
         filtered_neighborhoods = filter_neighborhoods(neighborhood_data, num_neighbors)
         surrogates = list(filtered_neighborhoods.keys())
-        filtered_neighborhoods_dict = {key : value for (key, value) in neighborhood_data.items() if key in surrogates}
+        filtered_neighborhoods_dict = {key: value for (key, value) in neighborhood_data.items() if key in surrogates}
         write_filtered_genomes_textfile(filtered_neighborhoods, AMR_gene, output_path)
 
         # Get data needed to write JSON files
@@ -1274,14 +1274,14 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
         filtered_neighborhood_JSON_dict = make_neighborhood_JSON_data(filtered_neighborhoods_dict, AMR_gene)
 
         # Update UID genes' data if present
-        #complete_neighborhood_JSON_dict = update_UID_JSON_data(neighborhood_JSON_dict, AMR_gene, output_path)
+        # complete_neighborhood_JSON_dict = update_UID_JSON_data(neighborhood_JSON_dict, AMR_gene, output_path)
 
         # Create JSON file
-        #write_neighborhood_JSON(complete_neighborhood_JSON_dict, AMR_gene, output_path)
+        # write_neighborhood_JSON(complete_neighborhood_JSON_dict, AMR_gene, output_path)
         write_neighborhood_JSON(neighborhood_JSON_dict, AMR_gene, output_path)
         write_neighborhood_JSON(filtered_neighborhood_JSON_dict, AMR_gene, output_path, True)
 
-    sample_data_path = '../sample_data'
+    sample_data_path = '../../../sample_data'
     make_AMR_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
 
     with open(output_path + '/' + 'neighborhood_indices.txt', 'w') as outfile:
