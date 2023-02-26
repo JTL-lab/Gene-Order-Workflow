@@ -460,7 +460,7 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
         for i in range(len(downstream_indices) - 1, -1, -1):
             try:
                 neighbor = contig_df.iloc[downstream_indices[i]]
-                downstream_neighbors = downstream_neighbors.append(neighbor)
+                pd.concat([downstream_neighbors, neighbor])
             except IndexError:
                 print("Contig end found at position -{} downstream.".format(i + 1))
                 neighborhood_indices.append(i + 1)
@@ -477,7 +477,7 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
             contig_end_found = False
             try:
                 neighbor = contig_df.iloc[upstream_indices[i]]
-                upstream_neighbors = upstream_neighbors.append(neighbor)
+                pd.concat([upstream_neighbors, neighbor])
             except IndexError:
                 if not contig_end_found:
                     print("Contig end found at position {} upstream.".format(i + 1))
