@@ -5,7 +5,7 @@ process EXTRACTION {
     publishDir "${params.output_path}"
 
     input:
-      path rgi_path
+      path extract_path
       path gbk_path
       path output_path
       val num_neighbors
@@ -17,6 +17,6 @@ process EXTRACTION {
 
     script:
     """
-    extraction.py $rgi_path $gbk_path $output_path -n $num_neighbors -p $percent_cutoff
+    extraction.py $extract_path $gbk_path $output_path -n $num_neighbors -p $percent_cutoff
     """
 }

@@ -10,7 +10,7 @@
 //WorkflowGeneorderanalysis.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.assembly_path, params.rgi_path, params.gbk_path, params.output_path ]
+def checkPathParamList = [ params.assembly_path, params.extract_path, params.gbk_path, params.output_path ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
@@ -57,7 +57,7 @@ workflow GENEORDERANALYSIS {
 
     // Initialize channels from provided paths
     def assembly_ch = Channel.fromPath(params.assembly_path)
-    def rgi_ch = Channel.fromPath(params.rgi_path)
+    def extract_ch = Channel.fromPath(params.extract_path)
     def gbk_ch = Channel.fromPath(params.gbk_path)
     def output_ch = Channel.fromPath(params.output_path)
 
@@ -74,7 +74,7 @@ workflow GENEORDERANALYSIS {
     // MODULE: Run extraction 
     //
     EXTRACTION (
-        rgi_ch,
+        extract_ch,
     	gbk_ch,
     	output_ch,
     	num_neighbors,
