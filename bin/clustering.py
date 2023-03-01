@@ -24,8 +24,9 @@ import markov_clustering as mcl
 
 from DBCV import DBCV
 from scoring import get_normalized_bitscores
-from utils import get_filename, check_output_path, get_full_filepaths, remove_files, generate_alphanumeric_string, \
-                  write_clustermap_JSON_HTML, remove_defunct_clustermap_data
+from utils import get_filename, check_output_path, get_full_filepaths, remove_files, generate_alphanumeric_string
+from json_utils import order_JSON_clusters_UPGMA, make_representative_UPGMA_cluster_JSON, update_JSON_links_PI, \
+                       write_clustermap_JSON_HTML, remove_defunct_clustermap_data
 from visualization import plot_similarity_histogram, plot_distance_histogram, \
                           graph_UPGMA_clusters, draw_mcl_graph, graph_DBSCAN_clusters, \
                           plotly_pcoa, plotly_dendrogram, plotly_mcl_network
@@ -632,200 +633,6 @@ def check_clustering_savepaths(output_path):
         check_output_path(save_path)
 
 
-def load_JSON_data(output_path, AMR_gene, surrogates=False):
-    """
-    Helper function for loading JSON neighborhood data.
-    """
-    json_data = ''
-    if surrogates:
-        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '_surrogates.json
-    else:
-        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '.json'
-
-    print(gene_path)
-    with open(gene_path, 'r') as infile:
-        if len(infile.readlines()) != 0:
-            infile.seek(0)
-            json_data = json.load(infile)
-
-    return json_data, gene_path
-
-
-def update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False):
-    """
-    Updates JSON representations of AMR gene neighborhoods created using extraction module so that gene cluster links
-    reflect percent identities found in blast results.
-    """
-    for AMR_gene, blast_files_dict in BLAST_df_dict.items():
-
-        # Load AMR gene JSON link data
-        json_data, gene_path = load_JSON_data(output_path, AMR_gene, surrogates)
-
-        # Update each link according to the respective blast results
-        for i in range(len(json_data["links"])):
-
-            # Contig identifiers
-            contig_data = json_data["links"][i]["uid"].split('-')
-            contig_id_1 = contig_data[0].split('_')
-            contig_id_2 = contig_data[1].split('_')
-            contig_1 = contig_id_1[1] + '_' + contig_id_1[2]
-            contig_2 = contig_id_2[1] + '_' + contig_id_2[2]
-
-            # Genome names
-            genome_1 = contig_1.split('_')[0]
-            genome_2 = contig_2.split('_')[0]
-
-            # Check respective BLAST file dataframe and update percent identity
-            try:
-                df = BLAST_df_dict[AMR_gene][genome_1 + '_' + genome_2 + '.blast.txt']
-                row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
-                PI = row.PI.tolist()[0]
-
-            except KeyError:
-                try:
-                    df = BLAST_df_dict[AMR_gene][genome_2 + '_' + genome_1 + '.blast.txt']
-                    row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
-                    PI = row.PI.tolist()[0]
-                except KeyError:
-                    PI = 0.70
-                except IndexError:
-                    PI = 0.70
-
-            except IndexError:
-                PI = 0.70
-
-            try:
-                df = BLAST_df_dict[AMR_gene][genome_2 + '_' + genome_1 + '.blast.txt']
-                row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
-                PI = row.PI.tolist()[0]
-
-            except KeyError:
-                try:
-                    df = BLAST_df_dict[AMR_gene][genome_1 + '_' + genome_2 + '.blast.txt']
-                    row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
-                    PI = row.PI.tolist()[0]
-                except KeyError:
-                    PI = 0.70
-                except IndexError:
-                    PI = 0.70
-
-            except IndexError:
-                PI = 0.70
-
-            json_data["links"][i]["identity"] = PI
-
-        # Overwrite JSON file with updated data
-        with open(gene_path, 'w') as outfile:
-            json.dump(json_data, outfile)
-
-
-def map_genome_id_to_dendrogram_leaves(upgma_clusters, genome_to_num_mapping):
-    """
-    Given a UPGMA dendrogram and a dictionary mapping genomes to integers corresponding to the indices of the distance
-    matrix used to generate the dendrogram, returns a list of genome names in order of the dendrogram leaves from left
-    to right.
-    """
-    upgma_leaves = upgma_clusters['ivl']
-    genome_order = []
-    for leaf in upgma_leaves:
-        genome = genome_to_num_mapping[leaf]
-        genome_order.append(genome)
-
-    return genome_order
-
-
-def order_cluster_data_by_dendrogram(genome_order_dict, json_cluster_data):
-    """
-    Given JSON cluster data in the clustermap format, reorders cluster data according to dendrogram leaves from
-    left to right.
-    """
-    clusters = []
-    for genome in genome_order_dict:
-        for cluster in json_cluster_data:
-            if cluster["name"] == genome:
-                print(cluster)
-                clusters.append(cluster)
-    return clusters
-
-
-def order_JSON_clusters_UPGMA(output_path, AMR_gene, upgma_clusters, genome_to_num_mapping, surrogates=False):
-    """
-    Reorders how genomes are encoded in their respective JSON files for an AMR gene according to how they
-    were clustered by UPGMA (from left to right).
-    """
-    # Load AMR gene JSON cluster data
-    json_data = ''
-    if surrogates:
-        gene_path = output_path + '/JSON/' + AMR_gene + '_surrogates.json'
-    else:
-        gene_path = output_path + '/JSON/' + AMR_gene + '.json'
-
-    with open(gene_path, 'r') as infile:
-        if len(infile.readlines()) != 0:
-            infile.seek(0)
-            json_data = json.load(infile)
-
-    # Reorder cluster data genomes according to UPGMA leaves ordering
-    genome_order = map_genome_id_to_dendrogram_leaves(upgma_clusters, genome_to_num_mapping)
-    clusters = order_cluster_data_by_dendrogram(genome_order, json_data["clusters"])
-
-    # Update JSON data
-    json_data["clusters"] = clusters
-
-    # Update file
-    with open(gene_path, 'w') as outfile:
-        json.dump(json_data, outfile)
-
-
-def make_representative_UPGMA_cluster_JSON(output_path, AMR_gene, upgma_clusters, genome_to_num_mapping):
-    """
-    Creates a JSON file with one representative genome from each UPGMA cluster.
-    """
-    # Load AMR gene JSON cluster data
-    json_data = ''
-    with open(output_path + '/JSON/' + AMR_gene + '.json', 'r') as infile:
-        if len(infile.readlines()) != 0:
-            infile.seek(0)
-            json_data = json.load(infile)
-
-    # Determine genomes to keep in representation
-    representative_cluster_genomes = []
-
-    genome_order = map_genome_id_to_dendrogram_leaves(upgma_clusters, genome_to_num_mapping)
-    cluster_df = pd.DataFrame({'genome': genome_order, 'cluster': upgma_clusters['leaves_color_list']})
-    print(AMR_gene)
-    print(cluster_df)
-
-    unique_clusters = set(upgma_clusters['leaves_color_list'])
-    for cluster in unique_clusters:
-        cluster_rows = cluster_df.loc[cluster_df['cluster'] == cluster]
-        representative_cluster_genomes.append(cluster_rows.iloc[0].genome)
-    del cluster_df
-
-    # Update cluster data to only include those genomes
-    clusters = []
-    for genome in representative_cluster_genomes:
-        for cluster in json_data["clusters"]:
-            if cluster["name"] == genome:
-                print(cluster)
-                clusters.append(cluster)
-
-    # Update JSON data
-    json_data["clusters"] = clusters
-
-    #upgma_json_data = remove_defunct_clustermap_data(json_data)
-
-    #print("UPGMA JSON DATA:")
-    #print(upgma_json_data)
-
-    # Update file
-    with open(output_path + '/JSON/' + AMR_gene + '_upgma.json', 'w') as outfile:
-        json.dump(json_data, outfile)
-
-    # Make respective HTML file for Coeus
-    write_clustermap_JSON_HTML(AMR_gene, '../sample_data', output_path, rep_type='upgma')
-
-
 def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
                           neighborhood_size=10, inflation=2, epsilon=0.5, minpts=5):
     """
@@ -838,12 +645,6 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
 
     fa_dir_files = os.listdir(assembly_path)
     num_genome_combinations = list(itertools.permutations(fa_dir_files, 2))
-    #if len(blast_dir_files) < (len(num_genome_combinations) + len(fa_dir_files)):
-    #    print("Creating whole genome DIAMOND All-vs-All BLAST files...")
-    #    blast_neighborhoods(assembly_path, blast_path)
-
-    #if len(blast_dir_files) < len(fasta_dir_files):
-    #    blast_neighborhoods(assembly_path, blast_path)
 
     # Make BLAST dataframe dictionary
     print("Fetching relevant BLAST data from DIAMOND outputs for each respective neighborhood...")
@@ -946,9 +747,6 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
 
             # Interactive dendrogram visualization
             condensed_distance_matrix = squareform(distance_matrix)
-            print(condensed_distance_matrix)
-            #plotly_dendrogram(condensed_distance_matrix, genome_names, AMR_gene, output_path)
-            #plotly_dendrogram(upgma_linkage, genome_names, AMR_gene, output_path)
             plotly_dendrogram(distance_matrix, genome_names, AMR_gene, output_path)
 
             # Save distance matrix as textfile
