@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Given RGI files and their corresponding GBK files for complete bacterial genomes,
+Given extract files and their corresponding GBK files for complete bacterial genomes,
 this script is used for identification of all unique gene neighborhoods present for easy cross-genome comparison.
 """
 
@@ -15,20 +15,20 @@ import argparse
 import itertools
 
 from filtering import filter_neighborhoods, write_filtered_genomes_textfile
-from utils import get_filename, check_output_path, strip_brackets, generate_alphanumeric_string
-from json_utils import make_neighborhood_JSON_data, write_neighborhood_JSON, make_AMR_gene_HTML, \
-                       write_clustermap_JSON_HTML
+from utils import get_filename, check_output_path, strip_brackets
+from json_utils import make_neighborhood_JSON_data, write_neighborhood_JSON, make_AMR_gene_HTML
 
 def parse_args(args=None):
     Description = "Extract AMR gene neighborhoods according to fixed window size of N genes upstream and downstream."
-    Epilog = "Example usage: python extraction.py <RGI_PATH> <GBK_PATH> <OUTPUT_PATH> -n <NEIGHBORHOOD_SIZE> -p " \
+    Epilog = "Example usage: python extraction.py <extract_PATH> <GBK_PATH> <OUTPUT_PATH> -n <NEIGHBORHOOD_SIZE> -p " \
              "<PERCENT> "
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
-    parser.add_argument('RGI_PATH', metavar='rgi', type=str, help='Path to directory containing RGI files. Must have '
-                                                                  'names corresponding to GBK files.')
+    parser.add_argument('EXTRACT_PATH', metavar='extract', type=str, help='Path to directory containing extract '
+                                                                          'files. Must have names corresponding to '
+                                                                          'GBK files.')
     parser.add_argument('GBK_PATH', metavar='gbk', type=str, help='Path to directory containing GBK files. \
-                                                                   Must have names corresponding to RGI files.')
+                                                                   Must have names corresponding to extract files.')
     parser.add_argument('OUTPUT_PATH', metavar='output_path', type=str, help='Path to output directory where '
                                                                              'extracted neighborhood FASTA files will'
                                                                              ' be saved.')
@@ -41,19 +41,19 @@ def parse_args(args=None):
     return parser.parse_args(args)
 
 
-def load_filepaths(rgi_path_arg, gbk_path_arg):
+def load_filepaths(extract_path_arg, gbk_path_arg):
     """
-    Loads all RGI and GBK filepaths from user provided directory paths and returns them in respective lists.
-    Assumes that RGI file names have the following naming convention:
+    Loads all extract and GBK filepaths from user provided directory paths and returns them in respective lists.
+    Assumes that extract file names have the following naming convention:
     xxxxxxxxxxxxxxxxxxx_rgi.txt
     Assumes that GBK file names have the following naming convention:
     xxxxxxxxxxxxxxxxxxx_genomic.fna.gbk
     """
-    # Get paths for RGI files
+    # Get paths for extract files
     try:
-        rgi_filepaths = glob.glob(os.path.join(rgi_path_arg, "*.txt"))
+        extract_filepaths = glob.glob(os.path.join(extract_path_arg, "*.txt"))
     except FileNotFoundError:
-        print("Error: there are no RGI files found in the specified directory. Please double-check the provided path.")
+        print("Error: there are no extract files found in the specified directory. Please double-check the provided path.")
         sys.exit(1)
 
     # Get paths for GBK files
@@ -63,22 +63,22 @@ def load_filepaths(rgi_path_arg, gbk_path_arg):
         print("Error: there are no GBK files found in the specified directory. Please double-check the provided path.")
         sys.exit(1)
 
-    # Verify there is an equivalent number of RGI and GBK files
-    assert len(rgi_filepaths) == len(gbk_filepaths), "Error: mismatch occurred between number of RGI and GBK files."
+    # Verify there is an equivalent number of extract and GBK files
+    assert len(extract_filepaths) == len(gbk_filepaths), "Error: mismatch occurred between number of extract and GBK files."
 
-    # Verify that for each RGI file, there is a GBK file with the same filename
-    rgi_without_suffix = [os.path.basename(file).strip('_rgi.txt') for file in rgi_filepaths]
-    rgi_list = []
-    for file in rgi_without_suffix:
+    # Verify that for each extract file, there is a GBK file with the same filename
+    extract_without_suffix = [os.path.basename(file).strip('_rgi.txt') for file in extract_filepaths]
+    extract_list = []
+    for file in extract_without_suffix:
         tokens = file.split('.')
-        rgi_list.append(tokens[0])
-    rgi_list = [file.split('.')[0] for file in rgi_without_suffix]
-    rgi_file_names = set(rgi_list)
+        extract_list.append(tokens[0])
+    extract_list = [file.split('.')[0] for file in extract_without_suffix]
+    extract_file_names = set(extract_list)
     gbk_file_names = set(os.path.basename(file).strip('.gbk') for file in gbk_filepaths)
 
-    # assert rgi_file_names == gbk_file_names, "Error: mismatch occurred between RGI and GBK file names."
+    # assert extract_file_names == gbk_file_names, "Error: mismatch occurred between extract and GBK file names."
 
-    return rgi_filepaths, gbk_filepaths
+    return extract_filepaths, gbk_filepaths
 
 
 def load_GBK_file(GBK_filepath):
@@ -146,26 +146,26 @@ def make_GBK_dataframe(GBK_file_path):
 def make_extraction_dataframe(input_file_path):
     """
     Input: Path to tab-delimited file listing
-    Returns a dataframe containing RGI data from RGI
+    Returns a dataframe containing extract data from extract
     """
     extraction_df = pd.read_csv(input_file_path, sep='\t', header=0)
 
     return extraction_df
 
 
-def adjust_RGI_df_orientation(rgi_df):
+def adjust_extract_df_orientation(extract_df):
     """
-    Replaces RGI orientation symbols (-, +) with GBK convention (-1, +1) for easier cross-comparison
+    Replaces extract orientation symbols (-, +) with GBK convention (-1, +1) for easier cross-comparison
     """
-    rgi_df['Orientation'] = rgi_df['Orientation'].map({'-': '-1',
+    extract_df['Orientation'] = extract_df['Orientation'].map({'-': '-1',
                                                        '+': '+1'},
                                                       na_action=None)
-    return rgi_df
+    return extract_df
 
 
 def shorten_gene_identifier(name):
     """
-    Simplifies gene names. Mostly suitable for RGI ARO name cleanup
+    Simplifies gene names. Mostly suitable for extract ARO name cleanup
     (e.g. 'mecC-type BlaZ' -> 'mecC_BlaZ',
           'vanS gene in vanN cluster' -> 'vanS',
           'Bifidobacterium adolescentis rpoB mutants conferring resistance to rifampicin' -> 'rpoB',
@@ -193,10 +193,10 @@ def clean_gene_identifier(name):
 
 def manipulate_GBK_contigs(df, genome_name):
     """
-    For GBK dataframe, manipulates contig to compare if RGI and GBK genes belong to the same contig
+    For GBK dataframe, manipulates contig to compare if extract and GBK genes belong to the same contig
     """
     locus_tags = []
-    RGI_names = []
+    extract_names = []
     gene_name_identifiers = {}
 
     df.reset_index(drop=True, inplace=True)
@@ -207,7 +207,7 @@ def manipulate_GBK_contigs(df, genome_name):
         except IndexError:
             name = temp_name
         final_name = clean_gene_identifier(name)
-        RGI_names.append(final_name)
+        extract_names.append(final_name)
 
         # Keep track of original gene name and the modified version (if any)
         gene_name_identifiers[temp_name] = final_name
@@ -215,7 +215,7 @@ def manipulate_GBK_contigs(df, genome_name):
         locus_tags.append(genome_name + '(' + final_name + ')' + df['Cut_Off'][index][0] +
                           '_' + str(df['Best_Identities'][index]))
 
-    return locus_tags, RGI_names, gene_name_identifiers
+    return locus_tags, extract_names, gene_name_identifiers
 
 
 def partition_contig_name(contig_str):
@@ -237,17 +237,17 @@ def process_GBK_df_for_BLAST(gbk_df):
     return gbk_df
 
 
-def make_RGI_df_contig_col(rgi_df):
+def make_extract_df_contig_col(extract_df):
     """
     Applies transformation to contig name column to retain only first part of default contig col value from GBK.
     """
     new_contig_col = []
-    for value in rgi_df['Contig']:
+    for value in extract_df['Contig']:
         head, sep, tail = value.partition("_")
         new_contig_col.append(head)
-    rgi_df['Contig'] = new_contig_col
+    extract_df['Contig'] = new_contig_col
 
-    return rgi_df
+    return extract_df
 
 
 def group_by_contig(gbk_df):
@@ -263,52 +263,52 @@ def group_by_contig(gbk_df):
     return datasets
 
 
-def get_unique_AMR_genes(RGI_hit_dicts):
+def get_unique_AMR_genes(extract_hit_dicts):
     """
     Helper function to return a list of all unique AMR genes present across all inputted genomes.
     """
     unique_AMR_genes = set()
-    for RGI_hit_dict in RGI_hit_dicts:
+    for extract_hit_dict in extract_hit_dicts:
         # Get a list of all AMR genes present in the genome
-        AMR_genes = list(RGI_hit_dict.keys())
+        AMR_genes = list(extract_hit_dict.keys())
         # Add to set
         unique_AMR_genes.add(tuple(AMR_genes))
 
     return unique_AMR_genes
 
 
-def rename_duplicate_genes(rgi_dataframes):
+def rename_duplicate_genes(extract_dataframes):
     """
-    Given an RGI dataframe, renames duplicate genes by numbering them according to their contig and start index
+    Given an extract dataframe, renames duplicate genes by numbering them according to their contig and start index
     (e.g. multiple instances of vanA become vanA_1-1014, van_2-2500, etc.).
     """
     # Key: genome ID, Val: dict of multiple unique occurrences of the same gene
     multi_gene_genome_dict = {}
-    for genome_id, rgi_df in rgi_dataframes.items():
+    for genome_id, extract_df in extract_dataframes.items():
 
         # Key: gene name, Val = list of contig and start indices for that occurrence
         multi_gene_instances = {}
         unique_genes = []
-        for val in range(len(rgi_df)):
-            if rgi_df['Best_Hit_ARO'][val] not in unique_genes:
-                unique_genes.append(rgi_df['Best_Hit_ARO'][val])
+        for val in range(len(extract_df)):
+            if extract_df['Best_Hit_ARO'][val] not in unique_genes:
+                unique_genes.append(extract_df['Best_Hit_ARO'][val])
 
     return
 
 
-def find_union_AMR_genes(rgi_dataframes):
+def find_union_AMR_genes(extract_dataframes):
     """
-    TBD with refactoring: used to obtain unique ARO hits from all RGI dataframes and find the union of best hits.
+    TBD with refactoring: used to obtain unique ARO hits from all extract dataframes and find the union of best hits.
     """
     unique_best_hit_ARO = {}
     union_of_best_hits = []
 
-    # Iterate over every RGI dataframe: need to replace genes in all of them
-    for genome_id, rgi_df in rgi_dataframes.items():
+    # Iterate over every extract dataframe: need to replace genes in all of them
+    for genome_id, extract_df in extract_dataframes.items():
         unique_best_hits = []
-        for val in range(len(rgi_df)):
-            if rgi_df['Best_Hit_ARO'][val] not in unique_best_hits:
-                unique_best_hits.append(rgi_df['Best_Hit_ARO'][val])
+        for val in range(len(extract_df)):
+            if extract_df['Best_Hit_ARO'][val] not in unique_best_hits:
+                unique_best_hits.append(extract_df['Best_Hit_ARO'][val])
 
         unique_best_hit_ARO[genome_id] = list(set(unique_best_hits))
 
@@ -320,29 +320,29 @@ def find_union_AMR_genes(rgi_dataframes):
     return unique_best_hit_ARO, union_of_best_hits
 
 
-def check_duplicate_genes(RGI_dataframes, ARO_union):
+def check_duplicate_genes(extract_dataframes, ARO_union):
     """
-    Given the RGI dataframes for the genomes being analyzed, labels multi-gene instances numerically to differentiate
+    Given the extract dataframes for the genomes being analyzed, labels multi-gene instances numerically to differentiate
     between them downstream.
     """
     all_unique_ARO = []
     for AMR_gene in ARO_union:
-        for genome, rgi_df in RGI_dataframes.items():
+        for genome, extract_df in extract_dataframes.items():
 
             # Locate all instances of the gene within the genome
-            AMR_gene_row = rgi_df.loc[rgi_df['Best_Hit_ARO'] == AMR_gene]
+            AMR_gene_row = extract_df.loc[extract_df['Best_Hit_ARO'] == AMR_gene]
 
             # Case 1: If multiple instances are present, make a new dictionary for each new gene and modify the df
             if len(AMR_gene_row) > 1:
                 instance_num = 1
                 for gene_instance in range(len(AMR_gene_row)):
                     # Relabel each instance and save in the df
-                    gene_name_tokens = rgi_df['Best_Hit_ARO'][gene_instance].split('_')
+                    gene_name_tokens = extract_df['Best_Hit_ARO'][gene_instance].split('_')
                     if instance_num > 1:
                         del gene_name_tokens[-1]
                     restored_gene_name = '_'.join(gene_name_tokens)
                     gene_name = restored_gene_name + '_' + str(instance_num)
-                    rgi_df.loc[:, ('Best_Hit_ARO', gene_instance)] = gene_name
+                    extract_df.loc[:, ('Best_Hit_ARO', gene_instance)] = gene_name
                     instance_num += 1
 
                     # Append with new name
@@ -351,16 +351,16 @@ def check_duplicate_genes(RGI_dataframes, ARO_union):
             elif len(AMR_gene_row) == 1:
                 all_unique_ARO.append(AMR_gene)
 
-    return RGI_dataframes, set(all_unique_ARO)
+    return extract_dataframes, set(all_unique_ARO)
 
 
-def make_AMR_dict(RGI_dataframes, AMR_gene_index):
+def make_AMR_dict(extract_dataframes, AMR_gene_index):
     """
-    Given the RGI dataframes for the genomes being analyzed, creates a dictionary of AMR genes
+    Given the extract dataframes for the genomes being analyzed, creates a dictionary of AMR genes
     """
     AMR_dict = {}
-    for genome, rgi_df in RGI_dataframes.items():
-        AMR_gene_row = rgi_df.loc[rgi_df['Best_Hit_ARO'] == AMR_gene_index]
+    for genome, extract_df in extract_dataframes.items():
+        AMR_gene_row = extract_df.loc[extract_df['Best_Hit_ARO'] == AMR_gene_index]
         if len(AMR_gene_row) > 0:
             AMR_dict[genome] = AMR_gene_row
 
@@ -443,7 +443,7 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
 
 def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_genes, neighborhood_size):
     """
-    Given a dictionary of AMR genes determined using RGI outputs and a list of unique AMR genes, creates one dictionary
+    Given a dictionary of AMR genes determined using extract outputs and a list of unique AMR genes, creates one dictionary
     containing all AMR gene neighborhoods for a fixed size of 2N (user-defined by neighborhood_size, i.e., N genes
     downstream and upstream) for the set of genomes being analyzed.
     """
@@ -467,7 +467,7 @@ def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_ge
 
         for genome, data in AMR_dict.items():
 
-            # Get start index of the focal AMR gene from the RGI dataframe
+            # Get start index of the focal AMR gene from the extract dataframe
             start_vals = AMR_dict[genome]['Start']
             start_vals_list = list(start_vals)
             start_index = start_vals_list[0]
@@ -569,17 +569,17 @@ def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.2
     return AMR_gene_dict
 
 
-def get_AMR_gene_statistics(rgi_dataframes):
+def get_AMR_gene_statistics(extract_dataframes):
     """
-    Given RGI dataframes, counts the number of Perfect and Strict hits in each genome.
+    Given extract dataframes, counts the number of Perfect and Strict hits in each genome.
     Needed for extraction summary file.
     """
     amr_gene_statistics = {}
-    for genome, rgi_df in rgi_dataframes.items():
+    for genome, extract_df in extract_dataframes.items():
         try:
-            perfect_count = len(rgi_df[rgi_df["Cut_Off"] == "Perfect"])
-            strict_count = len(rgi_df[rgi_df["Cut_Off"] == "Strict"])
-            loose_count = len(rgi_df[rgi_df["Cut_Off"] == "Loose"])
+            perfect_count = len(extract_df[extract_df["Cut_Off"] == "Perfect"])
+            strict_count = len(extract_df[extract_df["Cut_Off"] == "Strict"])
+            loose_count = len(extract_df[extract_df["Cut_Off"] == "Loose"])
             amr_gene_statistics[genome] = [perfect_count, strict_count, loose_count]
         except IndexError:
             pass
@@ -620,25 +620,25 @@ def write_summary_file(output_dir, gbk_dataframes, neighborhood_size, ARO_union,
                                                                             loose=counts[2]))
 
 
-def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff_percent):
+def extract_neighborhoods(extract_path, gbk_path, output_path, num_neighbors, cutoff_percent):
     """
-    Driver script for extracting all AMR gene neighborhoods from specified GBK and RGI files to output FASTA format
+    Driver script for extracting all AMR gene neighborhoods from specified GBK and extract files to output FASTA format
     protein sequences for each neighborhood.
     """
-    # 0) Get user path args from pipeline for path to RGI files and GBK files
+    # 0) Get user path args from pipeline for path to extract files and GBK files
     try:
-        rgi_filepaths, gbk_filepaths = load_filepaths(rgi_path, gbk_path)
+        extract_filepaths, gbk_filepaths = load_filepaths(extract_path, gbk_path)
     except IndexError:
-        print("Please provide paths to the RGI files and GBK files respectively when running this script.")
+        print("Please provide paths to the extract files and GBK files respectively when running this script.")
         sys.exit(1)
 
-    print("RGI filepaths: {}".format(rgi_filepaths))
+    print("extract filepaths: {}".format(extract_filepaths))
     print("GBK filepaths: {}".format(gbk_filepaths))
 
     # Make output directory if non-existent
     check_output_path(output_path)
 
-    print("Processing GBK and RGI files...")
+    print("Processing GBK and extract files...")
 
     # 1) Get Genbank records, features and annotations for each GBK file
     # Contains a dataframe for each GBK file, where keys are filenames
@@ -664,45 +664,45 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
         gbk_dataframes[gbk_filename] = gbk_df
         gbk_contigs[gbk_filename] = contig_names
 
-    # 2) Get RGI dataframes and do all required preprocessing for later manipulation and comparison
-    # Contains a dataframe for each RGI file, where keys are filenames
-    rgi_dataframes = {}
+    # 2) Get extract dataframes and do all required preprocessing for later manipulation and comparison
+    # Contains a dataframe for each extract file, where keys are filenames
+    extract_dataframes = {}
 
-    for rgi_filepath in rgi_filepaths:
-        rgi_filename = get_filename(rgi_filepath, rgi=True)
-        rgi_df = make_extraction_dataframe(rgi_filepath)
-        rgi_dataframes[rgi_filename] = rgi_df
+    for extract_filepath in extract_filepaths:
+        extract_filename = get_filename(extract_filepath, extract=True)
+        extract_df = make_extraction_dataframe(extract_filepath)
+        extract_dataframes[extract_filename] = extract_df
 
-    for rgi_filename, rgi_df in rgi_dataframes.items():
+    for extract_filename, extract_df in extract_dataframes.items():
 
-        # Replace each RGI dataframe with one with the proper DNA orientation representation to match GBKs
-        rgi_dataframes[rgi_filename] = adjust_RGI_df_orientation(rgi_df)
+        # Replace each extract dataframe with one with the proper DNA orientation representation to match GBKs
+        extract_dataframes[extract_filename] = adjust_extract_df_orientation(extract_df)
 
-        # Add locus tag and contig details to the RGI dataframes
-        rgi_dataframes[rgi_filename] = make_RGI_df_contig_col(rgi_df)
-        rgi_dataframes[rgi_filename]['Locus_Tag'], rgi_dataframes[rgi_filename][
-            'Best_Hit_ARO'], gene_name_identifiers_dict = manipulate_GBK_contigs(rgi_df, rgi_filename)
+        # Add locus tag and contig details to the extract dataframes
+        extract_dataframes[extract_filename] = make_extract_df_contig_col(extract_df)
+        extract_dataframes[extract_filename]['Locus_Tag'], extract_dataframes[extract_filename][
+            'Best_Hit_ARO'], gene_name_identifiers_dict = manipulate_GBK_contigs(extract_df, extract_filename)
 
         # Preprocess all bracketed columns to remove brackets
-        for col in rgi_df:
-            if type(rgi_df[col][0]) is list or isinstance(rgi_df[col][0], str):
+        for col in extract_df:
+            if type(extract_df[col][0]) is list or isinstance(extract_df[col][0], str):
                 try:
-                    rgi_df[col] = rgi_df[col].apply(lambda x: strip_brackets(x))
+                    extract_df[col] = extract_df[col].apply(lambda x: strip_brackets(x))
                 except AttributeError:
                     pass
 
     # 4) Get unique ARO terms and union of all unique ARO terms
-    ARO_best_terms, ARO_union = find_union_AMR_genes(rgi_dataframes)
+    ARO_best_terms, ARO_union = find_union_AMR_genes(extract_dataframes)
 
     # 5) Get AMR dict for all genomes
-    # rgi_modified_dataframes, unique_ARO = check_duplicate_genes(rgi_dataframes, ARO_union)
-    # genomes_AMR_dict = make_AMR_dict(rgi_modified_dataframes, unique_ARO)
+    # extract_modified_dataframes, unique_ARO = check_duplicate_genes(extract_dataframes, ARO_union)
+    # genomes_AMR_dict = make_AMR_dict(extract_modified_dataframes, unique_ARO)
     genomes_AMR_dict = {}
     for AMR_gene in ARO_union:
         # Make entry for gene occurrences
-        genomes_AMR_dict[AMR_gene] = make_AMR_dict(rgi_dataframes, AMR_gene)
+        genomes_AMR_dict[AMR_gene] = make_AMR_dict(extract_dataframes, AMR_gene)
 
-    amr_statistics = get_AMR_gene_statistics(rgi_dataframes)
+    amr_statistics = get_AMR_gene_statistics(extract_dataframes)
 
     genomes_AMR_dict_filtered = delete_low_occurring_genes(genomes_AMR_dict, len(gbk_filepaths), cutoff_percent)
 
@@ -764,7 +764,7 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
 
 def main(args=None):
     args = parse_args(args)
-    extract_neighborhoods(args.RGI_PATH, args.GBK_PATH, args.OUTPUT_PATH, args.n, args.p)
+    extract_neighborhoods(args.EXTRACT_PATH, args.GBK_PATH, args.OUTPUT_PATH, args.n, args.p)
 
 
 if __name__ == '__main__':
