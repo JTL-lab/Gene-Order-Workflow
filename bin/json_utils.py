@@ -596,7 +596,7 @@ def load_JSON_data(output_path, AMR_gene, surrogates=False):
     """
     json_data = ''
     if surrogates:
-        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '_surrogates.json
+        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '_surrogates.json'
     else:
         gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '.json'
 
