@@ -303,7 +303,6 @@ def rename_duplicate_genes(rgi_dataframes):
         for val in range(len(rgi_df)):
             if rgi_df['Best_Hit_ARO'][val] not in unique_genes:
                 unique_genes.append(rgi_df['Best_Hit_ARO'][val])
-                print("Added gene {}!".format(rgi_df['Best_Hit_ARO'][val]))
 
     return
 
@@ -317,53 +316,10 @@ def find_union_AMR_genes(rgi_dataframes):
 
     # Iterate over every RGI dataframe: need to replace genes in all of them
     for genome_id, rgi_df in rgi_dataframes.items():
-
         unique_best_hits = []
-
         for val in range(len(rgi_df)):
-
-            # Case 1: First time the gene has occurred in the genome
-            # unique_best_hits_set = set([val.split('_')[0] for val in unique_best_hits])
-            # if rgi_df['Best_Hit_ARO'][val] not in unique_best_hits and rgi_df['Cut_Off'][val] != 'Loose':
             if rgi_df['Best_Hit_ARO'][val] not in unique_best_hits:
                 unique_best_hits.append(rgi_df['Best_Hit_ARO'][val])
-                print("Added gene {}!".format(rgi_df['Best_Hit_ARO'][val]))
-
-            # Case 2-3: same gene is present multiple times, need to number them to indicate distinct instances
-            # else:
-            # Determine the count (look for substring) and update the new gene with the proper indice accordingly
-            #    same_genes = [unique_best_hits[g] for g in range(len(unique_best_hits)) \
-            #                  if rgi_df['Best_Hit_ARO'][val] in unique_best_hits[g]]
-            #    print(same_genes)
-            #    df_copy = rgi_df.copy()
-
-            # Case 2: If only one other gene, label them 1 and 2 and modify dataframes accordingly
-            #    if len(same_genes) == 1:
-
-            # Number the first instance accordingly
-            # numbered_gene = df_copy['Best_Hit_ARO'][same_genes[0]] + '_1'
-            # rgi_df.loc[:, ('Best_Hit_ARO', same_genes[0])] = numbered_gene
-
-            # Update the second instance
-            #        new_gene_name = df_copy['Best_Hit_ARO'][val] + '_2'
-            #        rgi_df.loc[:, ('Best_Hit_ARO', val)] = new_gene_name
-            #        print("Renamed gene: {}".format(rgi_df['Best_Hit_ARO'][val]))
-            #        print("Now we've got {a} and {b}!".format(a=same_genes[0],
-            #                                                  b=rgi_df['Best_Hit_ARO'][val]))
-
-            # Add the newly named gene
-            #        unique_best_hits.append(new_gene_name)
-
-            # 3) If more than two instances already, get the last numbered gene and increment the new one's name
-            #    elif len(same_genes) > 1:
-            #        numbered_gene = df_copy['Best_Hit_ARO'][same_genes[len(same_genes) - 1]]
-            #        numbered_gene_tokens = numbered_gene.split('_')
-            #        print("Gene tokens: {}".format(numbered_gene_tokens))
-
-            #        num = int(numbered_gene_tokens[len(numbered_gene_tokens) - 1]) + 1
-            #        rgi_df.loc[:, ('Best_Hit_ARO', 'val')] = numbered_gene + '_' + str(num)
-            #        print("New name: " + str(numbered_gene) + '_' + str(num))
-            #        unique_best_hits.append(rgi_df['Best_Hit_ARO'][val] + '_' + str(num))
 
         unique_best_hit_ARO[genome_id] = list(set(unique_best_hits))
 
@@ -459,8 +415,8 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
                                                      'Product', 'Protein_Sequence', 'Contig_Name'])
         for i in range(len(downstream_indices) - 1, -1, -1):
             try:
-                neighbor = contig_df.iloc[downstream_indices[i]]
-                pd.concat([downstream_neighbors, neighbor])
+                neighbor = contig_df.iloc[[downstream_indices[i]]]
+                downstream_neighbors = pd.concat([downstream_neighbors, neighbor])
             except IndexError:
                 print("Contig end found at position -{} downstream.".format(i + 1))
                 neighborhood_indices.append(i + 1)
@@ -476,13 +432,12 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
         for i in range(len(upstream_indices)):
             contig_end_found = False
             try:
-                neighbor = contig_df.iloc[upstream_indices[i]]
-                pd.concat([upstream_neighbors, neighbor])
+                neighbor = contig_df.iloc[[upstream_indices[i]]]
+                upstream_neighbors = pd.concat([upstream_neighbors, neighbor])
             except IndexError:
                 if not contig_end_found:
                     print("Contig end found at position {} upstream.".format(i + 1))
                     contig_end_found = True
-
                 if len(neighborhood_indices) < 2:
                     neighborhood_indices.append(i + 1)
 
@@ -526,7 +481,6 @@ def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_ge
             # Get start index of the focal AMR gene from the RGI dataframe
             start_vals = AMR_dict[genome]['Start']
             start_vals_list = list(start_vals)
-            print("Start indices for gene {g} in genome {e}: {s}".format(g=AMR_gene, e=genome, s=start_vals_list))
             start_index = start_vals_list[0]
 
             # Make gene neighborhood dataframe for each genome for the focal gene, AMR_gene
@@ -1200,8 +1154,6 @@ def extract_neighborhoods(rgi_path, gbk_path, output_path, num_neighbors, cutoff
         # Retain GBK dataframe and GBK list of contig names with filename as key
         gbk_dataframes[gbk_filename] = gbk_df
         gbk_contigs[gbk_filename] = contig_names
-
-    print(gbk_dataframes)
 
     # 2) Get RGI dataframes and do all required preprocessing for later manipulation and comparison
     # Contains a dataframe for each RGI file, where keys are filenames
