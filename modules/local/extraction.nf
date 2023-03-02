@@ -4,6 +4,11 @@ process EXTRACTION {
 
     publishDir "${params.output_path}"
 
+    conda (params.enable_conda ? "conda-forge::python=3.8.3" : null)
+    if (workflow.containerEngine == 'singularity') {
+        container "library://jtl-lab-dev/bioinf-workflows/gene-order-workflow"
+    }
+
     input:
       path extract_path
       path gbk_path
