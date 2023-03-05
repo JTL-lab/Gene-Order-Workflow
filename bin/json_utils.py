@@ -46,7 +46,7 @@ def reverse_start_end(df, n_start, n_stop):
     return df
 
 
-def reverse_df(df, n_start, n_stop, amr_gene_index):
+def reverse_df(df, n_start, n_stop, gene_index):
     """
     Given a neighborhood dataframe we want to reverse, performs the following:
     (i) Reverses orientation of each gene.
@@ -66,7 +66,7 @@ def reverse_df(df, n_start, n_stop, amr_gene_index):
     return swapped_df.copy(deep=True)
 
 
-def make_neighborhood_JSON_data(AMR_gene_neighborhoods_dict, AMR_gene):
+def make_neighborhood_JSON_data(gene_neighborhoods_dict, gene):
     """
     Creates dictionary of data required to write neighborhoods JSON file.
     This function should be run on the complete set of neighborhoods (i.e. for all AMR genes).
@@ -81,7 +81,7 @@ def make_neighborhood_JSON_data(AMR_gene_neighborhoods_dict, AMR_gene):
     # Genome gene contig dict
     genome_contigs = {}
 
-    for genome_id, neighborhood_df in AMR_gene_neighborhoods_dict.items():
+    for genome_id, neighborhood_df in gene_neighborhoods_dict.items():
 
         neighborhood_data = {}
         contigs_dict = {}
@@ -105,10 +105,10 @@ def make_neighborhood_JSON_data(AMR_gene_neighborhoods_dict, AMR_gene):
         indices = neighborhood_df.index.values.tolist()
 
         # Reverse the neighborhood representation if the focal gene is not oriented correctly
-        amr_gene_index = int((len(indices) - 1) / 2)
+        gene_index = int((len(indices) - 1) / 2)
 
-        if neighborhood_df['Gene_Strand'][amr_gene_index] == -1:
-            neighborhood_df = reverse_df(neighborhood_df, loci_data["start"], loci_data["end"], amr_gene_index)
+        if neighborhood_df['Gene_Strand'][gene_index] == -1:
+            neighborhood_df = reverse_df(neighborhood_df, loci_data["start"], loci_data["end"], gene_index)
 
         for i in neighborhood_df.index:
             gene_data = {}
@@ -208,13 +208,13 @@ def make_neighborhood_JSON_data(AMR_gene_neighborhoods_dict, AMR_gene):
     return neighborhood_json_data
 
 
-def load_surrogates_file(output_path, AMR_gene):
+def load_surrogates_file(output_path, gene):
     """
     Loads surrogates file into dictionary where keys are surrogate genome IDs, values are lists of genomes they are
     respectively standing in for.
     """
     surrogates_dict = {}
-    with open(output_path + '/JSON/surrogates/' + AMR_gene + '_surrogates.txt', 'r') as infile:
+    with open(output_path + '/JSON/surrogates/' + gene + '_surrogates.txt', 'r') as infile:
         data = infile.readlines()
 
     for line in data:
@@ -232,14 +232,14 @@ def load_surrogates_file(output_path, AMR_gene):
     return surrogates_dict
 
 
-def update_UID_JSON_data(json_data, AMR_gene, output_path):
+def update_UID_JSON_data(json_data, gene, output_path):
     """
     Given gene JSON files, revisits all neighborhood genes to cross-check unidentified (UID) genes against other
     unidentified genes BLAST results to check if they are the same. If they are, updates gene groups and gene links
     accordingly.
     """
     # Load surrogate data
-    surrogate_dict = load_surrogates_file(output_path, AMR_gene)
+    surrogate_dict = load_surrogates_file(output_path, gene)
 
     # Keep track of new groups and links for UIDs
     group_data = {}
@@ -334,7 +334,7 @@ def update_UID_JSON_data(json_data, AMR_gene, output_path):
     return json_data
 
 
-def write_neighborhood_JSON(neighborhood_json_data, AMR_gene, output_path, surrogates=False):
+def write_neighborhood_JSON(neighborhood_json_data, gene, output_path, surrogates=False):
     """
     Creates JSON file containing neighborhood data for an AMR gene for the genomes under analysis of the following form
     (where the first N neighbor genes represent the N neighbors downstream of the target gene, and the last N
@@ -349,13 +349,13 @@ def write_neighborhood_JSON(neighborhood_json_data, AMR_gene, output_path, surro
         links_data = neighborhood_json_data['links']
         groups_data = neighborhood_json_data['groups']
     except KeyError:
-        print("Neighborhood data for {g} was not found.".format(g=AMR_gene))
+        print("Neighborhood data for {g} was not found.".format(g=gene))
         return
 
     if surrogates:
-        output_file_path = out_path + '/' + AMR_gene + '_surrogates.json'
+        output_file_path = out_path + '/' + gene + '_surrogates.json'
     else:
-        output_file_path = out_path + '/' + AMR_gene + '.json'
+        output_file_path = out_path + '/' + gene + '.json'
 
     with open(output_file_path, 'w') as outfile:
         outfile.write('{\n')
@@ -488,7 +488,7 @@ def write_neighborhood_JSON(neighborhood_json_data, AMR_gene, output_path, surro
         outfile.write('}\n')
 
 
-def write_clustermap_JSON_HTML(AMR_gene, sample_data_path, out_path, rep_type='standard'):
+def write_clustermap_JSON_HTML(gene, sample_data_path, out_path, rep_type='standard'):
     """
     Generates accompanying HTML file for clustermap compatible JSON representation of neighborhood.
     Creates standalone HTML file for each respective type of neighborhood representation (e.g. standard,
@@ -496,16 +496,16 @@ def write_clustermap_JSON_HTML(AMR_gene, sample_data_path, out_path, rep_type='s
     """
 
     if rep_type == 'upgma':
-        file_path = out_path + '/JSON/' + AMR_gene + '_upgma.html'
-        second_line = '\t\td3.json("' + AMR_gene + '_upgma.json"' + ')\n'
+        file_path = out_path + '/JSON/' + gene + '_upgma.html'
+        second_line = '\t\td3.json("' + gene + '_upgma.json"' + ')\n'
 
     elif rep_type == 'surrogates':
-        file_path = out_path + '/JSON/' + AMR_gene + '_surrogates.html'
-        second_line = '\t\td3.json("' + AMR_gene + '_surrogates.json"' + ')\n'
+        file_path = out_path + '/JSON/' + gene + '_surrogates.html'
+        second_line = '\t\td3.json("' + gene + '_surrogates.json"' + ')\n'
 
     else: # rep_type == 'standard'
-        file_path = out_path + '/JSON/' + AMR_gene + '.html'
-        second_line = '\t\td3.json("' + AMR_gene + '.json"' + ')\n'
+        file_path = out_path + '/JSON/' + gene + '.html'
+        second_line = '\t\td3.json("' + gene + '.json"' + ')\n'
 
 
     # Make HTML index file with appropriate JSON
@@ -531,18 +531,18 @@ def write_clustermap_JSON_HTML(AMR_gene, sample_data_path, out_path, rep_type='s
         html_outfile.write('</html>')
 
 
-def make_AMR_gene_HTML(AMR_genes_list, sample_data_path, out_path):
+def make_gene_HTML(genes_list, sample_data_path, out_path):
     """
     For each AMR gene for which a JSON file was created, generates an accompanying HTML file for rendering its gene
     order visualization using clustermap with. This is done for each gene individually to
     """
 
-    for AMR_gene in AMR_genes_list:
+    for gene in genes_list:
         # Make HTML index file with appropriate JSON
-        write_clustermap_JSON_HTML(AMR_gene, sample_data_path, out_path)
+        write_clustermap_JSON_HTML(gene, sample_data_path, out_path)
 
         # Make surrogate HTML
-        write_clustermap_JSON_HTML(AMR_gene, sample_data_path, out_path, rep_type='surrogates')
+        write_clustermap_JSON_HTML(gene, sample_data_path, out_path, rep_type='surrogates')
 
 
 def get_cluster_data_genes_uid_list(json_cluster_data, genome_ids):
@@ -590,15 +590,15 @@ def remove_defunct_clustermap_data(json_data):
     return json_data
 
 
-def load_JSON_data(output_path, AMR_gene, surrogates=False):
+def load_JSON_data(output_path, gene, surrogates=False):
     """
     Helper function for loading JSON neighborhood data.
     """
     json_data = ''
     if surrogates:
-        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '_surrogates.json'
+        gene_path = '../../../' + output_path + '/JSON/' + gene + '_surrogates.json'
     else:
-        gene_path = '../../../' + output_path + '/JSON/' + AMR_gene + '.json'
+        gene_path = '../../../' + output_path + '/JSON/' + gene + '.json'
 
     print(gene_path)
     with open(gene_path, 'r') as infile:
@@ -614,10 +614,10 @@ def update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False):
     Updates JSON representations of AMR gene neighborhoods created using extraction module so that gene cluster links
     reflect percent identities found in blast results.
     """
-    for AMR_gene, blast_files_dict in BLAST_df_dict.items():
+    for gene, blast_files_dict in BLAST_df_dict.items():
 
         # Load AMR gene JSON link data
-        json_data, gene_path = load_JSON_data(output_path, AMR_gene, surrogates)
+        json_data, gene_path = load_JSON_data(output_path, gene, surrogates)
 
         # Update each link according to the respective blast results
         for i in range(len(json_data["links"])):
@@ -635,13 +635,13 @@ def update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False):
 
             # Check respective BLAST file dataframe and update percent identity
             try:
-                df = BLAST_df_dict[AMR_gene][genome_1 + '_' + genome_2 + '.blast.txt']
+                df = BLAST_df_dict[gene][genome_1 + '_' + genome_2 + '.blast.txt']
                 row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
                 PI = row.PI.tolist()[0]
 
             except KeyError:
                 try:
-                    df = BLAST_df_dict[AMR_gene][genome_2 + '_' + genome_1 + '.blast.txt']
+                    df = BLAST_df_dict[gene][genome_2 + '_' + genome_1 + '.blast.txt']
                     row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
                     PI = row.PI.tolist()[0]
                 except KeyError:
@@ -653,13 +653,13 @@ def update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False):
                 PI = 0.70
 
             try:
-                df = BLAST_df_dict[AMR_gene][genome_2 + '_' + genome_1 + '.blast.txt']
+                df = BLAST_df_dict[gene][genome_2 + '_' + genome_1 + '.blast.txt']
                 row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
                 PI = row.PI.tolist()[0]
 
             except KeyError:
                 try:
-                    df = BLAST_df_dict[AMR_gene][genome_1 + '_' + genome_2 + '.blast.txt']
+                    df = BLAST_df_dict[gene][genome_1 + '_' + genome_2 + '.blast.txt']
                     row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
                     PI = row.PI.tolist()[0]
                 except KeyError:
@@ -706,7 +706,7 @@ def order_cluster_data_by_dendrogram(genome_order_dict, json_cluster_data):
     return clusters
 
 
-def order_JSON_clusters_UPGMA(output_path, AMR_gene, upgma_clusters, genome_to_num_mapping, surrogates=False):
+def order_JSON_clusters_UPGMA(output_path, gene, upgma_clusters, genome_to_num_mapping, surrogates=False):
     """
     Reorders how genomes are encoded in their respective JSON files for an AMR gene according to how they
     were clustered by UPGMA (from left to right).
@@ -714,9 +714,9 @@ def order_JSON_clusters_UPGMA(output_path, AMR_gene, upgma_clusters, genome_to_n
     # Load AMR gene JSON cluster data
     json_data = ''
     if surrogates:
-        gene_path = output_path + '/JSON/' + AMR_gene + '_surrogates.json'
+        gene_path = output_path + '/JSON/' + gene + '_surrogates.json'
     else:
-        gene_path = output_path + '/JSON/' + AMR_gene + '.json'
+        gene_path = output_path + '/JSON/' + gene + '.json'
 
     with open(gene_path, 'r') as infile:
         if len(infile.readlines()) != 0:
@@ -735,13 +735,13 @@ def order_JSON_clusters_UPGMA(output_path, AMR_gene, upgma_clusters, genome_to_n
         json.dump(json_data, outfile)
 
 
-def make_representative_UPGMA_cluster_JSON(output_path, AMR_gene, upgma_clusters, genome_to_num_mapping):
+def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, genome_to_num_mapping):
     """
     Creates a JSON file with one representative genome from each UPGMA cluster.
     """
     # Load AMR gene JSON cluster data
     json_data = ''
-    with open(output_path + '/JSON/' + AMR_gene + '.json', 'r') as infile:
+    with open(output_path + '/JSON/' + gene + '.json', 'r') as infile:
         if len(infile.readlines()) != 0:
             infile.seek(0)
             json_data = json.load(infile)
@@ -751,7 +751,7 @@ def make_representative_UPGMA_cluster_JSON(output_path, AMR_gene, upgma_clusters
 
     genome_order = map_genome_id_to_dendrogram_leaves(upgma_clusters, genome_to_num_mapping)
     cluster_df = pd.DataFrame({'genome': genome_order, 'cluster': upgma_clusters['leaves_color_list']})
-    print(AMR_gene)
+    print(gene)
     print(cluster_df)
 
     unique_clusters = set(upgma_clusters['leaves_color_list'])
@@ -774,8 +774,8 @@ def make_representative_UPGMA_cluster_JSON(output_path, AMR_gene, upgma_clusters
     #upgma_json_data = remove_defunct_clustermap_data(json_data)
 
     # Update file
-    with open(output_path + '/JSON/' + AMR_gene + '_upgma.json', 'w') as outfile:
+    with open(output_path + '/JSON/' + gene + '_upgma.json', 'w') as outfile:
         json.dump(json_data, outfile)
 
     # Make respective HTML file for Coeus
-    write_clustermap_JSON_HTML(AMR_gene, '../sample_data', output_path, rep_type='upgma')
+    write_clustermap_JSON_HTML(gene, '../sample_data', output_path, rep_type='upgma')
