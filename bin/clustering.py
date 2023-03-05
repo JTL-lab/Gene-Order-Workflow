@@ -31,6 +31,7 @@ from visualization import plot_similarity_histogram, plot_distance_histogram, \
                           graph_UPGMA_clusters, draw_mcl_graph, graph_DBSCAN_clusters, \
                           plotly_pcoa, plotly_dendrogram, plotly_mcl_network
 
+import time
 
 def parse_args(args=None):
     Description = "Cluster extracted AMR gene neighborhoods to compare conservation characteristics across genomes."
@@ -534,38 +535,6 @@ def UPGMA_clustering(condensed_distance_matrix):
         print("Empty distance matrix was passed for the gene!")
 
 
-#def MCL_hyperparameter_tuning(sparse_distance_matrix):
-#    """
-#    Performs hyperparameter tuning to find optimal inflation parameter for a given sparse distance matrix we want to
-#    apply MCL to using an Optuna study.
-#    """
-#    def objective(trial):
-#        """
-#        Optuna optimization trial for Markov Clustering Algorithm modularity (Q) score
-#        (see documentation at: https://markov-clustering.readthedocs.io/en/latest/readme.html#choosing-hyperparameters).
-#        """
-#        inflation = trial.suggest_float('inflation', 1.0, 15.0)
-
-#        result = mcl.run_mcl(sparse_distance_matrix, inflation=inflation)
-#        clusters = mcl.get_clusters(result)
-
-#        Q_score = mcl.modularity(matrix=result, clusters=clusters)
-#        return Q_score
-
-#    study = optuna.create_study(
-#        study_name='Markov_Clustering_Optimization',
-#        direction='maximize',
-#        pruner=optuna.pruners.HyperbandPruner(max_resource='auto')
-#    )
-#    study.optimize(objective, n_trials=100)
-
-    # Output results
- #   print("Best Q obtained during optimization: ", study.best_value)
- #   print("Best inflation parameter: ", study.best_params)
-
- #   return study.best_params.get('inflation')
-
-
 def MCL_clustering(matrix, inflation):
     """
     Performs MCL clustering on a neighborhood sparse similarity or symmetric distance matrix.
@@ -576,40 +545,6 @@ def MCL_clustering(matrix, inflation):
     clusters = mcl.get_clusters(result)
 
     return clusters
-
-
-#def DBSCAN_hyperparameter_tuning(np_distance_matrix):
-#    """
-#    Performs hyperparameter tuning to find optimal minPts and epsilon values for a given numpy distance matrix
-#    we want to apply DBSCAN to using an Optuna study.
-#    """
-#
-#    def objective(trial):
-#        """
-#        Optuna optimization trial for DBSCAN Density Based Validation (DBCV) score
-#        (see documentation at: https://markov-clustering.readthedocs.io/en/latest/readme.html#choosing-hyperparameters).
-#        """
-#        epsilon = trial.suggest_float('eps', 0, 1)
-#        min_points = trial.suggest_int('min_samples', 1, 5)
-
-#        distance_matrix = StandardScaler().fit_transform(np_distance_matrix)
-#        dbscan = DBSCAN(eps=epsilon, min_samples=min_points).fit(distance_matrix)
-#        dbcv_score = DBCV(X=distance_matrix, labels=dbscan.labels_, dist_function=euclidean)
-
-#        return dbcv_score
-
-#    study = optuna.create_study(
-#        study_name='DBSCAN_Optimization',
-#        direction='maximize',
-#        pruner=optuna.pruners.HyperbandPruner(max_resource='auto')
-#    )
-#    study.optimize(objective, n_trials=100)
-
-    # Output results
-#    print("Best DBCV score obtained during optimization: ", study.best_value)
-#    print("Best epsilon, min_samples parameter values found: ", study.best_params)
-
-#    return study.best_params.get('eps'), study.best_params.get('min_samples')
 
 
 def DBSCAN_clustering(np_distance_matrix, epsilon, minpts):
@@ -753,12 +688,8 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             check_output_path(output_path + '/clustering/distance_matrices')
             distance_matrix_df.to_csv(output_path + '/clustering/distance_matrices/' + AMR_gene + '_distance_matrix.csv', sep='\t', index=False)
 
-        except IndexError:
+        except (IndexError, TypeError):
             print("Unable to perform UPGMA clustering for gene {g}. " \
-                  "UPGMA results for {g} will be omitted.".format(g=AMR_gene))
-
-        except TypeError:
-            print("Unable to perform UPMA clustering for gene {g}. " \
                   "UPGMA results for {g} will be omitted.".format(g=AMR_gene))
 
         print("Generating DBSCAN clusters for {g}...".format(g=AMR_gene))
@@ -769,11 +700,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             # Plot DBSCAN clusters using distance matrix and PCoA: colour according to cluster assignment
             plotly_pcoa(distance_matrix_df, genome_names, labels, AMR_gene, output_path)
 
-        except IndexError:
-            print("Unable to perform DBSCAN clustering for gene {g}. " \
-                  "DBSCAN results for {g} will be omitted.".format(g=AMR_gene))
-
-        except KeyError:
+        except (IndexError, KeyError):
             print("Unable to perform DBSCAN clustering for gene {g}. " \
                   "DBSCAN results for {g} will be omitted.".format(g=AMR_gene))
 
@@ -798,11 +725,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             similarity_matrix_df.to_csv(output_path + '/clustering/similarity_matrices/' + AMR_gene + \
                                           '_similarity_matrix.csv', sep='\t', index=False)
 
-        except IndexError:
-            print("Unable to perform MCL clustering for gene {g}. "\
-                  "MCL results for {g} will be omitted.".format(g=AMR_gene))
-
-        except ValueError:
+        except (IndexError, ValueError):
             print("Unable to perform MCL clustering for gene {g}. "\
                   "MCL results for {g} will be omitted.".format(g=AMR_gene))
 
@@ -814,8 +737,11 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
 
 def main(args=None):
     args = parse_args(args)
+    start_time = time.time()
     cluster_neighborhoods(args.ASSEMBLY_PATH, args.FASTA_PATH, args.BLAST_PATH, args.OUTPUT_PATH, args.n, args.i, args.e, args.m)
-
+    end_time = time.time()
+    print("Time taken in seconds: {s}".format(s=end_time-start_time))
+    print("Time taken in minutes: {m}".format(m=(end_time-start_time)/60))
 
 if __name__ == '__main__':
     sys.exit(main())

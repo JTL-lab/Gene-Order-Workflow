@@ -566,7 +566,7 @@ def remove_defunct_clustermap_data(json_data):
     genome_ids = []
     for cluster in json_data["clusters"]:
         genome_ids.append(cluster["name"])
-    print("Genomes in clustermap UPGMA rep: {g}".format(g=genome_ids))
+
     gene_links = []
     for link in json_data["links"]:
 
@@ -600,7 +600,6 @@ def load_JSON_data(output_path, gene, surrogates=False):
     else:
         gene_path = '../../../' + output_path + '/JSON/' + gene + '.json'
 
-    print(gene_path)
     with open(gene_path, 'r') as infile:
         if len(infile.readlines()) != 0:
             infile.seek(0)
@@ -701,7 +700,6 @@ def order_cluster_data_by_dendrogram(genome_order_dict, json_cluster_data):
     for genome in genome_order_dict:
         for cluster in json_cluster_data:
             if cluster["name"] == genome:
-                print(cluster)
                 clusters.append(cluster)
     return clusters
 
@@ -751,8 +749,6 @@ def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, ge
 
     genome_order = map_genome_id_to_dendrogram_leaves(upgma_clusters, genome_to_num_mapping)
     cluster_df = pd.DataFrame({'genome': genome_order, 'cluster': upgma_clusters['leaves_color_list']})
-    print(gene)
-    print(cluster_df)
 
     unique_clusters = set(upgma_clusters['leaves_color_list'])
     for cluster in unique_clusters:
@@ -765,7 +761,6 @@ def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, ge
     for genome in representative_cluster_genomes:
         for cluster in json_data["clusters"]:
             if cluster["name"] == genome:
-                print(cluster)
                 clusters.append(cluster)
 
     # Update JSON data
