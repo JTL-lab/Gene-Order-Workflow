@@ -49,11 +49,11 @@ def get_fasta_filename(filepath):
     return filename
 
 
-def get_filename(filepath, rgi=False):
+def get_filename(filepath, extract=False):
     """
     Gets filename from filepath (i.e. removes directories and file suffix).
     """
-    if rgi:
+    if extract:
         if '.fna' in filepath:
             filename = os.path.basename(filepath).split('.')[0]
         else:
