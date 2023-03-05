@@ -35,12 +35,13 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { EXTRACTION } from '../modules/local/extraction'
+include { MAKE_GENOME_SAMPLESHEET } from '../modules/local/make_genome_samplesheet'
 include { MAKE_GENOME_FILEPAIRS } from '../modules/local/make_genome_filepairs'
 include { CLUSTERING } from '../modules/local/clustering'
 include { DIAMOND_BLASTP } from '../modules/nf-core/modules/nf-core/diamond/blastp/main'
 include { DIAMOND_MAKEDB } from '../modules/nf-core/modules/nf-core/diamond/makedb/main' addParams( options: [args:'--task blastp --outfmt 6 --max-hsps 1'] )
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { RUN_DIAMOND } from '../subworkflows/local/run_diamond'
+include { BLAST_GENOME_FILEPAIRS } from '../subworkflows/local/blast_genome_filepairs'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,32 +81,35 @@ workflow GENEORDERANALYSIS {
     	num_neighbors,
     	percent_cutoff
     )
-    
+
     //
-    // MODULE: Run nf-core/diamond to obtain BLAST results
+    // MODULE: Make CSV listing path to every unique genome assembly for DIAMOND MAKEDB
     //
-    def fasta_path = EXTRACTION.out.fasta_path
-    def blast_path = EXTRACTION.out.blast_path
-    
+    MAKE_GENOME_SAMPLESHEET (
+        assembly_ch,
+        output_ch
+    )
+
+    genome_paths_csv = MAKE_GENOME_SAMPLESHEET.out.genome_paths_csv
+
+    //
+    // MODULE: Make CSV listing all unique genome pairs for All-vs-All DIAMOND BLASTP
+    //
     MAKE_GENOME_FILEPAIRS (
         assembly_ch,
         output_ch
     )
 
-    csv_path = MAKE_GENOME_FILEPAIRS.out.csv_path
-    
-    //def fasta_filepaths = Channel.from('$fasta_path/*.fasta', chec)
-    //RUN_DIAMOND (
-    //    csv_path,
-    //	blast_path
-    //)
+    genome_filepairs_csv = MAKE_GENOME_FILEPAIRS.out.genome_filepairs_csv
 
-    //RUN_DIAMOND(csv_path)
+    //
+    // MODULE: Run nf-core/diamond to obtain BLAST results
+    //
+    BLAST_GENOME_FILEPAIRS(genome_paths_csv, genome_filepairs_csv)
 
     //
     // MODULE: Run clustering
     //
-    
     CLUSTERING (
         assembly_ch,
     	EXTRACTION.out.fasta_path,

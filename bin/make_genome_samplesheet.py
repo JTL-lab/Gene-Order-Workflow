@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 """
-Script to generate CSV file containing each unique filepair from among provided whole genome assembly files.
-Needed in order to do All-vs-All BLAST of unique pairs using nf-core DIAMOND BLASTP within Nextflow workflow.
+Script to generate CSV file containing the name of and path to every unique genome assembly from the provided
+whole genome assembly files. Needed to apply nf-core DIAMOND MAKEDB to them within Nextflow workflow.
 """
 
 import argparse
@@ -15,21 +15,20 @@ from utils import get_full_filepaths, remove_files, get_filename, check_output_p
 
 
 def parse_args(args=None):
-    Description = "Create CSV file listing each unique combination of genomes to BLAST in (genome1, genome2) format."
-    Epilog = "Example usage: python make_genome_filepairs.py <ASSEMBLY_PATH> <OUTPUT_PATH>"
+    Description = "Create CSV file listing each unique genome file's name and full path in a (name, path) col format."
+    Epilog = "Example usage: python make_genome_samplesheet.py <ASSEMBLY_PATH> <OUTPUT_PATH>"
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
     parser.add_argument('ASSEMBLY_PATH', metavar='asm_path', type=str,
-                        help='Path to directory containing whole genome assembly files to BLAST (e.g. .faa).')
+                        help='Path to directory containing whole genome assembly files (e.g. .faa).')
     parser.add_argument('OUTPUT_PATH', metavar='output_path', type=str, help='Path to output directory where '
                                                                              'CSV file will be outputted.')
     return parser.parse_args(args)
 
 
-def make_filepairs_csv(assembly_path, output_path):
+def make_genomes_csv(assembly_path, output_path):
     """
-    Driver script to obtain CSV listing all unique genome file pairs as needed for All-vs-All BLAST downstream
-    using NF-CORE DIAMOND BLASTP.
+    Driver script to obtain CSV listing all needed genome file details as needed for NF-CORE DIAMOND MAKEDB downstream.
     """
     check_output_path(output_path)
 
@@ -37,17 +36,18 @@ def make_filepairs_csv(assembly_path, output_path):
     full_genome_paths = get_full_filepaths(assembly_path)
 
     # Initialize column headers, row data
-    fields = ['blast_subdir', 'genome_1', 'genome_2']
+    fields = ['file_name', 'file_path']
     row_data = []
     header = False
-    
-    # Get every unique combination of genomes to BLAST against each other
-    for genome_1, genome_2 in itertools.combinations(full_genome_paths, 2):
-        row = [assembly_path, genome_1, genome_2]
+
+    # Get name and path for every whole genome assembly file
+    for genome_file_path in full_genome_paths:
+        file_name = get_filename(genome_file_path)
+        row = [file_name, genome_file_path]
         row_data.append(row)
 
     # Write data to csv file
-    with open(output_path + '/genome_pairs.csv', 'w') as csv_file:
+    with open(output_path + '/genome_paths.csv', 'w') as csv_file:
         csv_writer = csv.writer(csv_file)
         if not header:
             csv_writer.writerow(fields)
@@ -57,7 +57,7 @@ def make_filepairs_csv(assembly_path, output_path):
 
 def main(args=None):
     args = parse_args(args)
-    make_filepairs_csv(args.ASSEMBLY_PATH, args.OUTPUT_PATH)
+    make_genomes_csv(args.ASSEMBLY_PATH, args.OUTPUT_PATH)
 
 
 if __name__ == '__main__':
