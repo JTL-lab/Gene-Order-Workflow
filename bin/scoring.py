@@ -4,51 +4,23 @@
 Script for scoring utilities.
 """
 import pandas as pd
-import cProfile
-import io
-import pstats
 
-def profile(fnc):
-    """
-    Decorator that uses cProfile to profile a function
-    """
-    def inner(*args, **kwargs):
-        pr = cProfile.Profile()
-        pr.enable()
-        retval = fnc(*args, **kwargs)
-        pr.disable()
-        s = io.StringIO()
-        sortby = 'cumulative'
-        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-        ps.print_stats()
-        print(s.getvalue())
-        return retval
-
-    return inner
-
-
-def calculate_bitscore(g1_g1_bitscore, g1_g2_row):
-    return float(round(g1_g2_row.bitscore / g1_g1_bitscore, 3))
-
-
-#@profile
 def get_normalized_bitscores(blast_df):
     """
     Adds normalized bitscore column to BLAST results dataframe given dataframe contains data from BLAST textfiles
     in output format 6.
     """
-    # Get dataframe containing only rows where the query and comparison sequences are identical
+    # Get dataframe copy to modify
     blast_df_copy = blast_df.copy()
 
-    # Get dataframe containing only rows where query and comparison sequences are different
-    norm_bitscores = []
-    for row in blast_df.itertuples():
-        g1_g1_row = blast_df_copy[((blast_df_copy['query_id'] == row.query_id) & (blast_df_copy['sub_id'] == row.query_id))]
-        g1_g1_bitscore_row = g1_g1_row['bitscore'].tolist()
-        g1_g1_bitscore = g1_g1_bitscore_row[0]
-        norm_bitscore = calculate_bitscore(g1_g1_bitscore, row)
-        norm_bitscores.append(norm_bitscore)
+    # Use dictionary to store g1_g1 bitscores for each respective unique query id
+    blast_df_copy['bitscore'] = blast_df_copy['bitscore'].where(blast_df_copy['query_id']==blast_df_copy['sub_id'], other=2.000)
+    g1_g1_bitscore_dict = dict()
+    for query_id, bitscore in zip(blast_df_copy.query_id.to_list(), blast_df_copy.bitscore.to_list()):
+        if bitscore != 2.000:
+            g1_g1_bitscore_dict[query_id] = bitscore
 
-    blast_df['normalized_bitscore'] = norm_bitscores
+    # Calculate normalized bitscore by performing g1_g2_bitscore / g1_g1_bitscore as row-wise operator
+    blast_df['normalized_bitscore'] = blast_df_copy.apply(lambda row: row.bitscore / g1_g1_bitscore_dict[row.query_id], axis=1)
 
     return blast_df
