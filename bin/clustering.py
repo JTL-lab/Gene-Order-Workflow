@@ -32,6 +32,7 @@ from visualization import plot_similarity_histogram, plot_distance_histogram, \
                           plotly_pcoa, plotly_dendrogram, plotly_mcl_network
 
 import time
+import multiprocessing as mp
 
 def parse_args(args=None):
     Description = "Cluster extracted AMR gene neighborhoods to compare conservation characteristics across genomes."
@@ -125,34 +126,6 @@ def blast_neighborhoods(assembly_path, blast_path):
     run_DIAMOND_BLAST(fa_file_paths, blast_path)
 
 
-def blast_neighborhoods(fasta_path, blast_path):
-    """
-    Calls DIAMOND BLAST on all gene neighborhood FASTA outputs.
-    """
-    # Get BLAST results for each AMR gene neighborhood set
-    fasta_folder_paths = get_full_filepaths(fasta_path)
-    # For each AMR gene, get the neighborhood set for all genomes for a given AMR gene
-    for AMR_gene_subdir in fasta_folder_paths:
-        # Remove non-FASTA files
-        remove_files(AMR_gene_subdir, '.fasta')
-
-        # Make output dir for AMR gene within blast output
-        AMR_gene_name = get_filename(AMR_gene_subdir)
-        dir_output_path = blast_path + '/' + AMR_gene_name
-
-        # If BLAST files already exist for a given gene directory, skip it
-        if os.path.exists(dir_output_path):
-                pass
-        else:
-                check_output_path(dir_output_path)
-                # Get all genome neighborhood fasta paths
-                root_path = fasta_path + '/' + AMR_gene_name
-                full_genome_paths = get_full_filepaths(root_path)
-
-                # All vs All BLAST each genome pair against each other once
-                run_DIAMOND_BLAST(full_genome_paths, root_path, dir_output_path)
-
-
 def make_fasta_contig_dict(fasta_path, AMR_gene):
     """
     Given FASTA neighborhood file, creates a dictionary where keys correspond to indices from 0 to N,
@@ -183,18 +156,12 @@ def get_blast_dict_whole_genomes(fasta_path, output_path):
     dataframe as values.
     """
     blast_path = '../../../' + output_path + '/blast'
-    AMR_genes = os.listdir(fasta_path)
+    AMR_genes = (filename for filename in os.listdir(fasta_path))
 
     BLAST_df_dict = {}
     for AMR_gene in AMR_genes:
-
-        # Get the fasta file contents for each genome for that gene so contigs can be easily parsed
         fasta_dict = make_fasta_contig_dict(fasta_path, AMR_gene)
-
-        # Make the BLAST dataframe using the contig dict
         AMR_dict = get_AMR_blast_df(AMR_gene, blast_path, fasta_path, fasta_dict)
-
-        #AMR_dict = get_AMR_blast_dict(blast_path, AMR_gene)
         BLAST_df_dict[AMR_gene] = AMR_dict
 
     return BLAST_df_dict
@@ -245,9 +212,6 @@ def append_FASTA_neighborhood_contigs(filename, AMR_gene, contig_dict, identical
     # Dataframe containing genome BLAST results
     data_df = load_BLAST_file_df(filename)
 
-    if AMR_gene == 'RCP1' and filename == 'SAMEA1486355_SAMEA1466699.dmnd.out':
-        data_df.to_csv('data_df.csv', index=True)
-
     for contig in contig_dict.keys():
         contig_rows = get_contig_rows(contig_dict[contig], data_df, identical=identical)
         df = df.append(contig_rows)
@@ -258,38 +222,23 @@ def append_FASTA_neighborhood_contigs(filename, AMR_gene, contig_dict, identical
     return df
 
 
+def process_blast_file(blast_file, AMR_gene, fasta_dict, identical):
+    blast_rows_df = append_FASTA_neighborhood_contigs(blast_file, AMR_gene, fasta_dict, identical)
+    return blast_rows_df
+
 def get_AMR_blast_df(AMR_gene, blast_path, fasta_path, fasta_dict):
-    """
-    Loads whole genome BLAST into a dataframe with only relevant contig data rows.
-    """
-    # Identify all genomes the gene is present in using FASTA outputs
     present_genomes = [key.split('.')[0] for key in fasta_dict.keys()]
 
     AMR_dict = {}
-    for genome_1, genome_2 in itertools.combinations(present_genomes, 2):
-
-        # Initialize empty dataframe to hold desired contig data
-        df = pd.DataFrame(columns=['query_id', 'sub_id', 'PI', 'aln_len', 'n_of_mismatches', 'gap_openings',
-                                   'q_start', 'q_end', 's_start', 's_end', 'Evalue', 'bitscore'])
-
-        # Load comparative BLAST file
-        filename = ''
-        genome_1_genome_2_file_name = blast_path + '/'  + genome_1 + '_' + genome_2 + '.dmnd.out'
-        genome_2_genome_1_file_name = blast_path + '/' + genome_2 + '_' + genome_1 + '.dmnd.out'
-        genome_1_file_name = blast_path + '/' + genome_1 + '_' + genome_1 + '.dmnd.out'
-        genome_2_file_name = blast_path + '/' + genome_2 + '_' + genome_2 + '.dmnd.out'
-
-        # Append all relevant BLAST rows for neighborhood contigs to df
-        files = [genome_1_genome_2_file_name, genome_2_genome_1_file_name, genome_1_file_name, genome_2_file_name]
-        contig_dicts = [fasta_dict[genome_1], fasta_dict[genome_2], fasta_dict[genome_1], fasta_dict[genome_2]]
-        identical_bools = [False, False, True, True]
-
-        for blast_file_name, contig_dict, bool in zip(files, contig_dicts, identical_bools):
-            blast_rows_df = append_FASTA_neighborhood_contigs(blast_file_name, AMR_gene, contig_dict, identical=bool)
-            df = df.append(blast_rows_df)
-            df.reset_index(drop=True, inplace=True)
-
-        AMR_dict[genome_1 + '_' + genome_2 + '.blast.txt'] = df
+    with mp.Pool(processes=4) as pool: # 4 processes
+        for genome_1, genome_2 in itertools.combinations(present_genomes, 2):
+            df = pd.concat(pool.starmap(process_blast_file, [
+                (blast_path + '/' + genome_1 + '_' + genome_2 + '.dmnd.out', AMR_gene, fasta_dict[genome_1], False),
+                (blast_path + '/' + genome_2 + '_' + genome_1 + '.dmnd.out', AMR_gene, fasta_dict[genome_2], False),
+                (blast_path + '/' + genome_1 + '_' + genome_1 + '.dmnd.out', AMR_gene, fasta_dict[genome_1], True),
+                (blast_path + '/' + genome_2 + '_' + genome_2 + '.dmnd.out', AMR_gene, fasta_dict[genome_2], True)
+            ]))
+            AMR_dict[genome_1 + '_' + genome_2 + '.blast.txt'] = df
 
     return AMR_dict
 
@@ -449,9 +398,10 @@ def get_similarity_matrices(amr_blast_dict, neighborhoods_dict, neighborhood_siz
                     neighborhood_2 = neighborhoods_dict[AMR_gene][genome_1_id]
                     
                 except KeyError:
-                    print("Key error for gene {g}: {a} and {b} didn't exist...".format(g=AMR_gene,
-                                                                                       a=genome_1_id + '_' + genome_2_id + '.blast.txt',
-                                                                                       b=genome_2_id + '_' + genome_1_id + '.blast.txt'))
+                    pass
+                    #print("Key error for gene {g}: {a} and {b} didn't exist...".format(g=AMR_gene,
+                    #                                                                   a=genome_1_id + '_' + genome_2_id + '.blast.txt',
+                    #                                                                   b=genome_2_id + '_' + genome_1_id + '.blast.txt'))
 
             # ORIGINAL FILTERING CONDITION
             blast_neighborhood = blast_df[(((blast_df['query_id'].isin(neighborhood_1)) &
@@ -532,7 +482,8 @@ def UPGMA_clustering(condensed_distance_matrix):
         upgma_linkage = hierarchy.average(condensed_distance_matrix)
         return upgma_linkage
     except ValueError:
-        print("Empty distance matrix was passed for the gene!")
+        pass
+        #print("Empty distance matrix was passed for the gene!")
 
 
 def MCL_clustering(matrix, inflation):
@@ -582,16 +533,16 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     num_genome_combinations = list(itertools.permutations(fa_dir_files, 2))
 
     # Make BLAST dataframe dictionary
-    print("Fetching relevant BLAST data from DIAMOND outputs for each respective neighborhood...")
+    #print("Fetching relevant BLAST data from DIAMOND outputs for each respective neighborhood...")
     BLAST_df_dict = get_blast_dict_whole_genomes(fasta_path, output_path)
 
     # Calculate normalized bitscores and save as column
-    print("Calculating normalized bitscores for downstream scoring...")
+    #print("Calculating normalized bitscores for downstream scoring...")
     final_BLAST_dict = {}
     for amr_gene_subdir, df_dict in BLAST_df_dict.items():
         blast_files_dict = {}
         for filename, blast_df in df_dict.items():
-            print("Getting normalized bitscores for gene {a} in genome {f}...".format(f=filename, a=amr_gene_subdir))
+            #print("Getting normalized bitscores for gene {a} in genome {f}...".format(f=filename, a=amr_gene_subdir))
             final_df = get_normalized_bitscores(blast_df)
             blast_files_dict[filename] = final_df
 
@@ -604,7 +555,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     #update_unidentified_genes_data(BLAST_df_dict, output_path, surrogates=False)
 
     # Update links in each AMR gene JSON file to reflect percent identities of blast hits
-    print("Updating JSON neighborhood representations' links percent identities according to BLAST results...")
+    #print("Updating JSON neighborhood representations' links percent identities according to BLAST results...")
     update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False)
     update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=True)
 
@@ -619,7 +570,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     neighborhoods = get_neighborhoods_dict(fasta_path)
 
     # Calculate similarity matrix for each gene
-    print("Calculating similarity matrices for each AMR gene...")
+    #print("Calculating similarity matrices for each AMR gene...")
     check_output_path(output_path)
     similarity_matrices_dict, AMR_genome_names_dict = get_similarity_matrices(final_BLAST_dict,
                                                                               neighborhoods,
@@ -629,7 +580,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     check_output_path(output_path + '/clustering')
 
     # Generate distance matrices
-    print("Calculating distance matrices...")
+    #print("Calculating distance matrices...")
 
     distance_matrices_df_dict = {}
     average_similarity_scores_dict = {}
@@ -645,10 +596,10 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
 
         # if directory empty of BLAST results
         except ValueError:
-            print("Was unable to locate BLAST results for gene {g}. Skipped.".format(g=AMR_gene))
             pass
+            #print("Was unable to locate BLAST results for gene {g}. Skipped.".format(g=AMR_gene))
 
-    print("Clustering neighborhoods...")
+    #print("Clustering neighborhoods...")
     check_clustering_savepaths(output_path)
 
     max_distance_scores_dict = {}
@@ -669,7 +620,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
         for i in range(len(genome_names)):
             genome_to_num_mapping[str(i)] = genome_names[i]
 
-        print("Generating UPGMA clusters for {g}...".format(g=AMR_gene))
+        #print("Generating UPGMA clusters for {g}...".format(g=AMR_gene))
         try:
             # Get UPGMA linkage matrix
             upgma_linkage = UPGMA_clustering(distance_matrix)
@@ -689,10 +640,11 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             distance_matrix_df.to_csv(output_path + '/clustering/distance_matrices/' + AMR_gene + '_distance_matrix.csv', sep='\t', index=False)
 
         except (IndexError, TypeError):
-            print("Unable to perform UPGMA clustering for gene {g}. " \
-                  "UPGMA results for {g} will be omitted.".format(g=AMR_gene))
+            pass
+            #print("Unable to perform UPGMA clustering for gene {g}. " \
+            #      "UPGMA results for {g} will be omitted.".format(g=AMR_gene))
 
-        print("Generating DBSCAN clusters for {g}...".format(g=AMR_gene))
+        #print("Generating DBSCAN clusters for {g}...".format(g=AMR_gene))
 
         try:
             dbscan_clusters, labels = DBSCAN_clustering(distance_matrix, epsilon, minpts)
@@ -701,8 +653,9 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             plotly_pcoa(distance_matrix_df, genome_names, labels, AMR_gene, output_path)
 
         except (IndexError, KeyError):
-            print("Unable to perform DBSCAN clustering for gene {g}. " \
-                  "DBSCAN results for {g} will be omitted.".format(g=AMR_gene))
+            pass
+            #print("Unable to perform DBSCAN clustering for gene {g}. " \
+            #      "DBSCAN results for {g} will be omitted.".format(g=AMR_gene))
 
     for AMR_gene, similarity_matrix_data in similarity_matrices_dict.items():
 
@@ -713,7 +666,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             df = pd.DataFrame(data=similarity_matrix, index=genome_names, columns=genome_names)
             values = df.values
 
-            print("Generating Markov clusters for {g}...".format(g=AMR_gene))
+            #print("Generating Markov clusters for {g}...".format(g=AMR_gene))
 
             clusters = MCL_clustering(similarity_matrix, inflation)
             sparse_sim_matrix = get_sparse_matrix(similarity_matrix)
@@ -726,11 +679,12 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
                                           '_similarity_matrix.csv', sep='\t', index=False)
 
         except (IndexError, ValueError):
-            print("Unable to perform MCL clustering for gene {g}. "\
-                  "MCL results for {g} will be omitted.".format(g=AMR_gene))
+            pass
+            #print("Unable to perform MCL clustering for gene {g}. "\
+            #      "MCL results for {g} will be omitted.".format(g=AMR_gene))
 
     # Generate summary histograms for analyzed genomes' similarities
-    print("Generating average similarity and max distance histograms for all neighborhoods...")
+    #print("Generating average similarity and max distance histograms for all neighborhoods...")
     plot_similarity_histogram(average_similarity_scores_dict, output_path)
     plot_distance_histogram(max_distance_scores_dict, output_path)
 
