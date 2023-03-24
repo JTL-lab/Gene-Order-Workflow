@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Methods for generating JSON representations of extracted neighborhoods that can be used with clustermap.js.
 """
@@ -8,9 +7,7 @@ import json
 import itertools
 import pandas as pd
 from utils import check_output_path, generate_alphanumeric_string
-from collections import defaultdict
-from functools import partial
-from multiprocessing import Pool
+
 
 def swap_neighborhood_orientation(df):
     """
@@ -568,7 +565,6 @@ def remove_defunct_clustermap_data(json_data):
     genome_ids = []
     for cluster in json_data["clusters"]:
         genome_ids.append(cluster["name"])
-
     gene_links = []
     for link in json_data["links"]:
 
@@ -610,48 +606,70 @@ def load_JSON_data(output_path, gene, surrogates=False):
     return json_data, gene_path
 
 
-def update_link_identity(link, blast_df_dict, gene):
-    """
-    Parallelizable function for updating percent identity of links in JSON representation.
-    """
-    contig_data = link["uid"].split('-')
-    contig_id_1 = contig_data[0].split('_')
-    contig_id_2 = contig_data[1].split('_')
-    contig_1 = contig_id_1[1] + '_' + contig_id_1[2]
-    contig_2 = contig_id_2[1] + '_' + contig_id_2[2]
-    genome_1 = contig_1.split('_')[0]
-    genome_2 = contig_2.split('_')[0]
-    try:
-        df = blast_df_dict[gene][genome_1 + '_' + genome_2 + '.blast.txt']
-    except KeyError:
-        try:
-            df = blast_df_dict[gene][genome_2 + '_' + genome_1 + '.blast.txt']
-        except KeyError:
-            link["identity"] = 0.70
-            return link
-    row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2)), "PI"]
-    if len(row) > 0:
-        link["identity"] = row.iloc[0]
-    else:
-        link["identity"] = 0.70
-    return link
-
-
 def update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False):
     """
-    Updates JSON representations of gene neighborhoods created using extraction module so that gene cluster links
+    Updates JSON representations of AMR gene neighborhoods created using extraction module so that gene cluster links
     reflect percent identities found in blast results.
     """
     for gene, blast_files_dict in BLAST_df_dict.items():
-        # Load gene JSON link data
+
+        # Load AMR gene JSON link data
         json_data, gene_path = load_JSON_data(output_path, gene, surrogates)
 
         # Update each link according to the respective blast results
-        update_link_identity_partial = partial(update_link_identity, blast_df_dict=blast_files_dict, gene=gene)
-        with Pool() as p:
-            json_data["links"] = p.map(update_link_identity_partial, json_data["links"])
+        for i in range(len(json_data["links"])):
 
-        # Update JSON file
+            # Contig identifiers
+            contig_data = json_data["links"][i]["uid"].split('-')
+            contig_id_1 = contig_data[0].split('_')
+            contig_id_2 = contig_data[1].split('_')
+            contig_1 = contig_id_1[1] + '_' + contig_id_1[2]
+            contig_2 = contig_id_2[1] + '_' + contig_id_2[2]
+
+            # Genome names
+            genome_1 = contig_1.split('_')[0]
+            genome_2 = contig_2.split('_')[0]
+
+            # Check respective BLAST file dataframe and update percent identity
+            try:
+                df = BLAST_df_dict[gene][genome_1 + '_' + genome_2 + '.blast.txt']
+                row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
+                PI = row.PI.tolist()[0]
+
+            except KeyError:
+                try:
+                    df = BLAST_df_dict[gene][genome_2 + '_' + genome_1 + '.blast.txt']
+                    row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
+                    PI = row.PI.tolist()[0]
+                except KeyError:
+                    PI = 0.70
+                except IndexError:
+                    PI = 0.70
+
+            except IndexError:
+                PI = 0.70
+
+            try:
+                df = BLAST_df_dict[gene][genome_2 + '_' + genome_1 + '.blast.txt']
+                row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
+                PI = row.PI.tolist()[0]
+
+            except KeyError:
+                try:
+                    df = BLAST_df_dict[gene][genome_1 + '_' + genome_2 + '.blast.txt']
+                    row = df.loc[((df['query_id'] == contig_1) & (df['sub_id'] == contig_2))]
+                    PI = row.PI.tolist()[0]
+                except KeyError:
+                    PI = 0.70
+                except IndexError:
+                    PI = 0.70
+
+            except IndexError:
+                PI = 0.70
+
+            json_data["links"][i]["identity"] = PI
+
+        # Overwrite JSON file with updated data
         with open(gene_path, 'w') as outfile:
             json.dump(json_data, outfile)
 
@@ -690,11 +708,7 @@ def order_JSON_clusters_UPGMA(output_path, gene, upgma_clusters, genome_to_num_m
     were clustered by UPGMA (from left to right).
     """
     # Load AMR gene JSON cluster data
-    json_data = ''
-    if surrogates:
-        gene_path = output_path + '/JSON/' + gene + '_surrogates.json'
-    else:
-        gene_path = output_path + '/JSON/' + gene + '.json'
+    json_data, gene_path = load_JSON_data(output_path, gene, surrogates)
 
     with open(gene_path, 'r') as infile:
         if len(infile.readlines()) != 0:
@@ -753,4 +767,4 @@ def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, ge
         json.dump(json_data, outfile)
 
     # Make respective HTML file for Coeus
-    write_clustermap_JSON_HTML(gene, '../sample_data', output_path, rep_type='upgma')
+    write_clustermap_JSON_HTML(gene, '../../../sample_data', output_path, rep_type='upgma')
