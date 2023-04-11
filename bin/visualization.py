@@ -20,13 +20,20 @@ from plotly.figure_factory import create_dendrogram
 import networkx as nx
 from matplotlib.pylab import savefig, cm, axis
 
-colours = ['#6e40aa', '#b83cb0', '#c33dad', '#ff4f7c', '#f6478d', '#ff6956', '#f59f30', '#c4d93e',
-           '#83f557', '#38f17a', '#22e599', '#19d3b5', '#29a0dd', '#5069d9', '#5f56c9', '#bbbbbb']
+def get_colors(num):
+    """
+    Color mapping for visualizations.
+    """
+    colors = ['#6e40aa', '#b83cb0', '#c33dad', '#ff4f7c', '#f6478d', '#ff6956', '#f59f30', '#c4d93e',
+              '#83f557', '#38f17a', '#22e599', '#19d3b5', '#29a0dd', '#5069d9', '#5f56c9', '#bbbbbb']
 
-for i in range(84):
-    rand_num = random.randrange(0, 2**24)
-    col = hex(rand_num)
-    colours.append('#' + col[2:])
+    if num <= len(colors):
+        return colors
+    else:
+        for i in range(num - len(colors)):
+            rand_color = lambda: random.randint(0, 255)
+            colors.append('#%02X%02X%02X' % (rand_color(), rand_color(), rand_color()))
+        return colors
 
 
 def plot_similarity_histogram(similarity_dict, save_path):
@@ -46,7 +53,7 @@ def plot_similarity_histogram(similarity_dict, save_path):
     fig, ax = plt.subplots(1, 1)
     N, bins, patches = ax.hist(similarity_scores, bins=num_bins)
 
-    # Set colours!
+    # Set colors!
     fracs = N / N.max()
     norm = colors.Normalize(fracs.min(), fracs.max())
     for thisfrac, thispatch in zip(fracs, patches):
@@ -80,7 +87,7 @@ def plot_distance_histogram(distance_dict, save_path):
     fig, ax = plt.subplots(1, 1)
     N, bins, patches = ax.hist(distances, bins=num_bins)
 
-    # Set colours
+    # Set colors
     fracs = N / N.max()
     norm = colors.Normalize(fracs.min(), fracs.max())
     for thisfrac, thispatch in zip(fracs, patches):
@@ -121,7 +128,7 @@ def plotly_dendrogram(linkage_matrix, labels, AMR_gene, output_path):
     Generates an interactive dendrogram visualization using Plotly figure factory.
     """
     title = "UPGMA dendrogram for {g}".format(g=AMR_gene, n=len(labels))
-    fig = create_dendrogram(linkage_matrix, labels=labels, colorscale=colours)
+    fig = create_dendrogram(linkage_matrix, labels=labels, colorscale=get_colors(len(labels)))
     fig.update_layout(autosize=True, title=title, paper_bgcolor='white', template='plotly_white', width=419, height=316)
     savename = os.path.join(output_path + '/clustering/UPGMA/', AMR_gene + ".html")
     fig.write_html(savename)
@@ -189,7 +196,8 @@ def plotly_mcl_network(matrix, clusters, genome_names, AMR_gene, output_path):
     hex_colors = []
     cluster_colors_dict = {}
 
-    for hex in colours:
+    colors = get_colors(len(genome_names))
+    for hex in colors:
         hex_colors.append(hex)
 
     for cluster in set(cluster_map.values()):
@@ -320,9 +328,13 @@ def plotly_pcoa(distance_matrix_df, genome_ids, labels, AMR_gene, output_path):
     df = pd.DataFrame(data=df_data, index=genome_ids)
     df['Cluster'] = df['Cluster'].astype(str)
 
+    colors = get_colors(len(genome_ids))
+    # Make noise cluster black by default
+    colors.insert(0, '#111111')
+
     fig = px.scatter(df, x='PC1', y='PC2',
                      color='Cluster',
-                     color_discrete_sequence=colours,
+                     color_discrete_sequence=colors,
                      hover_name='GenomeID',
                      title='PCoA DBSCAN clusters for {g}'.format(g=AMR_gene))
     fig.update_traces(marker_size=5, line=dict(width=2, color='black'))
