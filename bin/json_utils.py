@@ -760,11 +760,35 @@ def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, ge
     # Update JSON data
     json_data["clusters"] = clusters
 
-    #upgma_json_data = remove_defunct_clustermap_data(json_data)
+    # Get rid of defunct links: Remove any link that has a target or query uid that is not in the set of cluster uids
+    cluster_uids = set()
+    for cluster in json_data['clusters']:
+        cluster_uids.add(cluster['uid'])
+
+    new_links = []
+    for link in json_data['links']:
+        if link['target']['uid'] in cluster_uids and link['query']['uid'] in cluster_uids:
+            new_links.append(link)
+
+    # Replace the original links with the filtered links
+    json_data['links'] = new_links
+
+    # Get rid of defunct groups: a) remove group genes no longer included in clusters and b) remove newly empty groups
+    new_groups = []
+    for group in json_data['groups']:
+        new_group_genes = []
+        for gene_uid in group['genes']:
+            if gene_uid in cluster_uids:
+                new_group_genes.append(gene_uid)
+        if new_group_genes:
+            group['genes'] = new_group_genes
+            new_groups.append(group)
+
+    json_data['groups'] = new_groups
 
     # Update file
     with open(output_path + '/JSON/' + gene + '_upgma.json', 'w') as outfile:
         json.dump(json_data, outfile)
 
     # Make respective HTML file for Coeus
-    write_clustermap_JSON_HTML(gene, '../../../sample_data', output_path, rep_type='upgma')
+    write_clustermap_JSON_HTML(gene, '../sample_data', output_path, rep_type='upgma')
