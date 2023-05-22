@@ -36,11 +36,15 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 //
 include { EXTRACTION } from '../modules/local/extraction'
 include { MAKE_GENOME_SAMPLESHEET } from '../modules/local/make_genome_samplesheet'
-include { MAKE_GENOME_FILEPAIRS } from '../modules/local/make_genome_filepairs'
+//include { MAKE_GENOME_FILEPAIRS } from '../modules/local/make_genome_filepairs'
+//include { CREATE_DB } from '../modules/local/all_vs_all_blast.nf'
+//include { ALL_VS_ALL_BLAST } from '../modules/local/all_vs_all_blast.nf'
 include { CLUSTERING } from '../modules/local/clustering'
-include { DIAMOND_BLASTP } from '../modules/nf-core/modules/nf-core/diamond/blastp/main'
-include { DIAMOND_MAKEDB } from '../modules/nf-core/modules/nf-core/diamond/makedb/main' addParams( options: [args:'--task blastp --outfmt 6 --max-hsps 1'] )
+include { DIAMOND_BLASTP } from '../modules/nf-core/diamond/blastp/main'
+include { DIAMOND_MAKEDB } from '../modules/nf-core/diamond/makedb/main' addParams( options: [args:'--task blastp --outfmt 6 --max-hsps 1'] )
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
+//include { INPUT_GENOMES_CHECK } from '../subworkflows/local/input_genomes_check.nf'
+//include { INPUT_GENOME_PAIRS_CHECK } from '../subworkflows/local/input_genome_pairs_check.nf'
 include { BLAST_GENOME_FILEPAIRS } from '../subworkflows/local/blast_genome_filepairs'
 
 /*
@@ -90,27 +94,47 @@ workflow GENEORDERANALYSIS {
         output_ch
     )
 
-    genome_paths_csv = MAKE_GENOME_SAMPLESHEET.out.genome_paths_csv
+    csv_ch = MAKE_GENOME_SAMPLESHEET.out.genome_paths_csv
 
     //
     // MODULE: Make CSV listing all unique genome pairs for All-vs-All DIAMOND BLASTP
     //
-    MAKE_GENOME_FILEPAIRS (
-        assembly_ch,
-        output_ch
-    )
+    //MAKE_GENOME_FILEPAIRS (
+    //    params.assembly_path,
+    //    params.output_path
+    //)
 
-    genome_filepairs_csv = MAKE_GENOME_FILEPAIRS.out.genome_filepairs_csv
+    //INPUT_GENOME_PAIRS_CHECK(MAKE_GENOME_FILEPAIRS.out.genome_filepairs_csv)
 
     //
     // MODULE: Run nf-core/diamond to obtain BLAST results
     //
-    BLAST_GENOME_FILEPAIRS(genome_paths_csv, genome_filepairs_csv)
+    //BLAST_GENOME_FILEPAIRS(assembly_ch)
+    //BLAST_GENOME_FILEPAIRS(INPUT_GENOMES_CHECK.out.genomes, INPUT_GENOME_PAIRS_CHECK.out.genome_pairs)
+    def assemblyFiles = Channel.fromPath("${params.assembly_path}/*.{fa,faa,fna}")
+    assemblyFiles.view()
+    def modifiedChannel = assemblyFiles.collect { path ->
+        tuple(path, path)
+    }
+
+    // Print the channel of tuples
+    modifiedChannel.view()
+
+    BLAST_GENOME_FILEPAIRS(csv_ch, modifiedChannel)
+
+    // Create the databases for each genome
+    //CREATE_DB(assembly_ch)
+
+    //dbFiles = CREATE_DB.out.dbFiles
+
+    // Perform All-vs-All BLAST for each genome
+    //ALL_VS_ALL_BLAST(assembly_ch, dbFiles)
 
     //
     // MODULE: Run clustering
     //
     CLUSTERING (
+        BLAST_GENOME_FILEPAIRS.out.blastResults,
         assembly_ch,
     	EXTRACTION.out.fasta_path,
     	EXTRACTION.out.blast_path,

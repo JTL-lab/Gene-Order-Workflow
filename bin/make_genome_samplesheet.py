@@ -33,17 +33,16 @@ def make_genomes_csv(assembly_path, output_path):
     check_output_path(output_path)
 
     # Get list of full file paths to genome assemblies
-    full_genome_paths = get_full_filepaths(assembly_path)
+    full_genome_paths = [os.path.abspath(assembly_path) + '/' + file for file in os.listdir(assembly_path)]
 
     # Initialize column headers, row data
-    fields = ['file_name', 'file_path']
+    fields = ['meta', 'file_path']
     row_data = []
     header = False
 
     # Get name and path for every whole genome assembly file
     for genome_file_path in full_genome_paths:
-        file_name = get_filename(genome_file_path)
-        row = [file_name, genome_file_path]
+        row = [genome_file_path.split('/')[-1], genome_file_path]
         row_data.append(row)
 
     # Write data to csv file

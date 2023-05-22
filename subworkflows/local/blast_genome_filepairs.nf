@@ -1,41 +1,32 @@
-//
-// Check GBK filepairs samplesheet and get read channels in order to BLAST each pair using DIAMOND
-//
-include { DIAMOND_BLASTP } from '../../modules/nf-core/modules/nf-core/diamond/blastp/main'
-include { DIAMOND_MAKEDB } from '../../modules/nf-core/modules/nf-core/diamond/makedb/main'
+// Import the modules
+include { DIAMOND_MAKEDB } from '../../modules/nf-core/diamond/makedb/main'
+include { DIAMOND_BLASTP } from '../../modules/nf-core/diamond/blastp/main'
 
-workflow BLAST_GENOME_FILEPAIRS{
+// Define the subworkflow
+workflow BLAST_GENOME_FILEPAIRS {
+
     take:
-        genome_paths_csv
-        genome_filepairs_csv
+        csv_ch
+        assemblyFiles
 
     main:
-        // Initialize channels to hold outputs
-        blast_dbs = Channel.empty()
-        blast_outputs = Channel.empty()
+        // Keep only columns required for clustering module
+        def blast_columns = "qseqid sseqid pident bitscore"
 
-        // Specify BLAST output file columns
-        def blast_columns = "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore"
+        // Split CSV channel to get filepaths to assemblies
+        csv_ch
+            .splitCsv(header: true)
+            .map { it.file_path }
+            .set{ genomeFiles }
 
-        // Create channel to hold paths to all whole genome assembly files as values
-        Channel
-            .fromPath ( genome_paths_csv )
-            .splitCsv ( header: true, sep: ',' )
-            .map { row -> path(row.file_path) }
-            .set { genome_paths_ch }
+        // Create a database for each genome using nf-core MAKEDB module
+        DIAMOND_MAKEDB(genomeFiles).db.set { dbFiles }
 
-        // Create channel to hold paths to files to blast against each other
-        Channel
-            .fromPath( genome_filepairs_csv )
-            .splitCsv( header: true, sep: ',' )
-            .map { row-> tuple(path(row.blast_dir), file(row.genome_1), file(row.genome_2)) }
-            .set { genome_pairs_ch }
-
-        // Make BLAST DB for every unique genome assembly
-        DIAMOND_MAKEDB(genome_paths_ch).db.set{ blast_dbs }
-        DIAMOND_BLASTP(genome_paths_ch, blast_dbs, "txt", blast_columns).txt.set{ blast_file_paths }
+        // BLAST every assembly file against every DB for All-vs-All BLAST
+        assemblyFiles.each { fasta_tuple ->
+            DIAMOND_BLASTP(fasta_tuple, dbFiles, "txt", blast_columns)
+        }
 
     emit:
-        blast_file_paths
-        //versions = BLAST_GENOME_FILEPAIRS.out.versions // channel: [ versions.yml ]
+        blastResults = DIAMOND_BLASTP.out.txt
 }
