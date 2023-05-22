@@ -24,7 +24,9 @@ workflow BLAST_GENOME_FILEPAIRS {
 
         // BLAST every assembly file against every DB for All-vs-All BLAST
         assemblyFiles.each { fasta_tuple ->
-            DIAMOND_BLASTP(fasta_tuple, dbFiles, "txt", blast_columns)
+            dbFiles.each { db_file ->
+                DIAMOND_BLASTP(fasta_tuple, db_file, "txt", blast_columns)
+            }
         }
 
     emit:
