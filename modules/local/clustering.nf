@@ -11,6 +11,7 @@ process CLUSTERING {
     }
 
     input:
+      path blast_output
       path faa_path
       path fasta_path
       path blast_path

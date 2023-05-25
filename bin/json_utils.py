@@ -6,7 +6,7 @@ Methods for generating JSON representations of extracted neighborhoods that can 
 import json
 import itertools
 import pandas as pd
-from utils import check_output_path, generate_alphanumeric_string
+from utils import check_output_path, generate_alphanumeric_string, make_fasta_contig_dict
 
 
 def swap_neighborhood_orientation(df):
@@ -65,7 +65,7 @@ def reverse_df(df, n_start, n_stop, gene_index):
     return swapped_df.copy(deep=True)
 
 
-def make_neighborhood_JSON_data(gene_neighborhoods_dict, gene):
+def make_neighborhood_JSON_data(gene_neighborhoods_dict, gene, neighborhood_size):
     """
     Creates dictionary of data required to write neighborhoods JSON file.
     This function should be run on the complete set of neighborhoods (i.e. for all AMR genes).
@@ -109,18 +109,22 @@ def make_neighborhood_JSON_data(gene_neighborhoods_dict, gene):
         if neighborhood_df['Gene_Strand'][gene_index] == -1:
             neighborhood_df = reverse_df(neighborhood_df, loci_data["start"], loci_data["end"], gene_index)
 
+        focal_gene_index = (neighborhood_size * 2 + 1) // 2
         for i in neighborhood_df.index:
             gene_data = {}
-            gene_data["uid"] = loci_data["uid"] + '-' + str(i)
+            gene_data["uid"] = neighborhood_df['Locus_Tag'][i].replace("'", "")
             gene_data["name"] = neighborhood_df['Gene_Name'][i].replace('"','')
-            if neighborhood_df['Gene_Name'][i].replace("'", "") not in unique_genes:
+            if i == focal_gene_index:
+                if gene not in unique_genes:
+                    unique_genes.append(gene)
+            elif neighborhood_df['Gene_Name'][i].replace("'", "") not in unique_genes:
                 unique_genes.append(neighborhood_df['Gene_Name'][i].replace("'", "").replace('"', ''))
             gene_data["start"] = neighborhood_df['Gene_Start'][i]
             gene_data["end"] = neighborhood_df['Gene_End'][i]
             gene_data["strand"] = neighborhood_df['Gene_Strand'][i]
 
             # Keep track of contig data
-            contigs_dict[loci_data["uid"] + '-' + str(i)] = neighborhood_df['Locus_Tag'][i]
+            contigs_dict[neighborhood_df['Locus_Tag'][i]] = neighborhood_df['Locus_Tag'][i]
 
             genes_dict[i] = gene_data
 
@@ -186,8 +190,8 @@ def make_neighborhood_JSON_data(gene_neighborhoods_dict, gene):
                     if cluster_data[genome_2]["loci"]["genes"][genome_2_key]["uid"] not in gene_group_list:
                         gene_group_list.append(cluster_data[genome_2]["loci"]["genes"][genome_2_key]["uid"])
 
-                    contig_1 = genome_contigs[genome_1][target["uid"]].replace("'", "")
-                    contig_2 = genome_contigs[genome_2][query["uid"]].replace("'", "")
+                    contig_1 = target["uid"]
+                    contig_2 = query["uid"]
                     link_data["uid"] = str(genome_1) + '_' + contig_1 + '-' + str(genome_2) + '_' + contig_2
                     link_data["target"] = target
                     link_data["query"] = query
@@ -506,7 +510,6 @@ def write_clustermap_JSON_HTML(gene, sample_data_path, out_path, rep_type='stand
         file_path = out_path + '/JSON/' + gene + '.html'
         second_line = '\t\td3.json("' + gene + '.json"' + ')\n'
 
-
     # Make HTML index file with appropriate JSON
     with open(file_path, 'w') as html_outfile, open(sample_data_path + '/index.html') as template:
         for line in template:
@@ -586,6 +589,66 @@ def remove_defunct_clustermap_data(json_data):
     json_data["groups"] = gene_groups
 
     return json_data
+
+
+def rename_clustermap_genes_contigs(output_path, fasta_path, gene, neighborhood_size):
+    """
+    Given clustermap-style JSON representing neighborhood data for a given gene across multiple genomes, modifies JSON
+    to rename all gene uids according to their contig. This is required for downstream filtering to obtain unique
+    neighborhoods based on percent identity of matched hits, wherein identical neighborhoods are represented by a
+    surrogate neighborhood.
+    """
+    # Load gene JSON surrogate representation
+    json_data, gene_path = load_JSON_data(output_path, gene, surrogates=True)
+
+    # Get contig dictionary for gene
+    fasta_contigs_dict = make_fasta_contig_dict(fasta_path, gene)
+
+    # Load neighborhood indices
+    neighborhood_indices_dict = json.load(open(output_path + '/neighborhood_indices.txt'))
+
+    for cluster in json_data['clusters']:
+        # Loop over each locus in the cluster
+        for locus in cluster['loci']:
+
+            # Get neighborhood indices and adjust them
+            genomes_indices = neighborhood_indices_dict[gene]
+            neighborhood_indices = genomes_indices[cluster["name"]]
+
+            # Case 1: no upstream genes
+            if neighborhood_indices[0] == 0:
+                focal_gene_index = 0
+            # Case 2: no downstream genes
+            elif neighborhood_indices[1] == 0:
+                focal_gene_index = 0
+            # Case 3: full neighborhood
+            elif neighborhood_indices[0] == -neighborhood_size and neighborhood_indices[1] == neighborhood_size:
+                focal_gene_index = (neighborhood_indices[1] * 2) // 2
+            # Case 4: at least one upstream, downstream gene
+            else:
+                neighborhood_indices[0] += abs(neighborhood_indices[0])
+                neighborhood_indices[1] += abs(neighborhood_indices[0])
+                focal_gene_index = neighborhood_indices[1] // 2
+
+            # Get the orientation of the focal gene
+            orientation = locus['genes'][focal_gene_index]['strand']
+
+            # Loop over each gene in the locus
+            for gene_entry in locus['genes']:
+
+                # Get the gene index from its uid and convert to an integer
+                gene_uid_tokens = gene_entry['uid'].split('-')
+                gene_index = int(gene_uid_tokens[1])
+
+                # Get the contig ID for this gene from the fasta_contigs_dict
+                contig_id = fasta_contigs_dict[cluster['name']][gene_index]
+
+                # Replace the gene uid with the contig ID
+                gene_entry['uid'] = contig_id
+
+    # Save new data
+    with open(gene_path, 'w') as outfile:
+        json.dump(json_data, outfile)
 
 
 def load_JSON_data(output_path, gene, surrogates=False):
@@ -727,6 +790,39 @@ def order_JSON_clusters_UPGMA(output_path, gene, upgma_clusters, genome_to_num_m
         json.dump(json_data, outfile)
 
 
+def clean_json_data(json_data):
+    """
+    Parses through JSON clustermap representation that has had its cluster data updated to also update links and groups
+    data to reflect changes (e.g. remove links involve genomes no longer included, remove genes from gene groups where
+    the genome was removed, etc).
+    """
+    # Get rid of defunct links: Remove any link that has a target or query uid that is not in the set of cluster uids
+    cluster_uids = set()
+    for cluster in json_data['clusters']:
+        cluster_uids.add(cluster['uid'])
+
+    new_links = []
+    for link in json_data['links']:
+        if link['target']['uid'] in cluster_uids and link['query']['uid'] in cluster_uids:
+            new_links.append(link)
+
+    # Replace the original links with the filtered links
+    json_data['links'] = new_links
+
+    # Get rid of defunct groups: a) remove group genes no longer included in clusters and b) remove newly empty groups
+    new_groups = []
+    for group in json_data['groups']:
+        new_group_genes = []
+        for gene_uid in group['genes']:
+            if gene_uid in cluster_uids:
+                new_group_genes.append(gene_uid)
+        if new_group_genes:
+            group['genes'] = new_group_genes
+            new_groups.append(group)
+
+    json_data['groups'] = new_groups
+
+
 def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, genome_to_num_mapping):
     """
     Creates a JSON file with one representative genome from each UPGMA cluster.
@@ -780,9 +876,8 @@ def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, ge
         for gene_uid in group['genes']:
             if gene_uid in cluster_uids:
                 new_group_genes.append(gene_uid)
-        if new_group_genes:
-            group['genes'] = new_group_genes
-            new_groups.append(group)
+        group['genes'] = new_group_genes
+        new_groups.append(group)
 
     json_data['groups'] = new_groups
 

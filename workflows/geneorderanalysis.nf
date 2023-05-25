@@ -61,6 +61,7 @@ workflow GENEORDERANALYSIS {
     //ch_versions = Channel.empty()
 
     // Initialize channels from provided paths
+    def input_file_ch = Channel.fromPath(params.input_file_path)
     def assembly_ch = Channel.fromPath(params.assembly_path)
     def extract_ch = Channel.fromPath(params.extract_path)
     def gbk_ch = Channel.fromPath(params.gbk_path)
@@ -79,6 +80,7 @@ workflow GENEORDERANALYSIS {
     // MODULE: Run extraction 
     //
     EXTRACTION (
+        input_file_ch,
         extract_ch,
     	gbk_ch,
     	output_ch,
@@ -97,44 +99,21 @@ workflow GENEORDERANALYSIS {
     csv_ch = MAKE_GENOME_SAMPLESHEET.out.genome_paths_csv
 
     //
-    // MODULE: Make CSV listing all unique genome pairs for All-vs-All DIAMOND BLASTP
-    //
-    //MAKE_GENOME_FILEPAIRS (
-    //    params.assembly_path,
-    //    params.output_path
-    //)
-
-    //INPUT_GENOME_PAIRS_CHECK(MAKE_GENOME_FILEPAIRS.out.genome_filepairs_csv)
-
-    //
     // MODULE: Run nf-core/diamond to obtain BLAST results
     //
-    //BLAST_GENOME_FILEPAIRS(assembly_ch)
-    //BLAST_GENOME_FILEPAIRS(INPUT_GENOMES_CHECK.out.genomes, INPUT_GENOME_PAIRS_CHECK.out.genome_pairs)
     def assemblyFiles = Channel.fromPath("${params.assembly_path}/*.{fa,faa,fna}")
-    assemblyFiles.view()
     def modifiedChannel = assemblyFiles.collect { path ->
         tuple(path, path)
     }
 
-    // Print the channel of tuples
-    modifiedChannel.view()
-
     BLAST_GENOME_FILEPAIRS(csv_ch, modifiedChannel)
-
-    // Create the databases for each genome
-    //CREATE_DB(assembly_ch)
-
-    //dbFiles = CREATE_DB.out.dbFiles
-
-    // Perform All-vs-All BLAST for each genome
-    //ALL_VS_ALL_BLAST(assembly_ch, dbFiles)
+    blastResults_ch = BLAST_GENOME_FILEPAIRS.out.blastResults
 
     //
     // MODULE: Run clustering
     //
     CLUSTERING (
-        BLAST_GENOME_FILEPAIRS.out.blastResults,
+        blastResults_ch,
         assembly_ch,
     	EXTRACTION.out.fasta_path,
     	EXTRACTION.out.blast_path,

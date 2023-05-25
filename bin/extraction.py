@@ -16,7 +16,7 @@ import itertools
 
 from filtering import filter_neighborhoods, write_filtered_genomes_textfile
 from utils import get_filename, check_output_path, strip_brackets
-from json_utils import make_neighborhood_JSON_data, write_neighborhood_JSON, make_AMR_gene_HTML
+from json_utils import make_neighborhood_JSON_data, write_neighborhood_JSON, make_gene_HTML
 
 def parse_args(args=None):
     Description = "Extract AMR gene neighborhoods according to fixed window size of N genes upstream and downstream."
@@ -24,6 +24,10 @@ def parse_args(args=None):
              "<PERCENT> "
 
     parser = argparse.ArgumentParser(description=Description, epilog=Epilog)
+    parser.add_argument('INPUT_FILE_PATH', metavar='in_file', type=str, help='Path to an input textfile specifying '
+                                                                             'either a) column names for data needed for'
+                                                                             'extracting from pre-existing annotation '
+                                                                             'files or b) gene names to extract.')
     parser.add_argument('EXTRACT_PATH', metavar='extract', type=str, help='Path to directory containing extract '
                                                                           'files. Must have names corresponding to '
                                                                           'GBK files.')
@@ -38,7 +42,59 @@ def parse_args(args=None):
     parser.add_argument('-p', metavar='p', type=float, default=0.75, help='Cutoff percentage of genomes that a given '
                                                                           'AMR gene should be present in for its '
                                                                           'neighborhood to be considered.')
+    parser.add_argument('-c', metavar='label_cols', type=str, default=None, help='If using annotation files predicting '
+                                                                                  'features, list of space separated '
+                                                                                  'column names to be added to the gene'
+                                                                                  ' names.')
     return parser.parse_args(args)
+
+
+def load_input_file(input_file_path):
+    """
+    Handles user input file.
+
+    I) If a list of column specifiers for custom annotation files in format:
+
+    annotation_contig_column_name = Contig
+    annotation_gene_name_column_name = Gene_Name
+    annotation_gene_start_column_name = Gene_Start
+    annotation_gene_end_column_name = Gene_End
+
+    Returns a dictionary where keys are the column names, values are the equivalent columns in the custom
+    annotation files.
+
+    II) If a list of gene names in format:
+
+    gene_A
+    gene_B
+    ...
+    gene_X
+
+    Returns a list of non-redundant gene names to extract.
+    """
+    with open(input_file_path, 'r') as infile:
+        input_data = infile.readlines()
+        if len(input_data) == 0:
+            print("Error: No data found in input file. Please provide an input file specifying either a) column names "
+                  "of required data columns in custom annotation files, or b) list of genes to extract, in specified "
+                  "format given in docs.")
+            sys.exit(1)
+
+    # Determine which input file format was given
+    if '=' in input_data[0]:
+        # Custom annotation files provided
+        col_names_dict = dict()
+        for line in input_data:
+            col_name_tokens = line.split('=')
+            col_names_dict[col_name_tokens[0].strip(' ')] = col_name_tokens[1].strip(' ').strip('\n')
+        return col_names_dict
+
+    else:
+        # List of gene names provided
+        gene_names = []
+        for line in input_data:
+            gene_names.append(line.strip('\n'))
+        return gene_names
 
 
 def load_filepaths(extract_path_arg, gbk_path_arg):
@@ -53,7 +109,8 @@ def load_filepaths(extract_path_arg, gbk_path_arg):
     try:
         extract_filepaths = glob.glob(os.path.join(extract_path_arg, "*.txt"))
     except FileNotFoundError:
-        print("Error: there are no extract files found in the specified directory. Please double-check the provided path.")
+        print("Error: there are no extract files found in the specified directory. "
+              "Please double-check the provided path.")
         sys.exit(1)
 
     # Get paths for GBK files
@@ -64,21 +121,37 @@ def load_filepaths(extract_path_arg, gbk_path_arg):
         sys.exit(1)
 
     # Verify there is an equivalent number of extract and GBK files
-    assert len(extract_filepaths) == len(gbk_filepaths), "Error: mismatch occurred between number of extract and GBK files."
-
-    # Verify that for each extract file, there is a GBK file with the same filename
-    extract_without_suffix = [os.path.basename(file).strip('_rgi.txt') for file in extract_filepaths]
-    extract_list = []
-    for file in extract_without_suffix:
-        tokens = file.split('.')
-        extract_list.append(tokens[0])
-    extract_list = [file.split('.')[0] for file in extract_without_suffix]
-    extract_file_names = set(extract_list)
-    gbk_file_names = set(os.path.basename(file).strip('.gbk') for file in gbk_filepaths)
-
-    # assert extract_file_names == gbk_file_names, "Error: mismatch occurred between extract and GBK file names."
+    assert len(extract_filepaths) == len(gbk_filepaths), "Error: mismatch occurred between number of extract and GBK " \
+                                                         "files."
 
     return extract_filepaths, gbk_filepaths
+
+
+def get_gbk_data(gbk_filepaths):
+    """
+    Return dictionary of dataframes containing each GBK file's Genbank records, features and annotations.
+    """
+    # Contains a dataframe for each GBK file, where keys are filenames
+    gbk_dataframes = {}
+
+    for gbk_filepath in gbk_filepaths:
+
+        # Get GBK filename for GBK dictionary keys
+        gbk_filename = get_filename(gbk_filepath)
+
+        # Get GBK dataframe and contig names
+        gbk_df = make_GBK_dataframe(gbk_filepath)
+
+        # Preprocess all bracketed columns to remove brackets
+        for col in gbk_df:
+            if type(gbk_df[col][0]) is list or isinstance(gbk_df[col][0], str):
+                gbk_df[col] = gbk_df[col].apply(lambda x: strip_brackets(x))
+                gbk_df[col] = gbk_df[col].apply(lambda x: x.strip("'"))
+
+        # Retain GBK dataframe
+        gbk_dataframes[gbk_filename] = gbk_df
+
+    return gbk_dataframes
 
 
 def load_GBK_file(GBK_filepath):
@@ -138,84 +211,58 @@ def make_GBK_dataframe(GBK_file_path):
     gbk_df['Protein_Sequence'] = protein_seq
     gbk_df['Contig_Name'] = contig_name
 
-    unique_contig_names = set(contig_name)
-
-    return gbk_df, unique_contig_names
+    return gbk_df
 
 
-def make_extraction_dataframe(input_file_path):
+def make_extraction_dataframe(input_file_path, col_names_data):
     """
-    Input: Path to tab-delimited file listing
-    Returns a dataframe containing extract data from extract
+    Input: Path to tab-delimited file listing custom annotation data.
+    Returns a dataframe containing
     """
     extraction_df = pd.read_csv(input_file_path, sep='\t', header=0)
+
+    # Drop unnecessary columns
+    drop_cols = [col_name for col_name in extraction_df.columns.values.tolist()
+                 if col_name not in col_names_data.keys()]
+
+    # Rename columns
+    extraction_df.rename(columns=col_names_data, inplace=True)
 
     return extraction_df
 
 
-def adjust_extract_df_orientation(extract_df):
-    """
-    Replaces extract orientation symbols (-, +) with GBK convention (-1, +1) for easier cross-comparison
-    """
-    extract_df['Orientation'] = extract_df['Orientation'].map({'-': '-1',
-                                                       '+': '+1'},
-                                                      na_action=None)
-    return extract_df
-
-
-def shorten_gene_identifier(name):
-    """
-    Simplifies gene names. Mostly suitable for extract ARO name cleanup
-    (e.g. 'mecC-type BlaZ' -> 'mecC_BlaZ',
-          'vanS gene in vanN cluster' -> 'vanS',
-          'Bifidobacterium adolescentis rpoB mutants conferring resistance to rifampicin' -> 'rpoB',
-          '' -> ''
-    )
-    """
-    conjunctions = ['to', 'and', 'of', 'in']
-    tokenized_name = name.split(" ")
-    if len(tokenized_name) > 1:
-        final_name = tokenized_name[0][0] + tokenized_name[1][0] + "_" + tokenized_name[2]
-    else:
-        final_name = tokenized_name[0]
-
-    return final_name
-
-
 def clean_gene_identifier(name):
     """
-    Preprocesses gene names for additional shortening/simplification by removing extraneous characters.
+    Simplifies gene names and removes extraneous characters. Mostly suitable for RGI ARO name cleanup currently.
+    (e.g. 'mecC-type BlaZ' -> 'mecC_BlaZ',
+          'vanS gene in vanN cluster' -> 'vanS',
+          'Bifidobacterium adolescentis rpoB mutants conferring resistance to rifampicin' -> 'rpoB')
     """
-    clean_name = name.replace("'", "").replace("-", "_").replace("(", "").replace(")", "").replace("/", "-") \
-        .replace(" ", "_").replace(".", "-").replace('"', '').strip('-').strip('"')
-    return clean_name
+    tokenized_name = name.split(" ")
+    try:
+        if len(tokenized_name) > 1:
+            short_name = tokenized_name[0][0] + tokenized_name[1][0] + "_" + tokenized_name[2]
+        else:
+            short_name = tokenized_name[0]
+    except IndexError:
+        short_name = tokenized_name[0]
+
+    short_name = short_name.replace("'", "").replace("-", "_").replace("(", "").replace(")", "").replace("/", "-") \
+                           .replace(" ", "_").replace(".", "-").replace('"', '').strip('-').strip('"')
+
+    return short_name
 
 
-def manipulate_GBK_contigs(df, genome_name):
+def clean_gene_names_df(extract_df, genome_name):
     """
-    For GBK dataframe, manipulates contig to compare if extract and GBK genes belong to the same contig
+    Simplifies gene names from annotation df
     """
-    locus_tags = []
-    extract_names = []
-    gene_name_identifiers = {}
-
-    df.reset_index(drop=True, inplace=True)
-    for index in range(len(df)):
-        temp_name = df['Best_Hit_ARO'][index]
-        try:
-            name = shorten_gene_identifier(temp_name)
-        except IndexError:
-            name = temp_name
-        final_name = clean_gene_identifier(name)
-        extract_names.append(final_name)
-
-        # Keep track of original gene name and the modified version (if any)
-        gene_name_identifiers[temp_name] = final_name
-
-        locus_tags.append(genome_name + '(' + final_name + ')' + df['Cut_Off'][index][0] +
-                          '_' + str(df['Best_Identities'][index]))
-
-    return locus_tags, extract_names, gene_name_identifiers
+    extract_df.reset_index(drop=True, inplace=True)
+    original_names = extract_df['Gene_Name'].tolist()
+    extract_df['Gene_Name'] = extract_df['Gene_Name'].apply(lambda name: clean_gene_identifier(name))
+    final_names = extract_df['Gene_Name'].tolist()
+    names_dict = dict(zip(original_names, final_names))
+    return extract_df, names_dict
 
 
 def partition_contig_name(contig_str):
@@ -230,8 +277,8 @@ def process_GBK_df_for_BLAST(gbk_df):
     Given a dataframe for a GBK file, removes bracket formatting for easier processing and readability later
     """
     gbk_df['Locus_Tag'] = gbk_df['Locus_Tag'].apply(lambda i: str(i).replace("[", "").replace("]", "").replace("'", ""))
-    gbk_df['Gene_Name'] = gbk_df['Gene_Name'].apply(lambda i: str(i).replace("[", "").replace("]", "") \
-                                                    .replace("'", "").replace('"', ''))
+    gbk_df['Gene_Name'] = gbk_df['Gene_Name'].apply(lambda i: str(i).replace("[", "").replace("]", "").replace("'", "")
+                                                    .replace('"', '').replace("/","").replace("(", "").replace(")", ""))
     gbk_df['ProteinSequence'] = gbk_df['ProteinSequence'].str.strip('[]')
 
     return gbk_df
@@ -241,11 +288,7 @@ def make_extract_df_contig_col(extract_df):
     """
     Applies transformation to contig name column to retain only first part of default contig col value from GBK.
     """
-    new_contig_col = []
-    for value in extract_df['Contig']:
-        head, sep, tail = value.partition("_")
-        new_contig_col.append(head)
-    extract_df['Contig'] = new_contig_col
+    extract_df = extract_df['Contig'].apply(lambda contig_name: contig_name.split('_')[0])
 
     return extract_df
 
@@ -277,97 +320,34 @@ def get_unique_AMR_genes(extract_hit_dicts):
     return unique_AMR_genes
 
 
-def rename_duplicate_genes(extract_dataframes):
+def find_union_genes(extract_dataframes):
     """
-    Given an extract dataframe, renames duplicate genes by numbering them according to their contig and start index
-    (e.g. multiple instances of vanA become vanA_1-1014, van_2-2500, etc.).
+    Returns a list of unique genes occurring in the full set of genomes from the extract dataframes.
     """
-    # Key: genome ID, Val: dict of multiple unique occurrences of the same gene
-    multi_gene_genome_dict = {}
+    unique_genes = []
     for genome_id, extract_df in extract_dataframes.items():
+        genome_genes = extract_df['Gene_Name'].to_list()
+        for gene in genome_genes:
+            unique_genes.append(gene)
 
-        # Key: gene name, Val = list of contig and start indices for that occurrence
-        multi_gene_instances = {}
-        unique_genes = []
-        for val in range(len(extract_df)):
-            if extract_df['Best_Hit_ARO'][val] not in unique_genes:
-                unique_genes.append(extract_df['Best_Hit_ARO'][val])
-
-    return
+    return list(set(unique_genes))
 
 
-def find_union_AMR_genes(extract_dataframes):
-    """
-    TBD with refactoring: used to obtain unique ARO hits from all extract dataframes and find the union of best hits.
-    """
-    unique_best_hit_ARO = {}
-    union_of_best_hits = []
-
-    # Iterate over every extract dataframe: need to replace genes in all of them
-    for genome_id, extract_df in extract_dataframes.items():
-        unique_best_hits = []
-        for val in range(len(extract_df)):
-            if extract_df['Best_Hit_ARO'][val] not in unique_best_hits:
-                unique_best_hits.append(extract_df['Best_Hit_ARO'][val])
-
-        unique_best_hit_ARO[genome_id] = list(set(unique_best_hits))
-
-    for genome_id, ARO_term in unique_best_hit_ARO.items():
-        for val in ARO_term:
-            if val not in union_of_best_hits:
-                union_of_best_hits.append(val)
-
-    return unique_best_hit_ARO, union_of_best_hits
-
-
-def check_duplicate_genes(extract_dataframes, ARO_union):
-    """
-    Given the extract dataframes for the genomes being analyzed, labels multi-gene instances numerically to differentiate
-    between them downstream.
-    """
-    all_unique_ARO = []
-    for AMR_gene in ARO_union:
-        for genome, extract_df in extract_dataframes.items():
-
-            # Locate all instances of the gene within the genome
-            AMR_gene_row = extract_df.loc[extract_df['Best_Hit_ARO'] == AMR_gene]
-
-            # Case 1: If multiple instances are present, make a new dictionary for each new gene and modify the df
-            if len(AMR_gene_row) > 1:
-                instance_num = 1
-                for gene_instance in range(len(AMR_gene_row)):
-                    # Relabel each instance and save in the df
-                    gene_name_tokens = extract_df['Best_Hit_ARO'][gene_instance].split('_')
-                    if instance_num > 1:
-                        del gene_name_tokens[-1]
-                    restored_gene_name = '_'.join(gene_name_tokens)
-                    gene_name = restored_gene_name + '_' + str(instance_num)
-                    extract_df.loc[:, ('Best_Hit_ARO', gene_instance)] = gene_name
-                    instance_num += 1
-
-                    # Append with new name
-                    all_unique_ARO.append(gene_name)
-
-            elif len(AMR_gene_row) == 1:
-                all_unique_ARO.append(AMR_gene)
-
-    return extract_dataframes, set(all_unique_ARO)
-
-
-def make_AMR_dict(extract_dataframes, AMR_gene_index):
+def make_occurrence_dict(extract_dataframes, gene):
     """
     Given the extract dataframes for the genomes being analyzed, creates a dictionary of AMR genes
     """
-    AMR_dict = {}
-    for genome, extract_df in extract_dataframes.items():
-        AMR_gene_row = extract_df.loc[extract_df['Best_Hit_ARO'] == AMR_gene_index]
-        if len(AMR_gene_row) > 0:
-            AMR_dict[genome] = AMR_gene_row
+    gene_occurrences_dict = {}
+    for genome, df in extract_dataframes.items():
+        gene_row = df.loc[df['Gene_Name'] == gene]
+        if len(gene_row) > 0:
+            gene_occurrences_dict[genome] = gene_row
 
-    return AMR_dict
+    return gene_occurrences_dict
 
 
-def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name, neighborhood_size):
+def make_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
+                              neighborhood_size, modified_gene_name):
     """
     Finds gene neighborhood of size 2N (user-defined by neighborhood_size, i.e., N genes downstream and upstream)
     for a given AMR gene for cross genome comparison.
@@ -383,68 +363,76 @@ def make_AMR_gene_neighborhood_df(GBK_df_dict, genome_id, gene_start, gene_name,
     neighborhood_indices = []
 
     # Get the focal (central) AMR gene
-    try:
-        # Subtract one from gene start index to account for automatic padding
-        AMR_gene_df_row = GBK_df.loc[((GBK_df['Gene_Start'] == gene_start - 1))]
+    # Subtract one from gene start index to account for automatic padding
+    gene_df_row = GBK_df.loc[((GBK_df['Gene_Start'] == gene_start - 1))]
+    if gene_df_row.empty:
+        gene_df_row = GBK_df.loc[((GBK_df['Gene_Start'] == gene_start))]
 
+    try:
         # Get only genes on the same contig as the focal gene for consideration as neighbors
-        contig_id = AMR_gene_df_row.Contig_Name.tolist()[0]
+        contig_id = gene_df_row.Contig_Name.tolist()[0]
         contig_df = GBK_df.loc[(GBK_df['Contig_Name'] == contig_id)].sort_values(by='Gene_Start')
         contig_df.reset_index(drop=True, inplace=True)
+    except IndexError:
+        return TypeError
 
-        AMR_gene_index = contig_df.index[(contig_df['Gene_Start'] == gene_start - 1)].tolist()
-        gene_index = AMR_gene_index[0]
+    gene_index_coord = contig_df.index[(contig_df['Gene_Start'] == gene_start - 1)].tolist()
+    if not gene_index_coord:
+        gene_index_coord = contig_df.index[(contig_df['Gene_Start'] == gene_start)].tolist()
 
-        # Get downstream neighbors
-        downstream = [gene_index - index for index in range(1, neighborhood_size + 1)]
+    gene_index = gene_index_coord[0]
 
-        # If contig end present downstream, some indices will be negative: remove these to prevent index errors
-        downstream_indices = [index for index in downstream if index >= 0]
-        downstream_neighbors = pd.DataFrame(columns=['Gene_Start', 'Gene_End', 'Gene_Strand', 'Locus_Tag', 'Gene_Name',
-                                                     'Product', 'Protein_Sequence', 'Contig_Name'])
-        for i in range(len(downstream_indices) - 1, -1, -1):
-            try:
-                neighbor = contig_df.iloc[[downstream_indices[i]]]
-                downstream_neighbors = pd.concat([downstream_neighbors, neighbor])
-            except IndexError:
-                print("Contig end found at position -{} downstream.".format(i + 1))
+    gene_df_row = contig_df.iloc[[gene_index]]
+    if modified_gene_name is not None:
+        gene_df_row.loc[:, 'Gene_Name'] = modified_gene_name
+
+    # Get downstream neighbors
+    downstream = [gene_index - index for index in range(1, neighborhood_size + 1)]
+
+    # If contig end present downstream, some indices will be negative: remove these to prevent index errors
+    downstream_indices = [index for index in downstream if index >= 0]
+    downstream_neighbors = pd.DataFrame(columns=['Gene_Start', 'Gene_End', 'Gene_Strand', 'Locus_Tag', 'Gene_Name',
+                                                 'Product', 'Protein_Sequence', 'Contig_Name'])
+    for i in range(len(downstream_indices) - 1, -1, -1):
+        try:
+            neighbor = contig_df.iloc[[downstream_indices[i]]]
+            downstream_neighbors = pd.concat([downstream_neighbors, neighbor])
+        except IndexError:
+            print("Contig end found at position -{} downstream.".format(i + 1))
+            neighborhood_indices.append(i + 1)
+
+    # If there was no contig end, append default N size to neighborhood_indices
+    if len(neighborhood_indices) == 0:
+        neighborhood_indices.append(-neighborhood_size)
+
+    # Get upstream neighbors
+    upstream_indices = [gene_index + index for index in range(1, neighborhood_size + 1)]
+    upstream_neighbors = pd.DataFrame(columns=['Gene_Start', 'Gene_End', 'Gene_Strand', 'Locus_Tag',
+                                               'Gene_Name', 'Product', 'Protein_Sequence', 'Contig_Name'])
+    for i in range(len(upstream_indices)):
+        contig_end_found = False
+        try:
+            neighbor = contig_df.iloc[[upstream_indices[i]]]
+            upstream_neighbors = pd.concat([upstream_neighbors, neighbor])
+        except IndexError:
+            if not contig_end_found:
+                print("Contig end found at position {} upstream.".format(i + 1))
+                contig_end_found = True
+            if len(neighborhood_indices) < 2:
                 neighborhood_indices.append(i + 1)
 
-        # If there was no contig end, append default N size to neighborhood_indices
-        if len(neighborhood_indices) == 0:
-            neighborhood_indices.append(-neighborhood_size)
+    if len(neighborhood_indices) < 2:
+        neighborhood_indices.append(neighborhood_size)
 
-        # Get upstream neighbors
-        upstream_indices = [gene_index + index for index in range(1, neighborhood_size + 1)]
-        upstream_neighbors = pd.DataFrame(columns=['Gene_Start', 'Gene_End', 'Gene_Strand', 'Locus_Tag',
-                                                   'Gene_Name', 'Product', 'Protein_Sequence', 'Contig_Name'])
-        for i in range(len(upstream_indices)):
-            contig_end_found = False
-            try:
-                neighbor = contig_df.iloc[[upstream_indices[i]]]
-                upstream_neighbors = pd.concat([upstream_neighbors, neighbor])
-            except IndexError:
-                if not contig_end_found:
-                    print("Contig end found at position {} upstream.".format(i + 1))
-                    contig_end_found = True
-                if len(neighborhood_indices) < 2:
-                    neighborhood_indices.append(i + 1)
-
-        if len(neighborhood_indices) < 2:
-            neighborhood_indices.append(neighborhood_size)
-
-        neighborhood_df = pd.concat([upstream_neighbors, AMR_gene_df_row, downstream_neighbors])
-
-        return neighborhood_df, neighborhood_indices
-
-    except IndexError:
-        print("Gene {gene} not found.".format(gene=gene_name))
+    neighborhood_df = pd.concat([downstream_neighbors, gene_df_row, upstream_neighbors])
+    return neighborhood_df, neighborhood_indices
 
 
-def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_genes, neighborhood_size):
+def get_all_gene_neighborhoods(gene_instance_dict, GBK_df_dict, unique_genes,
+                               neighborhood_size, cols):
     """
-    Given a dictionary of AMR genes determined using extract outputs and a list of unique AMR genes, creates one dictionary
-    containing all AMR gene neighborhoods for a fixed size of 2N (user-defined by neighborhood_size, i.e., N genes
+    Given a dictionary of genes determined using extract outputs and a list of unique genes, creates one dictionary
+    containing all gene neighborhoods for a fixed size of 2N (user-defined by neighborhood_size, i.e., N genes
     downstream and upstream) for the set of genomes being analyzed.
     """
     # Will be used to store dataframes of neighborhoods
@@ -453,29 +441,38 @@ def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_ge
     # Keeps track of contig ends, if applicable
     contig_ends = {}
 
-    for AMR_gene, AMR_dict in AMR_instance_dict.items():
+    for gene, gene_dict in gene_instance_dict.items():
 
         # Keep track of size 2N neighborhood
         neighbors = {}
-
-        # Get the name without any numbering for multiple instances, since start index will allow us to differentiate
-        gene_name = AMR_gene.split('_')[0]
 
         # Keep track of start and stop indices for each neighborhood
         contig_end_flags = {}
         errors = 0
 
-        for genome, data in AMR_dict.items():
-
+        for genome, data in gene_dict.items():
             # Get start index of the focal AMR gene from the extract dataframe
-            start_vals = AMR_dict[genome]['Start']
+            start_vals = gene_dict[genome]['Gene_Start']
             start_vals_list = list(start_vals)
             start_index = start_vals_list[0]
 
+            # If using annotation, set gene name according to annotated feature name
+            if cols is not None:
+                additional_data = []
+                gene_dict[genome].reset_index(drop=True, inplace=True)
+                for col in cols:
+                    additional_data.append(gene_dict[genome].loc[0, col])
+                delim = '_'
+                temp_data_str = list(map(str, additional_data))
+                str_data = delim.join(temp_data_str)
+                modified_gene_name = str(gene + '_' + str_data)
+            else:
+                modified_gene_name = None
+
             # Make gene neighborhood dataframe for each genome for the focal gene, AMR_gene
             try:
-                neighborhood_df, indices = make_AMR_gene_neighborhood_df(GBK_df_dict, genome, start_index, gene_name,
-                                                                         neighborhood_size)
+                neighborhood_df, indices = make_gene_neighborhood_df(GBK_df_dict, genome, start_index, gene,
+                                                                     neighborhood_size, modified_gene_name)
                 neighborhood_df.reset_index(drop=True, inplace=True)
 
                 if len(neighborhood_df) > 1:
@@ -483,10 +480,10 @@ def get_all_AMR_gene_neighborhoods(AMR_instance_dict, GBK_df_dict, unique_AMR_ge
                     contig_end_flags[genome] = indices
             except TypeError:
                 errors += 1
-                print("AMR gene {} was not present in this genome!".format(AMR_gene))
+                print("Gene {} was not present in this genome!".format(gene))
 
-        gene_neighborhoods[AMR_gene] = neighbors
-        contig_ends[AMR_gene] = contig_end_flags
+        gene_neighborhoods[gene] = neighbors
+        contig_ends[gene] = contig_end_flags
 
     return gene_neighborhoods, contig_ends
 
@@ -509,7 +506,7 @@ def get_neighborhood_gene_data(neighborhood_df):
 def get_neighborhood_data(neighborhoods_dict, num_neighbors):
     """
     Extracts locus, protein sequence, and gene name data for a dictionary of neighborhood data created using
-    get_all_AMR_gene_neighborhoods.
+    get_all_gene_neighborhoods.
     """
     locus_dict = {}
     protein_dict = {}
@@ -531,7 +528,7 @@ def get_neighborhood_data(neighborhoods_dict, num_neighbors):
     return locus_dict, protein_dict, gene_name_dict
 
 
-def write_AMR_neighborhood_to_FNA(AMR_gene_neighborhoods_dict, AMR_gene, locuses_dict, protein_seqs_dict, out_path):
+def write_gene_neighborhood_to_FNA(AMR_gene_neighborhoods_dict, AMR_gene, locuses_dict, protein_seqs_dict, out_path):
     """
     Given a dictionary containing AMR gene neighborhoods for a set of genomes being analyzed and a specified output
     directory path, creates a distinct .fna file for each AMR gene neighborhood to use for BLAST All-vs-All comparison.
@@ -547,31 +544,29 @@ def write_AMR_neighborhood_to_FNA(AMR_gene_neighborhoods_dict, AMR_gene, locuses
         output_fasta.close()
 
 
-def delete_low_occurring_genes(AMR_gene_dict, num_genomes, cutoff_percentage=0.25):
+def delete_low_occurring_genes(gene_occurrence_dict, num_genomes, cutoff_percentage=0.25):
     """
-    Removes keys of AMR genes not present in cutoff percentage of genomes.
-    - AMR_gene_dict should be the dictionary of one type of AMR gene, with entries representing
-    its occurrences within genomes.
-    - Cutoff percentage is a float between 0 and 1 (e.g., 0.25 means only genes present in min 25% of genomes are kept).
+    Removes keys of genes not present in cutoff percentage of genomes.
+    Cutoff percentage is a float between 0 and 1 (e.g., 0.25 means only genes present in min 25% of genomes are kept).
     """
     # Define threshold amount of genomes an AMR gene must be present in for inclusion
     minimum_num_genomes = round(num_genomes * cutoff_percentage)
 
     # Remove all AMR genes that occur in less genomes than the threshold amount
     genes_to_remove = []
-    for AMR_gene, neighborhoods_dict in AMR_gene_dict.items():
+    for gene, neighborhoods_dict in gene_occurrence_dict.items():
         if len(neighborhoods_dict) < minimum_num_genomes:
-            genes_to_remove.append(AMR_gene)
+            genes_to_remove.append(gene)
 
-    for AMR_gene in genes_to_remove:
-        del AMR_gene_dict[AMR_gene]
+    for gene in genes_to_remove:
+        del gene_occurrence_dict[gene]
 
-    return AMR_gene_dict
+    return gene_occurrence_dict
 
 
 def get_AMR_gene_statistics(extract_dataframes):
     """
-    Given extract dataframes, counts the number of Perfect and Strict hits in each genome.
+    Given RGI dataframes, counts the number of Perfect and Strict hits in each genome.
     Needed for extraction summary file.
     """
     amr_gene_statistics = {}
@@ -587,184 +582,244 @@ def get_AMR_gene_statistics(extract_dataframes):
     return amr_gene_statistics
 
 
-def write_summary_file(output_dir, gbk_dataframes, neighborhood_size, ARO_union,
-                       amr_gene_statistics, gene_name_identifiers_dict):
+def write_summary_file(output_dir, gbk_dataframes, neighborhood_size, extraction_genes, gene_name_identifiers_dict=None):
     """
     Writes summary data of neighborhood extraction for the set of genomes being analyzed to
     output/Neighborhoods_Extraction_Summary.txt.
     """
     with open(output_dir + '/' + 'Neighborhoods_Extraction_Summary.txt', 'w') as outfile:
-        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        outfile.write('----------------------------------------------------------------------------------------\n')
         outfile.write('NEIGHBORHOOD EXTRACTION SUMMARY' + '\n')
         outfile.write(
             '----------------------------------------------------------------------------------------' + '\n\n')
-        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        outfile.write('----------------------------------------------------------------------------------------\n')
         outfile.write('General Details' + '\n')
-        outfile.write('----------------------------------------------------------------------------------------' + '\n')
+        outfile.write('----------------------------------------------------------------------------------------\n')
         outfile.write('Number of genomes analyzed: {}'.format(len(gbk_dataframes.keys())) + '\n')
         outfile.write('Neighborhood size extracted: {}'.format(neighborhood_size) + '\n')
-        outfile.write('Number of genes whose neighborhoods were extracted: {}'.format(len(ARO_union)) + '\n\n')
-        outfile.write('----------------------------------------------------------------------------------------' + '\n')
-        outfile.write('Original Gene Names and Simplified Names' + '\n')
-        outfile.write('----------------------------------------------------------------------------------------' + '\n')
-        for gene_name, simplified_gene_name in sorted(gene_name_identifiers_dict.items()):
-            outfile.write(gene_name + '\t--->\t' + simplified_gene_name + '\n')
-        outfile.write('----------------------------------------------------------------------------------------' + '\n')
-        outfile.write('AMR Gene Details Per Genome' + '\n')
-        outfile.write('----------------------------------------------------------------------------------------' + '\n')
-        outfile.write('GENOME_ID' + '\t' + 'PERFECT_HITS' + '\t' + 'STRICT_HITS' + '\t' + 'LOOSE_HITS' + '\n')
-        for genome, counts in amr_gene_statistics.items():
-            outfile.write('{genome}\t{perfect}\t{strict}\t{loose}\n'.format(genome=get_filename(genome),
-                                                                            perfect=counts[0],
-                                                                            strict=counts[1],
-                                                                            loose=counts[2]))
+        outfile.write('Number of genes whose neighborhoods were extracted: {}\n\n'.format(len(extraction_genes)))
+        if gene_name_identifiers_dict is not None:
+            outfile.write('----------------------------------------------------------------------------------------' +
+                          '\n')
+            outfile.write('Original Gene Names and Simplified Names' + '\n')
+            outfile.write('----------------------------------------------------------------------------------------' +
+                          '\n')
+            for gene_name, simplified_gene_name in sorted(gene_name_identifiers_dict.items()):
+                outfile.write(gene_name + '\t--->\t' + simplified_gene_name + '\n')
 
 
-def extract_neighborhoods(extract_path, gbk_path, output_path, num_neighbors, cutoff_percent):
+def extract_neighborhoods(input_file_path, extract_path, gbk_path, output_path,
+                          num_neighbors, cutoff_percent, label_cols=None):
     """
-    Driver script for extracting all AMR gene neighborhoods from specified GBK and extract files to output FASTA format
-    protein sequences for each neighborhood.
+    Driver script for extracting all gene neighborhoods from either a) specified GBK and extract files or b) GBK files
+    according to provided list of gene names to output FASTA format protein sequences for each neighborhood.
     """
-    # 0) Get user path args from pipeline for path to extract files and GBK files
-    try:
-        extract_filepaths, gbk_filepaths = load_filepaths(extract_path, gbk_path)
-    except IndexError:
-        print("Please provide paths to the extract files and GBK files respectively when running this script.")
-        sys.exit(1)
-
-    print("extract filepaths: {}".format(extract_filepaths))
-    print("GBK filepaths: {}".format(gbk_filepaths))
+    # Load input file: determine case
+    input_file_data = load_input_file(input_file_path)
 
     # Make output directory if non-existent
     check_output_path(output_path)
 
-    print("Processing GBK and extract files...")
+    # Case 1: User provided custom annotation files to extract data according to
+    if type(input_file_data) is dict:
 
-    # 1) Get Genbank records, features and annotations for each GBK file
-    # Contains a dataframe for each GBK file, where keys are filenames
-    gbk_dataframes = {}
+        # 0) Get user path args from pipeline for path to extract files and GBK files
+        try:
+            extract_filepaths, gbk_filepaths = load_filepaths(extract_path, gbk_path)
+        except IndexError:
+            print("Please provide paths to the extract files and GBK files respectively when running this script.")
+            sys.exit(1)
 
-    # Contains contig names associated with each GBK file required for later processing, where keys are filenames
-    gbk_contigs = {}
+        # 1) Get Genbank records, features and annotations for each GBK file
+        print("Processing GBK files...")
+        gbk_dataframes = get_gbk_data(gbk_filepaths)
 
-    for gbk_filepath in gbk_filepaths:
+        # 2) Get extract dataframes and do all required preprocessing for later manipulation and comparison
+        # Contains a dataframe for each extract file, where keys are filenames
+        print("Processing extract files...")
+        extract_dataframes = {}
+        for extract_filepath in extract_filepaths:
+            extract_filename = get_filename(extract_filepath, extract=True)
+            extract_df = make_extraction_dataframe(extract_filepath, input_file_data)
+            extract_dataframes[extract_filename] = extract_df
 
-        # Get GBK filename for GBK dictionary keys
-        gbk_filename = get_filename(gbk_filepath)
+        gene_name_identifiers_dict = dict()
+        for extract_filename, extract_df in extract_dataframes.items():
 
-        # Get GBK dataframe and contig names
-        gbk_df, contig_names = make_GBK_dataframe(gbk_filepath)
+            # Add locus tag and contig details to the extract dataframes
+            extract_dataframes[extract_filename] = make_extract_df_contig_col(extract_df)
+            extract_dataframes[extract_filename], names_dict = clean_gene_names_df(extract_df, extract_filename)
+            gene_name_identifiers_dict.update(names_dict)
 
-        # Preprocess all bracketed columns to remove brackets
-        for col in gbk_df:
-            if type(gbk_df[col][0]) is list or isinstance(gbk_df[col][0], str):
-                gbk_df[col] = gbk_df[col].apply(lambda x: strip_brackets(x))
+            # Preprocess all bracketed columns to remove brackets
+            for col in extract_df:
+                if type(extract_df[col][0]) is list or isinstance(extract_df[col][0], str):
+                    try:
+                        extract_df[col] = extract_df[col].apply(lambda x: strip_brackets(x))
+                    except AttributeError:
+                        pass
 
-        # Retain GBK dataframe and GBK list of contig names with filename as key
-        gbk_dataframes[gbk_filename] = gbk_df
-        gbk_contigs[gbk_filename] = contig_names
+        # 4) Get unique gene instances for genes to extract
+        extraction_genes = find_union_genes(extract_dataframes)
 
-    # 2) Get extract dataframes and do all required preprocessing for later manipulation and comparison
-    # Contains a dataframe for each extract file, where keys are filenames
-    extract_dataframes = {}
+        # 5) Get occurrence dict for all genomes
+        genomes_occurrence_dict = {}
+        for gene in extraction_genes:
+            # Make entry for gene occurrences
+            genomes_occurrence_dict[gene] = make_occurrence_dict(extract_dataframes, gene)
 
-    for extract_filepath in extract_filepaths:
-        extract_filename = get_filename(extract_filepath, extract=True)
-        extract_df = make_extraction_dataframe(extract_filepath)
-        extract_dataframes[extract_filename] = extract_df
+        genomes_occurrence_dict_filtered = delete_low_occurring_genes(genomes_occurrence_dict,
+                                                                      len(gbk_filepaths),
+                                                                      cutoff_percent)
 
-    for extract_filename, extract_df in extract_dataframes.items():
+        print("Extracting gene neighborhood data for neighborhoods of size {}...".format(num_neighbors))
 
-        # Replace each extract dataframe with one with the proper DNA orientation representation to match GBKs
-        extract_dataframes[extract_filename] = adjust_extract_df_orientation(extract_df)
+        # Process additional cols from annotations to add to gene name
+        if label_cols is not None:
+           col_tokens = label_cols.split(',')
+           for col_token in col_tokens:
+               col_token = col_token.replace(' ', '')
+        else:
+            col_tokens = None
 
-        # Add locus tag and contig details to the extract dataframes
-        extract_dataframes[extract_filename] = make_extract_df_contig_col(extract_df)
-        extract_dataframes[extract_filename]['Locus_Tag'], extract_dataframes[extract_filename][
-            'Best_Hit_ARO'], gene_name_identifiers_dict = manipulate_GBK_contigs(extract_df, extract_filename)
+        # 6) Extract gene neighborhoods and store them in dataframes
+        neighborhoods, neighborhood_indices = get_all_gene_neighborhoods(genomes_occurrence_dict_filtered,
+                                                                         gbk_dataframes, extraction_genes,
+                                                                         num_neighbors, col_tokens)
 
-        # Preprocess all bracketed columns to remove brackets
-        for col in extract_df:
-            if type(extract_df[col][0]) is list or isinstance(extract_df[col][0], str):
-                try:
-                    extract_df[col] = extract_df[col].apply(lambda x: strip_brackets(x))
-                except AttributeError:
-                    pass
+        # 7) Get the locus, protein, and gene name details for each neighborhood respectively for FNA file creation
+        locuses, protein_seqs, gene_names = get_neighborhood_data(neighborhoods, num_neighbors)
 
-    # 4) Get unique ARO terms and union of all unique ARO terms
-    ARO_best_terms, ARO_union = find_union_AMR_genes(extract_dataframes)
+        # 8) Save neighborhoods to FNA files needed for All-vs-all BLAST results later
+        print("Generating neighborhood FNA files...")
+        for gene, genome_neighborhoods in neighborhoods.items():
 
-    # 5) Get AMR dict for all genomes
-    # extract_modified_dataframes, unique_ARO = check_duplicate_genes(extract_dataframes, ARO_union)
-    # genomes_AMR_dict = make_AMR_dict(extract_modified_dataframes, unique_ARO)
-    genomes_AMR_dict = {}
-    for AMR_gene in ARO_union:
-        # Make entry for gene occurrences
-        genomes_AMR_dict[AMR_gene] = make_AMR_dict(extract_dataframes, AMR_gene)
+            # Make output subdirectory for the gene
+            gene_name = gene.replace('(', '_').replace(')', '_').replace("'", "").replace("/", "")
+            out_path = output_path + '/fasta/' + gene_name
 
-    amr_statistics = get_AMR_gene_statistics(extract_dataframes)
+            check_output_path(out_path)
 
-    genomes_AMR_dict_filtered = delete_low_occurring_genes(genomes_AMR_dict, len(gbk_filepaths), cutoff_percent)
+            for genome_id in genome_neighborhoods.keys():
+                # Make file with genome ID as filename
+                write_gene_neighborhood_to_FNA(genome_neighborhoods, gene, locuses, protein_seqs, out_path)
 
-    print("Extracting gene neighborhood data for neighborhoods of size {}...".format(num_neighbors))
+        # 9) Make neighborhoods summary textfile in output dir
+        print("Making extraction summary file...")
+        write_summary_file(output_path, gbk_dataframes, num_neighbors, extraction_genes, gene_name_identifiers_dict)
 
-    # 6) Extract AMR neighborhoods and store them in neighborhood dataframes
-    neighborhoods, neighborhood_indices = get_all_AMR_gene_neighborhoods(genomes_AMR_dict_filtered, gbk_dataframes,
-                                                                         ARO_union, num_neighbors)
+        # 10) Save gene neighborhoods and indices in textfile: needed for JSON representations downstream
+        print("Generating neighborhood JSON representations...")
+        for AMR_gene, neighborhood_data in neighborhoods.items():
 
-    # 7) Get the locus, protein, and gene name details for each neighborhood respectively for FNA file creation
-    locuses, protein_seqs, gene_names = get_neighborhood_data(neighborhoods, num_neighbors)
+            # Filter neighborhoods
+            filtered_neighborhoods = filter_neighborhoods(neighborhood_data, num_neighbors)
+            surrogates = list(filtered_neighborhoods.keys())
+            filtered_neighborhoods_dict = {key: value for (key, value) in neighborhood_data.items() if
+                                           key in surrogates}
+            write_filtered_genomes_textfile(filtered_neighborhoods, AMR_gene, output_path)
 
-    # 8) Save neighborhoods to FNA files needed for All-vs-all BLAST results later
-    print("Generating neighborhood FNA files...")
-    for AMR_gene, genome_neighborhoods in neighborhoods.items():
+            # Get data needed to write JSON files
+            neighborhood_JSON_dict = make_neighborhood_JSON_data(neighborhood_data, AMR_gene, num_neighbors)
+            filtered_neighborhood_JSON_dict = make_neighborhood_JSON_data(filtered_neighborhoods_dict, AMR_gene, num_neighbors)
 
-        # Make output subdirectory for the gene
-        gene_name = AMR_gene.replace('(', '_').replace(')', '_').replace("'", "")
-        out_path = output_path + '/fasta/' + gene_name
-        check_output_path(out_path)
+            # Create JSON file
+            write_neighborhood_JSON(neighborhood_JSON_dict, AMR_gene, output_path)
+            write_neighborhood_JSON(filtered_neighborhood_JSON_dict, AMR_gene, output_path, True)
 
-        for genome_id in genome_neighborhoods.keys():
-            # Make file with genome ID as filename
-            write_AMR_neighborhood_to_FNA(genome_neighborhoods, AMR_gene, locuses, protein_seqs, out_path)
+        sample_data_path = '../../../sample_data'
+        make_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
 
-    # 9) Make neighborhoods summary textfile in output dir
-    print("Making extraction summary file...")
-    write_summary_file(output_path, gbk_dataframes, num_neighbors, ARO_union, amr_statistics, gene_name_identifiers_dict)
+        with open(output_path + '/' + 'neighborhood_indices.txt', 'w') as outfile:
+            outfile.write(str(neighborhood_indices))
 
-    # 10) Save gene neighborhoods and indices in textfile: needed for JSON representations downstream
-    for AMR_gene, neighborhood_data in neighborhoods.items():
-        # Filter neighborhoods
-        filtered_neighborhoods = filter_neighborhoods(neighborhood_data, num_neighbors)
-        surrogates = list(filtered_neighborhoods.keys())
-        filtered_neighborhoods_dict = {key: value for (key, value) in neighborhood_data.items() if key in surrogates}
-        write_filtered_genomes_textfile(filtered_neighborhoods, AMR_gene, output_path)
+        print("Neighborhood extraction complete.")
 
-        # Get data needed to write JSON files
-        neighborhood_JSON_dict = make_neighborhood_JSON_data(neighborhood_data, AMR_gene)
-        filtered_neighborhood_JSON_dict = make_neighborhood_JSON_data(filtered_neighborhoods_dict, AMR_gene)
+    # Case 2: User provided list of genes to extract
+    elif type(input_file_data) is list:
+        try:
+            gbk_filepaths = glob.glob(os.path.join(gbk_path, "*.gbk"))
+        except FileNotFoundError:
+            print("Error: there are no GBK files found in the specified directory. "
+                  "Please double-check the provided path.")
+            sys.exit(1)
 
-        # Update UID genes' data if present
-        # complete_neighborhood_JSON_dict = update_UID_JSON_data(neighborhood_JSON_dict, AMR_gene, output_path)
+        # 1) Get Genbank records, features and annotations for each GBK file
+        print("Processing GBK files...")
+        gbk_dataframes = get_gbk_data(gbk_filepaths)
 
-        # Create JSON file
-        # write_neighborhood_JSON(complete_neighborhood_JSON_dict, AMR_gene, output_path)
-        write_neighborhood_JSON(neighborhood_JSON_dict, AMR_gene, output_path)
-        write_neighborhood_JSON(filtered_neighborhood_JSON_dict, AMR_gene, output_path, True)
+        # 2) Determine all occurrences of given genes in the genome dataset
+        genomes_occurrence_dict = {}
+        for gene in input_file_data:
+            # Make entry for gene occurrences
+            genomes_occurrence_dict[gene] = make_occurrence_dict(gbk_dataframes, gene)
 
-    sample_data_path = '../../../sample_data'
-    make_AMR_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
+        # 3) Remove low occurrence genes according to cutoff threshold
+        genomes_occurrence_dict_filtered = delete_low_occurring_genes(genomes_occurrence_dict, len(gbk_filepaths),
+                                                                      cutoff_percent)
 
-    with open(output_path + '/' + 'neighborhood_indices.txt', 'w') as outfile:
-        outfile.write(str(neighborhood_indices))
+        print("Extracting gene neighborhood data for neighborhoods of size {}...".format(num_neighbors))
 
-    print("Neighborhood extraction complete.")
-    check_output_path(output_path + '/blast')
+        # 6) Extract gene neighborhoods and store them in dataframes
+        neighborhoods, neighborhood_indices = get_all_gene_neighborhoods(genomes_occurrence_dict_filtered,
+                                                                         gbk_dataframes, input_file_data,
+                                                                         num_neighbors, label_cols)
 
+        # 7) Get the locus, protein, and gene name details for each neighborhood respectively for FNA file creation
+        locuses, protein_seqs, gene_names = get_neighborhood_data(neighborhoods, num_neighbors)
+
+        # 8) Save neighborhoods to FNA files needed for All-vs-all BLAST results later
+        print("Generating neighborhood FNA files...")
+        for gene, genome_neighborhoods in neighborhoods.items():
+
+            # Make output subdirectory for the gene
+            gene_name = gene.replace('(', '_').replace(')', '_').replace("'", "")
+            out_path = output_path + '/fasta/' + gene_name
+            check_output_path(out_path)
+
+            for genome_id in genome_neighborhoods.keys():
+                # Make file with genome ID as filename
+                write_gene_neighborhood_to_FNA(genome_neighborhoods, gene, locuses, protein_seqs, out_path)
+
+        # 9) Make neighborhoods summary textfile in output dir
+        print("Making extraction summary file...")
+        write_summary_file(output_path, gbk_dataframes, num_neighbors, input_file_data)
+
+        # 10) Save gene neighborhoods and indices in textfile: needed for JSON representations downstream
+        print("Generating neighborhood JSON representations...")
+        for gene, neighborhood_data in neighborhoods.items():
+
+            # Filter neighborhoods
+            filtered_neighborhoods = filter_neighborhoods(neighborhood_data, num_neighbors)
+            surrogates = list(filtered_neighborhoods.keys())
+            filtered_neighborhoods_dict = {key: value for (key, value) in neighborhood_data.items() if
+                                           key in surrogates}
+            write_filtered_genomes_textfile(filtered_neighborhoods, gene, output_path)
+
+            # Get data needed to write JSON files
+            neighborhood_JSON_dict = make_neighborhood_JSON_data(neighborhood_data, gene, num_neighbors)
+            filtered_neighborhood_JSON_dict = make_neighborhood_JSON_data(filtered_neighborhoods_dict, gene, num_neighbors)
+
+            # Create JSON file
+            write_neighborhood_JSON(neighborhood_JSON_dict, gene, output_path)
+            write_neighborhood_JSON(filtered_neighborhood_JSON_dict, gene, output_path, True)
+
+        sample_data_path = '../../../sample_data'
+        make_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
+
+        with open(output_path + '/' + 'neighborhood_indices.txt', 'w') as outfile:
+            outfile.write(str(neighborhood_indices))
+
+        print("Neighborhood extraction complete.")
+
+    else:
+        print("Invalid input file provided. Please double-check the documentation for the proper input file format.")
+        sys.exit(1)
 
 def main(args=None):
     args = parse_args(args)
-    extract_neighborhoods(args.EXTRACT_PATH, args.GBK_PATH, args.OUTPUT_PATH, args.n, args.p)
+    extract_neighborhoods(args.INPUT_FILE_PATH, args.EXTRACT_PATH, args.GBK_PATH, args.OUTPUT_PATH,
+                          args.n, args.p, args.c)
 
 
 if __name__ == '__main__':

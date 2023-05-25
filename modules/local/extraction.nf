@@ -10,6 +10,7 @@ process EXTRACTION {
     }
 
     input:
+      path input_file_path
       path extract_path
       path gbk_path
       path output_path
@@ -22,6 +23,6 @@ process EXTRACTION {
 
     script:
     """
-    extraction.py $extract_path $gbk_path $output_path -n $num_neighbors -p $percent_cutoff
+    extraction.py $input_file_path $extract_path $gbk_path $output_path -n $num_neighbors -p $percent_cutoff
     """
 }
