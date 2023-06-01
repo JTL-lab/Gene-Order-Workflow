@@ -14,7 +14,7 @@ process MAKE_GENOME_FILEPAIRS {
     path output_path
 
     output:
-    path "${output_path}/genome_pairs.csv", emit: genome_filepairs_csv
+    path "${output_path}/genome_filepairs.csv", emit: genome_filepairs_csv
 
     // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin
     script:

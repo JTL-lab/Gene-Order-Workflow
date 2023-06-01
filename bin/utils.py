@@ -114,3 +114,28 @@ def generate_alphanumeric_string(length):
     """
     str = string.ascii_lowercase
     return ''.join(random.choice(str) for i in range(length))
+
+
+def make_fasta_contig_dict(fasta_path, gene):
+    """
+    For a given gene and given FASTA neighborhood files, creates a dictionary where keys correspond to indices from
+    0 to N, and values correspond to contig ids.
+    """
+    fasta_dict = dict()
+    fasta_files = [fasta_file for fasta_file in os.listdir(fasta_path + '/' + gene)
+                   if fasta_file.endswith('.fasta')]
+
+    for fasta_file in fasta_files:
+        with open(fasta_path + '/' + gene + '/' + fasta_file, 'r') as infile:
+            data = infile.readlines()
+            fasta_file_dict = dict()
+            index = 0
+            contig_lines = [line for line in data if line.startswith('>')]
+            for line in contig_lines:
+                contig_id = line.strip().replace('>', '')
+                fasta_file_dict[index] = contig_id
+                index += 1
+            genome_id = fasta_file.split('.fasta')[0]
+            fasta_dict[genome_id] = fasta_file_dict
+
+    return fasta_dict

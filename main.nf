@@ -34,8 +34,6 @@ nextflow.enable.dsl = 2
 */
 
 include { GENEORDERANALYSIS } from './workflows/geneorderanalysis'
-include { DIAMOND_BLASTP } from './modules/nf-core/modules/nf-core/diamond/blastp/main'
-include { DIAMOND_MAKEDB } from './modules/nf-core/modules/nf-core/diamond/makedb/main' addParams( options: [args:'--task blastp --outfmt 6 --max-hsps 1'] )
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

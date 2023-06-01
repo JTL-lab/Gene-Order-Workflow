@@ -19,7 +19,7 @@ process EXTRACTION {
 
     output:
       path "${output_path}/fasta", emit: fasta_path
-      path "${output_path}/blast", emit: blast_path
+      path "${output_path}/diamond", emit: blast_path
 
     script:
     """
