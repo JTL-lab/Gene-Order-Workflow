@@ -6,10 +6,10 @@ process CLUSTERING {
     publishDir "${params.output_path}"
 
     conda (params.enable_conda ? "conda-forge::python=3.8.3" : null)
-    if (workflow.containerEngine == 'singularity') {
-        container "library://jtl-lab-dev/bioinf-workflows/gene-order-workflow"
-    }
-
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'library://jtl-lab-dev/bioinf-workflows/gene-order-workflow' :
+        'jtllab/gene-order-workflow' }"
+    
     input:
       path blast_output
       path faa_path
