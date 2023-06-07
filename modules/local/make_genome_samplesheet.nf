@@ -2,7 +2,7 @@ process MAKE_GENOME_SAMPLESHEET {
     tag "$make_genome_samplesheet"
     label 'process_low'
 
-    publishDir "${params.output_path}"
+    publishDir "${params.outdir}"
 
     conda (params.enable_conda ? "conda-forge::python=3.8.3" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -14,7 +14,7 @@ process MAKE_GENOME_SAMPLESHEET {
     path output_path
 
     output:
-    path "${output_path}/genome_paths.csv", emit: genome_paths_csv
+    path "${outdir}/genome_paths.csv", emit: genome_paths_csv
 
     // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin
     script:

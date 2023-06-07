@@ -10,7 +10,7 @@
 //WorkflowGeneorderanalysis.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input_file_path, params.assembly_path, params.gbk_path, params.output_path ]
+def checkPathParamList = [ params.input_file_path, params.assembly_path, params.gbk_path ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 /*
@@ -44,7 +44,7 @@ workflow GENEORDERANALYSIS {
     def assembly_ch = Channel.fromPath(params.assembly_path)
     def extract_ch = Channel.fromPath(params.extract_path)
     def gbk_ch = Channel.fromPath(params.gbk_path)
-    def output_ch = Channel.fromPath(params.output_path)
+    def output_ch = Channel.fromPath(params.outdir)
 
     // Optional extraction params
     num_neighbors = params.num_neighbors
@@ -87,17 +87,14 @@ workflow GENEORDERANALYSIS {
     //
     // MODULE: Run nf-core/diamond to obtain BLAST results
     //
-    //def assemblyFiles = Channel.fromPath("${params.assembly_path}/*.{fa,faa,fna}")
-
     BLAST_GENOME_FILEPAIRS(csv_ch, filepairs_ch)
-
-    def blastResults_ch = BLAST_GENOME_FILEPAIRS.out.blastResults
+    blastFiles = BLAST_GENOME_FILEPAIRS.out.blast_files
 
     //
     // MODULE: Run clustering
     //
     CLUSTERING (
-        blastResults_ch,
+        blastFiles,
         assembly_ch,
     	EXTRACTION.out.fasta_path,
     	EXTRACTION.out.blast_path,

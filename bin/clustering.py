@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Functions to cluster neighborhoods identified using extraction.py.
 """
@@ -14,21 +13,16 @@ import pandas as pd
 import polars as pl
 from scipy import sparse
 from scipy.cluster import hierarchy
-from scipy.spatial.distance import euclidean, pdist, squareform
 from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 
 import markov_clustering as mcl
 
-from DBCV import DBCV
-from filtering import filter_genes_percent_identity, write_filtered_genomes_textfile
 from scoring import get_normalized_bitscores
 from utils import get_filename, check_output_path, get_full_filepaths, remove_files, generate_alphanumeric_string
-from json_utils import order_JSON_clusters_UPGMA, make_representative_UPGMA_cluster_JSON, \
-    write_clustermap_JSON_HTML, remove_defunct_clustermap_data, update_JSON_links_PI
-from visualization import plot_similarity_histogram, plot_distance_histogram, \
-    graph_UPGMA_clusters, draw_mcl_graph, graph_DBSCAN_clusters, \
-    plotly_pcoa, plotly_dendrogram, plotly_mcl_network
+from json_utils import order_JSON_clusters_UPGMA, make_representative_UPGMA_cluster_JSON, update_JSON_links_PI
+from visualization import plot_similarity_histogram, plot_distance_histogram, plotly_pcoa, \
+    plotly_dendrogram, plotly_mcl_network
 
 
 def parse_args(args=None):
@@ -122,6 +116,7 @@ def append_FASTA_neighborhood_contigs(filename, gene, contig_dict, identical=Fal
 
     # Dataframe containing genome BLAST results
     data_df = load_BLAST_file_df(filename)
+    # Concatenate all neighborhood row data using contig names
     for contig in contig_dict.keys():
         contig_rows = get_contig_rows(contig_dict[contig], data_df, identical=identical)
         df = pl.concat([df, contig_rows], how='vertical')
@@ -131,11 +126,25 @@ def append_FASTA_neighborhood_contigs(filename, gene, contig_dict, identical=Fal
     return df
 
 
-def get_blast_df(gene, blast_path, fasta_path, fasta_dict):
+def make_assembly_dict(assembly_path):
+    """
+    Makes dictionary consisting of assembly file names with keys as the filename without the file extension, values
+    as the full filename.
+    """
+    faa_dict = {}
+    for filename in os.listdir(assembly_path):
+        key = filename.split('.')[0]
+        faa_dict[key] = filename
+
+    return faa_dict
+
+
+def get_blast_df(gene, blast_path, assembly_path, fasta_path, fasta_dict):
     """
     Loads whole genome BLAST into a dataframe with only relevant contig data rows.
     """
     # Identify all genomes the gene is present in using FASTA outputs
+    faa_files = make_assembly_dict(assembly_path)
     present_genomes = [key for key in fasta_dict.keys()]
 
     blast_dict = dict()
@@ -144,16 +153,29 @@ def get_blast_df(gene, blast_path, fasta_path, fasta_dict):
         # Initialize empty dataframe to hold desired contig data
         df = pl.DataFrame(schema={'query_id': pl.Utf8, 'sub_id': pl.Utf8, 'PI': pl.Float64, 'bitscore': pl.Float64})
 
+        genome_1_filename = faa_files.get(genome_1)
+        genome_2_filename = faa_files.get(genome_2)
+
         # Load comparative BLAST file
-        genome_1_genome_2_file_name = blast_path + '/' + genome_1 + '.dmnd_' + genome_2 + '.txt'
-        genome_2_genome_1_file_name = blast_path + '/' + genome_2 + '.dmnd_' + genome_1 + '.txt'
-        genome_1_file_name = blast_path + '/' + genome_1 + '.dmnd_' + genome_1 + '.txt'
-        genome_2_file_name = blast_path + '/' + genome_2 + '.dmnd_' + genome_2 + '.txt'
+        if os.path.exists(blast_path + '/' + genome_1_filename + '.dmnd_' + genome_2_filename + '.txt') or \
+                os.path.islink(blast_path + '/' + genome_1_filename + '.dmnd_' + genome_2_filename + '.txt'):
+            file_pair_file_name = blast_path + '/' + genome_1_filename + '.dmnd_' + genome_2_filename + '.txt'
+            contig_dict = fasta_dict[genome_1]
+        elif os.path.exists(blast_path + '/' + genome_2_filename + '.dmnd_' + genome_1_filename + '.txt') or \
+                os.path.islink(blast_path + '/' + genome_2_filename + '.dmnd_' + genome_1_filename + '.txt'):
+            file_pair_file_name = blast_path + '/' + genome_2_filename + '.dmnd_' + genome_1_filename + '.txt'
+            contig_dict = fasta_dict[genome_2]
+        else:
+            print("BLAST file for {g1} vs {g2} not found.".format(g1=genome_1_filename, g2=genome_2_filename))
+            sys.exit(1)
+
+        genome_1_file_name = blast_path + '/' + genome_1_filename + '.dmnd_' + genome_1_filename + '.txt'
+        genome_2_file_name = blast_path + '/' + genome_2_filename + '.dmnd_' + genome_2_filename + '.txt'
 
         # Append all relevant BLAST rows for neighborhood contigs to df
-        files = [genome_1_genome_2_file_name, genome_2_genome_1_file_name, genome_1_file_name, genome_2_file_name]
-        contig_dicts = [fasta_dict[genome_1], fasta_dict[genome_2], fasta_dict[genome_1], fasta_dict[genome_2]]
-        identical_bools = [False, False, True, True]
+        files = [file_pair_file_name, genome_1_file_name, genome_2_file_name]
+        contig_dicts = [contig_dict, fasta_dict[genome_1], fasta_dict[genome_2]]
+        identical_bools = [False, True, True]
 
         for blast_file_name, contig_dict, bool in zip(files, contig_dicts, identical_bools):
             blast_rows_df = append_FASTA_neighborhood_contigs(blast_file_name, gene, contig_dict,
@@ -165,7 +187,7 @@ def get_blast_df(gene, blast_path, fasta_path, fasta_dict):
     return blast_dict
 
 
-def get_blast_dict_whole_genomes(fasta_path, output_path):
+def get_blast_dict_whole_genomes(assembly_path, fasta_path, output_path):
     """
     Creates dictionary for all extracted genes where each key is a gene name (str) and each value is the dictionary
     containing genome combinations that were blasted together as keys and their accompanying blast file data in a
@@ -180,7 +202,7 @@ def get_blast_dict_whole_genomes(fasta_path, output_path):
         fasta_dict = make_fasta_contig_dict(fasta_path, gene)
 
         # Make the BLAST dataframe using the contig dict
-        occurrence_dict = get_blast_df(gene, blast_path, fasta_path, fasta_dict)
+        occurrence_dict = get_blast_df(gene, blast_path, assembly_path, fasta_path, fasta_dict)
 
         BLAST_df_dict[gene] = occurrence_dict
 
@@ -195,11 +217,9 @@ def filter_BLAST_results(blast_gene_dict, cutoff=70):
     for blast_file, blast_df in blast_gene_dict.items():
         # Filter rows to drop all rows with percent identity lower than specified threshold
         df = blast_df[blast_df['PI'] >= cutoff]
-        # df.reset_index(drop=True, inplace=True)
 
         # Remove rows where query ID and sub ID are the same: was only needed for normalized bitscores calculation
         final_df = df[df['query_id'] != df['sub_id']]
-        # final_df.reset_index(drop=True, inplace=True)
 
         filtered_BLAST_dict[blast_file] = df
 
@@ -360,13 +380,10 @@ def get_distance_matrix(np_similarity_matrix, genome_names):
 
 
 def get_maximum_distance_score(distance_matrix, genome_names):
-    """
-    Returns the maximum distance score within a numpy distance matrix.
-    """
     df = pd.DataFrame(data=distance_matrix, index=genome_names, columns=genome_names)
     values = df.values
 
-    return values.max()
+    return values.mean()
 
 
 def get_sparse_matrix(np_matrix):
@@ -394,7 +411,6 @@ def MCL_clustering(matrix, inflation):
     Performs MCL clustering on a neighborhood sparse similarity or symmetric distance matrix.
     """
     sparse_matrix = get_sparse_matrix(matrix)
-    # inflation = MCL_hyperparameter_tuning(sparse_matrix)
     result = mcl.run_mcl(sparse_matrix, inflation=inflation)
     clusters = mcl.get_clusters(result)
 
@@ -405,7 +421,6 @@ def DBSCAN_clustering(np_distance_matrix, epsilon, minpts):
     """
     Applies DBSCAN clustering to a neighborhood similarity or symmetric distance matrix.
     """
-    # epsilon, min_points = DBSCAN_hyperparameter_tuning(np_distance_matrix)
     distance_matrix = StandardScaler().fit_transform(np_distance_matrix)
     dbscan = DBSCAN(eps=epsilon, min_samples=minpts).fit(distance_matrix)
 
@@ -427,9 +442,10 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     """
     Driver script for clustering neighborhoods obtained from extraction module.
     """
+
     # Make BLAST dataframe dictionary
     print("Fetching relevant BLAST data from DIAMOND outputs for each respective neighborhood...")
-    BLAST_df_dict = get_blast_dict_whole_genomes(fasta_path, output_path)
+    BLAST_df_dict = get_blast_dict_whole_genomes(assembly_path, fasta_path, output_path)
 
     # Calculate normalized bitscores and save as column
     print("Calculating normalized bitscores for downstream scoring...")
@@ -443,11 +459,6 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     print("Updating JSON neighborhood representations' links percent identities according to BLAST results...")
     update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False)
     update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=True)
-
-    print("Updating JSON surrogates representations...")
-    for gene in os.listdir(fasta_path):
-        repesentative_genomes = filter_genes_percent_identity(output_path, gene, final_BLAST_dict[gene])
-        write_filtered_genomes_textfile(repesentative_genomes, gene, output_path)
 
     # Get neighborhoods dict for calculating similarity matrices (needed to compare contig ends)
     for gene_subdir in os.listdir(fasta_path):
@@ -490,16 +501,12 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     check_clustering_savepaths(output_path)
 
     max_distance_scores_dict = dict()
-    check_output_path(output_path + '/clustering/distance_matrices')
 
     for gene, distance_matrix_df in distance_matrices_df_dict.items():
 
         # Get distance matrix
         np.fill_diagonal(distance_matrix_df.values, 0)
         distance_matrix = np.array(distance_matrix_df.values)
-        # Save distance matrix as textfile
-        distance_matrix_df.to_csv(output_path + '/clustering/distance_matrices/' + gene + \
-                                  '_distance_matrix.csv', sep='\t', index=False)
 
         genome_names = genome_names_dict[gene]
 
@@ -523,15 +530,19 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_dendrogram, genome_to_num_mapping)
 
             # Interactive dendrogram visualization
-            condensed_distance_matrix = squareform(distance_matrix)
             plotly_dendrogram(distance_matrix, genome_names, gene, output_path)
 
+            # Save distance matrix as textfile
+            check_output_path(output_path + '/clustering/distance_matrices')
+            distance_matrix_df.to_csv(output_path + '/clustering/distance_matrices/' + gene + \
+                                      '_distance_matrix.csv', sep='\t', index=False)
+
         except IndexError:
-            print("Index error, Unable to perform UPGMA clustering for gene {g}. " \
+            print("Unable to perform UPGMA clustering for gene {g}. " \
                   "UPGMA results for {g} will be omitted.".format(g=gene))
 
         except TypeError:
-            print("Type error, Unable to perform UPGMA clustering for gene {g}. " \
+            print("Unable to perform UPMA clustering for gene {g}. " \
                   "UPGMA results for {g} will be omitted.".format(g=gene))
 
         print("Generating DBSCAN clusters for {g}...".format(g=gene))
