@@ -1,6 +1,6 @@
 process EXTRACTION {
     tag "extraction"
-    label 'process_medium'
+    //label 'process_medium'
 
     publishDir "${params.outdir}"
 
@@ -18,8 +18,8 @@ process EXTRACTION {
       val percent_cutoff
 
     output:
-      path "${outdir}/fasta", emit: fasta_path
-      path "${outdir}/diamond", emit: blast_path
+      path "${params.outdir}/fasta", emit: fasta_path
+      path "${params.outdir}/diamond", emit: blast_path
 
     // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin
     script:

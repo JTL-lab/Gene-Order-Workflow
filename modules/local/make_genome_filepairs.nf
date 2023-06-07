@@ -1,6 +1,6 @@
 process MAKE_GENOME_FILEPAIRS {
     tag "$make_genome_filepairs"
-    label 'process_low'
+    //label 'process_low'
 
     publishDir "${params.outdir}"
 
@@ -14,7 +14,7 @@ process MAKE_GENOME_FILEPAIRS {
     path output_path
 
     output:
-    path "${outdir}/genome_filepairs.csv", emit: genome_filepairs_csv
+    path "${params.outdir}/genome_filepairs.csv", emit: genome_filepairs_csv
 
     // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin
     script:

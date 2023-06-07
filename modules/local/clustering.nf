@@ -1,7 +1,7 @@
 process CLUSTERING {
     tag "clustering"
-    label 'process_high'
-    label 'process_high_memory'
+    //label 'process_high'
+    //label 'process_high_memory'
 
     publishDir "${params.outdir}"
 
@@ -22,7 +22,7 @@ process CLUSTERING {
       val minpts
 
     output:
-      path "${outdir}/clustering", emit: cluster_path
+      path "${params.outdir}/clustering", emit: cluster_path
 
     // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin
     script:

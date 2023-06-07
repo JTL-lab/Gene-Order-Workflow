@@ -15,7 +15,7 @@ def get_g1_g1_dict(blast_path):
     query_id column) and values are the corresponding bitscore value.
     """
     filepaths = os.listdir(blast_path)
-    regex = r'(\w+)_\1\.dmnd\.out'
+    regex = r'^\w+\.\w+\.dmnd_\w+\.\w+\.txt$'
     g1_g1_dict = dict()
     for filename in filepaths:
         file_dict = dict()

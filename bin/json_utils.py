@@ -886,4 +886,4 @@ def make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_clusters, ge
         json.dump(json_data, outfile)
 
     # Make respective HTML file for Coeus
-    write_clustermap_JSON_HTML(gene, '../sample_data', output_path, rep_type='upgma')
+    write_clustermap_JSON_HTML(gene, '../../../sample_data', output_path, rep_type='upgma')

@@ -8,29 +8,30 @@ A Nextflow workflow for bacterial gene order analysis, with outputs easily explo
 * VISUALIZATION: Pre-computes gene order visualizations, cluster visualizations, and similarity/distance summary histograms. Clustering visualizations can also be dynamically generated with [Coeus](https://github.com/JTL-lab/Coeus) using similarity and distance matrices calculated through this workflow.
 * (TBD) PREDICTION: If analyzing antimicrobial resistance (AMR) genes using annotations from AMR detection software, create gene-order based embeddings in the spirit of word embeddings and train ML classifiers on the representations to predict candidate AMR genes. Optional; must be enabled by the user when invoking workflow.  
 
-## Data: 
+
+## Data
 Gene-Order-Workflow can be run on either: 
-* Genbank files and their assemblies
-* Genbank files, assemblies, and annotations from external software (e.g. the [Resistance Gene Identifier](https://github.com/arpcard/rgi)). 
+* Genbank files and their corresponding assemblies.
+* Genbank files, their corresponding assemblies, and annotations from external software (e.g. the [Resistance Gene Identifier](https://github.com/arpcard/rgi)). 
 
 #### Required Files
 * INPUT FILE (.txt)
-    * If using Genbank files only: input file should be a textfile with one gene name per row for every gene you want to analyze (see `Gene-Order-Workflow/sample_data/genes_input_file.txt` for an example): 
+    * If using Genbank files only: input file should be a textfile with one gene name per row for every gene you want to analyze.
     ```
     geneA 
     geneB
     ...
     geneX
     ```
-    * If using Genbank files and annotations: input file should be a textfile indicating the column names (values between '<>' should be replaced with your column names) in your annotation file that correspond to the `Contig` identifier, `Gene_Start`, `Gene_Stop`, and `Gene_Name` for your data.
+    * If using Genbank files and annotations: input file should be a textfile indicating the column names (values between '<>' should be replaced with your column names) in your annotation file that correspond to the `Contig` identifier, `Gene_Start`, `Gene_Stop`, and `Gene_Name` for your data. An example that can be used with [RGI](https://github.com/arpcard/rgi) can be found in `sample_data/rgi_input.txt`.
     ```
     <contig_col> = Contig
     <gene_name_col> = Gene_Name
     <start_col> = Gene_Start
     <stop_col> = Gene_End
     ```
-* ASSEMBLIES ( .faa | .fa | .fna ) in a single directory.
-* GENBANK FILES ( .gbk | .gb ) in a single directory.
+* ASSEMBLIES ( .faa | .fa | .fna ) in a single directory. Should be annotated and share the same locus tags as those found in the Genbank files. 
+* GENBANK FILES ( .gbk | .gb ) in a single directory. Should correspond to the assembly files. 
 
 #### Optional Files
 * ANNOTATIONS (e.g. RGI textfiles) in a single directory. 

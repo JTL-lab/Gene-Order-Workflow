@@ -157,12 +157,10 @@ def get_blast_df(gene, blast_path, assembly_path, fasta_path, fasta_dict):
         genome_2_filename = faa_files.get(genome_2)
 
         # Load comparative BLAST file
-        if os.path.exists(blast_path + '/' + genome_1_filename + '.dmnd_' + genome_2_filename + '.txt') or \
-                os.path.islink(blast_path + '/' + genome_1_filename + '.dmnd_' + genome_2_filename + '.txt'):
+        if os.path.exists(blast_path + '/' + genome_1_filename + '.dmnd_' + genome_2_filename + '.txt'):
             file_pair_file_name = blast_path + '/' + genome_1_filename + '.dmnd_' + genome_2_filename + '.txt'
             contig_dict = fasta_dict[genome_1]
-        elif os.path.exists(blast_path + '/' + genome_2_filename + '.dmnd_' + genome_1_filename + '.txt') or \
-                os.path.islink(blast_path + '/' + genome_2_filename + '.dmnd_' + genome_1_filename + '.txt'):
+        elif os.path.exists(blast_path + '/' + genome_2_filename + '.dmnd_' + genome_1_filename + '.txt'):
             file_pair_file_name = blast_path + '/' + genome_2_filename + '.dmnd_' + genome_1_filename + '.txt'
             contig_dict = fasta_dict[genome_2]
         else:
@@ -501,6 +499,12 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     check_clustering_savepaths(output_path)
 
     max_distance_scores_dict = dict()
+    upgma_num_clusters_dict = dict()
+    dbscan_num_clusters_dict = dict()
+    mcl_num_clusters_dict = dict()
+
+    os.mkdir(output_path + '/clustering/distance_matrices')
+    os.mkdir(output_path + '/clustering/similarity_matrices')
 
     for gene, distance_matrix_df in distance_matrices_df_dict.items():
 
@@ -519,12 +523,18 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             genome_to_num_mapping[str(i)] = genome_names[i]
 
         print("Generating UPGMA clusters for {g}...".format(g=gene))
+
         try:
             # Get UPGMA linkage matrix
             upgma_linkage = UPGMA_clustering(distance_matrix)
 
             # Use linkage matrix to build dendrogram used for updating JSON data: reorder clusters, make UPGMA view
             upgma_dendrogram = hierarchy.dendrogram(upgma_linkage)
+
+            # Save number of clusters to upgma_num_clusters_dict
+            num_clusters = get_num_clusters(upgma_dendrogram['leaves_color_list'])
+            upgma_num_clusters_dict[gene] = num_clusters
+
             order_JSON_clusters_UPGMA(output_path, gene, upgma_dendrogram, genome_to_num_mapping, surrogates=False)
             order_JSON_clusters_UPGMA(output_path, gene, upgma_dendrogram, genome_to_num_mapping, surrogates=True)
             make_representative_UPGMA_cluster_JSON(output_path, gene, upgma_dendrogram, genome_to_num_mapping)
@@ -550,6 +560,10 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
         try:
             dbscan_clusters, labels = DBSCAN_clustering(distance_matrix, epsilon, minpts)
 
+            # Retain number of clusters
+            num_dbscan_clusters = get_num_clusters(labels)
+            dbscan_num_clusters_dict[gene] = num_dbscan_clusters
+
             # Plot DBSCAN clusters using distance matrix and PCoA: colour according to cluster assignment
             plotly_pcoa(distance_matrix_df, genome_names, labels, gene, output_path)
 
@@ -573,6 +587,12 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
             print("Generating Markov clusters for {g}...".format(g=gene))
 
             clusters = MCL_clustering(similarity_matrix, inflation)
+
+            # Retain number of clusters
+            num_mcl_clusters = get_num_clusters(clusters)
+            mcl_num_clusters_dict[gene] = num_mcl_clusters
+
+            # Plot MCL clusters
             sparse_sim_matrix = get_sparse_matrix(similarity_matrix)
             plotly_mcl_network(sparse_sim_matrix, clusters, genome_names, gene, output_path)
 
@@ -594,6 +614,8 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     print("Generating average similarity and max distance histograms for all neighborhoods...")
     plot_similarity_histogram(average_similarity_scores_dict, output_path)
     plot_distance_histogram(max_distance_scores_dict, output_path)
+    make_clustering_summary_csv(output_path, distance_matrices_df_dict, upgma_num_clusters_dict,
+                                mcl_num_clusters_dict, dbscan_num_clusters_dict)
 
 
 def main(args=None):

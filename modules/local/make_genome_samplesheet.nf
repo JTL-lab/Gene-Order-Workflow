@@ -1,6 +1,6 @@
 process MAKE_GENOME_SAMPLESHEET {
     tag "$make_genome_samplesheet"
-    label 'process_low'
+    //label 'process_low'
 
     publishDir "${params.outdir}"
 
@@ -14,7 +14,7 @@ process MAKE_GENOME_SAMPLESHEET {
     path output_path
 
     output:
-    path "${outdir}/genome_paths.csv", emit: genome_paths_csv
+    path "${params.outdir}/genome_paths.csv", emit: genome_paths_csv
 
     // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin
     script:
