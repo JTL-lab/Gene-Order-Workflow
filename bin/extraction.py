@@ -812,6 +812,9 @@ def extract_neighborhoods(input_file_path, extract_path, gbk_path, output_path,
 
         print("Neighborhood extraction complete.")
 
+        # Add output directory for DIAMOND processes as expected by module
+        check_output_path(output_path + '/diamond')
+
     else:
         print("Invalid input file provided. Please double-check the documentation for the proper input file format.")
         sys.exit(1)

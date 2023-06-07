@@ -377,11 +377,31 @@ def get_distance_matrix(np_similarity_matrix, genome_names):
     return df
 
 
-def get_maximum_distance_score(distance_matrix, genome_names):
+def get_distance_std_dev(distance_matrix, genome_names=None):
+    """
+    Returns the standard deviation computed over all values across all rows and columns of the distance matrix.
+    """
     df = pd.DataFrame(data=distance_matrix, index=genome_names, columns=genome_names)
-    values = df.values
+    values = df.to_numpy()
+    return np.std(values)
 
-    return values.mean()
+
+def get_minimum_distance_score(distance_matrix, genome_names=None):
+    """
+    Returns the smallest numerical value found in the distance matrix.
+    """
+    df = pd.DataFrame(data=distance_matrix, index=genome_names, columns=genome_names)
+    values = df.to_numpy()
+    return values.min()
+
+
+def get_maximum_distance_score(distance_matrix, genome_names=None):
+    """
+    Returns the largest numerical value found in the distance matrix.
+    """
+    df = pd.DataFrame(data=distance_matrix, index=genome_names, columns=genome_names)
+    values = df.to_numpy()
+    return values.max()
 
 
 def get_sparse_matrix(np_matrix):
@@ -434,6 +454,17 @@ def check_clustering_savepaths(output_path):
         save_path = output_path + '/clustering/' + clustering_type
         check_output_path(save_path)
 
+
+def get_num_clusters(clustering_labels):
+    """
+    Returns the number of unique clusters identified using a clustering algorithm given we provide a list of labels
+    ('leaves_color_list' if upgma, clustering.labels_ if dbscan, clusters if mcl).
+    """
+    # If DBSCAN classifies all points as noise, we consider this equivalent to finding no clusters at all
+    if -1 in set(clustering_labels) and len(set(clustering_labels)) == 1:
+        return 0
+    else:
+        return len(set(clustering_labels))
 
 def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
                           neighborhood_size=10, inflation=2, epsilon=0.5, minpts=5):
