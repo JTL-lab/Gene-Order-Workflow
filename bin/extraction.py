@@ -103,7 +103,7 @@ def load_filepaths(extract_path_arg, gbk_path_arg):
     Assumes that extract file names have the following naming convention:
     xxxxxxxxxxxxxxxxxxx_rgi.txt
     Assumes that GBK file names have the following naming convention:
-    xxxxxxxxxxxxxxxxxxx_genomic.fna.gbk
+    xxxxxxxxxxxxxxxxxxx.gbk
     """
     # Get paths for extract files
     try:
@@ -535,7 +535,7 @@ def write_gene_neighborhood_to_FNA(AMR_gene_neighborhoods_dict, AMR_gene, locuse
     """
     for genome_id, genome_neighborhood_df in AMR_gene_neighborhoods_dict.items():
         # Create a new FASTA file to write neighborhood sequence and identifier data to
-        with open(out_path + '/' + genome_id + '.fasta', 'w') as output_fasta:
+        with open(out_path + '/' + genome_id + '.fasta', 'w+') as output_fasta:
             for locus, protein_seq in zip(locuses_dict[AMR_gene][genome_id], protein_seqs_dict[AMR_gene][genome_id]):
                 locus_output = locus.strip("'")
                 protein_output = protein_seq.strip("'")
@@ -730,10 +730,13 @@ def extract_neighborhoods(input_file_path, extract_path, gbk_path, output_path,
         sample_data_path = '../../../sample_data'
         make_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
 
-        with open(output_path + '/' + 'neighborhood_indices.txt', 'w') as outfile:
+        with open(output_path + '/' + 'neighborhood_indices.txt', 'w+') as outfile:
             outfile.write(str(neighborhood_indices))
 
         print("Neighborhood extraction complete.")
+
+        # Add output directory for DIAMOND processes as expected by module
+        check_output_path(output_path + '/diamond')
 
     # Case 2: User provided list of genes to extract
     elif type(input_file_data) is list:
@@ -807,7 +810,7 @@ def extract_neighborhoods(input_file_path, extract_path, gbk_path, output_path,
         sample_data_path = '../../../sample_data'
         make_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
 
-        with open(output_path + '/' + 'neighborhood_indices.txt', 'w') as outfile:
+        with open(output_path + '/' + 'neighborhood_indices.txt', 'w+') as outfile:
             outfile.write(str(neighborhood_indices))
 
         print("Neighborhood extraction complete.")
