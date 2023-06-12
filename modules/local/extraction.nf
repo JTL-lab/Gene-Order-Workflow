@@ -1,6 +1,6 @@
 process EXTRACTION {
     tag "extraction"
-    //label 'process_medium'
+    label 'process_medium'
 
     publishDir "${params.outdir}"
 

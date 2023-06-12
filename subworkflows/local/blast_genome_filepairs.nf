@@ -4,20 +4,15 @@ include { DIAMOND_BLASTP } from '../../modules/nf-core/diamond/blastp/main'
 workflow BLAST_GENOME_FILEPAIRS {
 
     take:
-        csv_ch
+        assemblyFiles
         filepairs_ch
 
     main:
         // Keep only columns required for clustering module
         def blast_columns = "qseqid sseqid pident bitscore"
 
-        // Split CSV channel to get filepaths to assemblies
-        genomeFiles = csv_ch
-            .splitCsv(header: true)
-            .map { it.file_path }
-
         // Create a database for each genome using nf-core MAKEDB module
-        dbFiles = DIAMOND_MAKEDB(genomeFiles).db.collect()
+        dbFiles = DIAMOND_MAKEDB(assemblyFiles).db.collect()
 
         //Split CSV channels to get pairs of files for All-vs-All BLAST using DIAMOND_BLASTP
         blastPairs = filepairs_ch

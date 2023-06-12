@@ -23,7 +23,6 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // WORKFLOW: Consisting of a mix of local and nf-core modules, plus subworkflow for BLAST using nf-core/diamond
 //
 include { EXTRACTION } from '../modules/local/extraction'
-include { MAKE_GENOME_SAMPLESHEET } from '../modules/local/make_genome_samplesheet'
 include { MAKE_GENOME_FILEPAIRS } from '../modules/local/make_genome_filepairs'
 include { CLUSTERING } from '../modules/local/clustering'
 include { DIAMOND_BLASTP } from '../modules/nf-core/diamond/blastp/main'
@@ -68,15 +67,8 @@ workflow GENEORDERANALYSIS {
     )
 
     //
-    // MODULE: Make CSV listing path to every unique genome assembly for DIAMOND MAKEDB
+    // MODULE: Make CSV listing path to every unique genome assembly and db combination for DIAMOND BLASTP
     //
-    MAKE_GENOME_SAMPLESHEET (
-        assembly_ch,
-        output_ch
-    )
-
-    def csv_ch = MAKE_GENOME_SAMPLESHEET.out.genome_paths_csv
-
     MAKE_GENOME_FILEPAIRS (
         assembly_ch,
         output_ch
@@ -87,7 +79,10 @@ workflow GENEORDERANALYSIS {
     //
     // MODULE: Run nf-core/diamond to obtain BLAST results
     //
-    BLAST_GENOME_FILEPAIRS(csv_ch, filepairs_ch)
+
+    // Get assembly files channel containing path to every assembly file fasta (for DIAMOND_MAKEDB)
+    assemblyFiles = Channel.fromPath("${params.assembly_path}/*.{fa,faa,fna}")
+    BLAST_GENOME_FILEPAIRS(assemblyFiles, filepairs_ch)
     blastFiles = BLAST_GENOME_FILEPAIRS.out.blast_files
 
     //

@@ -1,7 +1,7 @@
 process CLUSTERING {
     tag "clustering"
-    //label 'process_high'
-    //label 'process_high_memory'
+    label 'process_high'
+    label 'process_high_memory'
 
     publishDir "${params.outdir}"
 

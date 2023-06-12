@@ -1,6 +1,6 @@
 process MAKE_GENOME_FILEPAIRS {
     tag "$make_genome_filepairs"
-    //label 'process_low'
+    label 'process_low'
 
     publishDir "${params.outdir}"
 
