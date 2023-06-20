@@ -8,7 +8,7 @@ import itertools
 import os
 import sys
 import csv
-
+import json
 import numpy as np
 import pandas as pd
 import polars as pl
@@ -24,7 +24,7 @@ from scoring import get_normalized_bitscores
 from utils import get_filename, check_output_path, get_full_filepaths, remove_files, generate_alphanumeric_string, \
                   make_fasta_contig_dict
 from json_utils import order_JSON_clusters_UPGMA, make_representative_UPGMA_cluster_JSON, update_JSON_links_PI, \
-                  load_JSON_data, update_cluster_data
+                  load_JSON_data, update_cluster_data, clean_json_data
 from visualization import plot_similarity_histogram, plot_distance_histogram, plotly_pcoa, \
     plotly_dendrogram, plotly_mcl_network
 
@@ -508,24 +508,20 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
     final_BLAST_dict = get_normalized_bitscores(BLAST_df_dict, blast_path)
     # final_BLAST_dict[gene] = filter_BLAST_results(blast_files_dict)
 
-    # Update UID genes in JSON neighborhood representation
-    # update_unidentified_genes_data(BLAST_df_dict, output_path, surrogates=False)
-
     # Update links in each  gene JSON file to reflect percent identities of blast hits
     print("Updating JSON neighborhood representations' links percent identities according to BLAST results...")
     update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=False)
-    update_JSON_links_PI(BLAST_df_dict, output_path, surrogates=True)
 
     # Update gene UIDs to reflect locus tags, filtering based on identical neighborhoods using BLAST results
     print("Updating JSON surrogates representations...")
     for gene in os.listdir(fasta_path):
 
         # Determine representative genomes based on BLAST results and modify existing surrogates files
-        representative_genomes = filter_genes_percent_identity(output_path, fasta_path, gene, final_BLAST_dict[gene])
+        representative_genomes = filter_genes_percent_identity(output_path, fasta_path, str(gene), final_BLAST_dict[gene], neighborhood_size)
         write_filtered_genomes_textfile(representative_genomes, gene, output_path)
 
         # Update surrogates JSON
-        json_data = load_JSON_data(output_path, gene, surrogates=True)
+        json_data, path = load_JSON_data(output_path, gene)
         surrogates_json_data = update_cluster_data(json_data, representative_genomes)
         surrogates_json_data = clean_json_data(surrogates_json_data)
         with open(output_path + '/JSON/' + gene + '_surrogates.json', 'w+') as outfile:
