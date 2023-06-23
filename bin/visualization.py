@@ -131,7 +131,7 @@ def plotly_dendrogram(linkage_matrix, labels, AMR_gene, output_path):
     fig = create_dendrogram(linkage_matrix, labels=labels, colorscale=get_colors(len(labels)))
     fig.update_layout(autosize=True, title=title, paper_bgcolor='white', template='plotly_white', width=419, height=316)
     savename = os.path.join(output_path + '/clustering/UPGMA/', AMR_gene + ".html")
-    fig.write_html(savename)
+    fig.write_html(savename, include_plotlyjs="cdn")
     # plotly.offline.plot(fig, filename=savename)
 
 
@@ -269,7 +269,7 @@ def plotly_mcl_network(matrix, clusters, genome_names, AMR_gene, output_path):
     fig.update_layout(legend_title='MCL Cluster', paper_bgcolor='white', template='plotly_white')
 
     savename = os.path.join(output_path + '/clustering/MCL/', AMR_gene + ".html")
-    fig.write_html(savename)
+    fig.write_html(savename, include_plotlyjs="cdn")
 
 
 def graph_DBSCAN_clusters(distance_matrix_df, DBSCAN_clusters, labels, AMR_gene, output_path):
@@ -341,4 +341,4 @@ def plotly_pcoa(distance_matrix_df, genome_ids, labels, AMR_gene, output_path):
     fig.update_layout(paper_bgcolor='white', template='plotly_white', width=419, height=316)
 
     savename = os.path.join(output_path + '/clustering/DBSCAN/', AMR_gene + ".html")
-    fig.write_html(savename)
+    fig.write_html(savename, include_plotlyjs="cdn")

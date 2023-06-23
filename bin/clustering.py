@@ -24,7 +24,7 @@ from scoring import get_normalized_bitscores
 from utils import get_filename, check_output_path, get_full_filepaths, remove_files, generate_alphanumeric_string, \
                   make_fasta_contig_dict
 from json_utils import order_JSON_clusters_UPGMA, make_representative_UPGMA_cluster_JSON, update_JSON_links_PI, \
-                  load_JSON_data, update_cluster_data, clean_json_data
+                  load_JSON_data, update_cluster_data, clean_json_data, write_clustermap_JSON_HTML
 from visualization import plot_similarity_histogram, plot_distance_histogram, plotly_pcoa, \
     plotly_dendrogram, plotly_mcl_network
 
@@ -526,6 +526,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
         surrogates_json_data = clean_json_data(surrogates_json_data)
         with open(output_path + '/JSON/' + gene + '_surrogates.json', 'w+') as outfile:
             json.dump(surrogates_json_data, outfile)
+        write_clustermap_JSON_HTML(gene, '../../../sample_data', output_path, rep_type='surrogates')
 
 
     # Get neighborhoods dict for calculating similarity matrices (needed to compare contig ends)
