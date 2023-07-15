@@ -48,6 +48,7 @@ workflow GENEORDERANALYSIS {
     // Optional extraction params
     num_neighbors = params.num_neighbors
     percent_cutoff = params.percent_cutoff
+    label_cols = params.label_cols ? params.label_cols : 'None'
 
     // Optional clustering params
     inflation = params.inflation
@@ -63,7 +64,8 @@ workflow GENEORDERANALYSIS {
     	gbk_ch,
     	output_ch,
     	num_neighbors,
-    	percent_cutoff
+    	percent_cutoff,
+    	label_cols
     )
 
     //

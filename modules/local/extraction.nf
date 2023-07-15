@@ -16,6 +16,7 @@ process EXTRACTION {
       path output_path
       val num_neighbors
       val percent_cutoff
+      val label_cols
 
     output:
       path "${params.outdir}/fasta", emit: fasta_path
@@ -24,6 +25,6 @@ process EXTRACTION {
     // This script is bundled with the pipeline, in nf-core/geneorderanalysis/bin
     script:
     """
-    extraction.py $input_file_path $extract_path $gbk_path $output_path -n $num_neighbors -p $percent_cutoff
+    extraction.py $input_file_path $extract_path $gbk_path $output_path -n $num_neighbors -p $percent_cutoff -c $label_cols
     """
 }

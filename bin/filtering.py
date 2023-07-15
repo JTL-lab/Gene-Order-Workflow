@@ -13,43 +13,15 @@ import json
 import polars as pl
 from utils import check_output_path
 from utils import make_fasta_contig_dict
-from json_utils import load_JSON_data
+from json_utils import load_JSON_data, get_focal_index, make_assembly_dict
 
-
-def get_focal_index(neighborhood_indices, num_neighbors):
-    """
-    Given a genome's neighborhood indices list as retrieved from the neighborhood_indices.txt output from extraction.py,
-    determines the index of the focal gene.
-    """
-    # Case 1: no upstream genes
-    if neighborhood_indices[0] == 0:
-        focal_gene_index = 0
-
-    # Case 2: no downstream genes
-    elif neighborhood_indices[1] == 0:
-        focal_gene_index = 0
-
-    # Case 3: full neighborhood
-    elif neighborhood_indices[0] == -num_neighbors and neighborhood_indices[1] == num_neighbors:
-        focal_gene_index = (neighborhood_indices[1] * 2) // 2
-
-    # Case 4: at least one upstream, downstream gene
-    else:
-        focal_gene_index = abs(neighborhood_indices[0])
-
-    return focal_gene_index
-
-
-def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_dict, num_neighbors):
+def filter_genes_percent_identity(output_path, fasta_path, extract_gene, blast_df_gene_dict, num_neighbors):
     """
     Used within clustering module in order to go over previous filtered neighborhoods representation and remove
     identical neighborhoods based on percent identity (PI) of matched hits.
     """
     # Load filtered neighborhood
-    json_data, gene_path = load_JSON_data(output_path, gene)
-
-    # Load contig dict
-    contig_dict = make_fasta_contig_dict(fasta_path, gene)
+    json_data, gene_path = load_JSON_data(output_path, extract_gene)
 
     # Go over combinations of genomes
     genome_genes_dict = dict()
@@ -67,7 +39,6 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
                 equivalent = True
                 if genome != genome_2:
 
-                    # Load neighborhood data for both genomes
                     cluster_1 = [cluster for cluster in json_data["clusters"] if cluster["name"] == genome][0]
                     cluster_2 = [cluster for cluster in json_data["clusters"] if cluster["name"] == genome_2][0]
                     clust_1 = cluster_1["loci"][0]
@@ -77,10 +48,6 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
                     genome_1_id = cluster_1["name"]
                     genome_2_id = cluster_2["name"]
 
-                    # Load contig data for both genomes
-                    genome_1_contigs = contig_dict[genome_1_id]
-                    genome_2_contigs = contig_dict[genome_2_id]
-
                     if genome_1_id + '_' + genome_2_id + '.blast.txt' in blast_df_gene_dict:
                         blast_df = blast_df_gene_dict[genome_1_id + '_' + genome_2_id + '.blast.txt']
                     else:
@@ -88,9 +55,10 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
 
                     # Case 1: Complete neighborhood OR aligned neighborhood with identical contig ends
                     if len(clust_1["genes"]) == len(clust_2["genes"]):
-
                         # Case 1.a: Assume neither are reversed
                         for gene_1, gene_2 in zip(range(len(clust_1["genes"])), range(len(clust_2["genes"]))):
+                            if not equivalent:
+                                break
 
                             # Get locus tags
                             genome_1_qid = clust_1["genes"][gene_1]["uid"]
@@ -104,7 +72,6 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
                                                          (blast_df["sub_id"] == genome_2_qid)) |
                                                           (blast_df["query_id"] == genome_2_qid) &
                                                           (blast_df["sub_id"] == genome_1_qid))
-
                             # Check if match found (by locus tag or gene names)
                             if (filtered_df.is_empty() or filtered_df.filter(pl.col("PI") >= 70).is_empty()) and \
                                 genome_1_gene != genome_2_gene:
@@ -112,6 +79,8 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
                                 # Case 1.b: Try reversing second neighborhood
                                 for gene_1, gene_2 in zip(range(len(clust_1["genes"])),
                                                           reversed(range(len(clust_2["genes"])))):
+                                    if not equivalent:
+                                        break
 
                                     # Get locus tags
                                     genome_1_qid = clust_1["genes"][gene_1]["uid"]
@@ -137,6 +106,7 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
                     # Case 2: At least one neighborhood incomplete, ends don't align
                     else:
                         # Determine the smaller and larger neighborhoods
+                        smaller_genome = clust_1 if len(clust_1["genes"]) < len(clust_2["genes"]) else clust_2
                         smaller_neighborhood = clust_1["genes"] if len(clust_1["genes"]) < len(clust_2["genes"]) else clust_2["genes"]
                         larger_neighborhood = clust_2["genes"] if len(clust_1["genes"]) < len(clust_2["genes"]) else \
                         clust_1["genes"]
@@ -148,7 +118,7 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
                                 neighborhood_indices_json = json.load(infile)
 
                         for gene_name in neighborhood_indices_json:
-                            if gene_name == gene:
+                            if gene_name == extract_gene:
                                 genome_indices = neighborhood_indices_json[gene_name][clust_1["name"]]
                                 focal_gene_index_smaller = get_focal_index(genome_indices, num_neighbors)
 
@@ -159,10 +129,17 @@ def filter_genes_percent_identity(output_path, fasta_path, gene, blast_df_gene_d
                                 aligned_smaller_reversed = smaller_neighborhood[
                                                             focal_gene_index_smaller:focal_gene_index_smaller + len(
                                                                 larger_neighborhood)][::-1]
+                                # If empty, not equivalent!
+                                if not aligned_smaller and not aligned_smaller_reversed:
+                                    equivalent = False
+                                    break
 
                                 # Iterate over the aligned genes and compare them in pairs
                                 for gene_index, (gene, gene_reversed) in enumerate(
                                         zip(aligned_smaller, aligned_smaller_reversed)):
+
+                                    if not equivalent:
+                                        break
 
                                     # Get locus tags
                                     gene_1 = gene["uid"]

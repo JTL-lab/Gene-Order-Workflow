@@ -54,12 +54,15 @@ def get_filename(filepath, extract=False):
     Gets filename from filepath (i.e. removes directories and file suffix).
     """
     if extract:
-        if '.fna' in filepath:
+        if '.fna' in os.path.basename(filepath):
             filename = os.path.basename(filepath).split('.')[0]
-        else:
+        elif '_' in os.path.basename(filepath):
             filename = os.path.basename(filepath).split('_')[0]
+        else:
+            filename = os.path.basename(filepath).split(".")[0]
     else:
         filename = os.path.basename(filepath).split(".")[0]
+
     return filename
 
 
