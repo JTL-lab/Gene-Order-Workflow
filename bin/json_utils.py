@@ -221,37 +221,29 @@ def make_neighborhood_JSON_data(gene_neighborhoods_dict, neighborhood_indices, g
                     links_data[ind] = link_data
                     ind += 1
 
-        # GROUPS DATA
-        groups_data = {}
-        annotated_groups = dict()
-        candidate_merge_groups = dict()
-        group_id = 1
+    # GROUPS DATA
+    groups_data = {}
+    group_id = 1
 
-        for i in range(len(unique_genes)):
-            unique_gene = unique_genes[i]
-            genomes = list(cluster_data.keys())
+    for i in range(len(unique_genes)):
+        unique_gene = unique_genes[i]
+        genomes = list(cluster_data.keys())
 
-            # Ignore unidentified genes
-            if not unique_gene.startswith('UID'):
-                group_data = {}
-                gene_uids = set()
-                for genome in genomes:
-                    for id in cluster_data[genome]["loci"]["genes"].keys():
-                        if unique_gene in cluster_data[genome]["loci"]["genes"][id]["name"]:
-                            gene_uids.add(cluster_data[genome]["loci"]["genes"][id]["uid"])
+        # Ignore unidentified genes
+        if not unique_gene.startswith('UID'):
+            group_data = {}
+            gene_uids = set()
+            for genome in genomes:
+                for id in cluster_data[genome]["loci"]["genes"].keys():
+                    if unique_gene in cluster_data[genome]["loci"]["genes"][id]["name"]:
+                        gene_uids.add(cluster_data[genome]["loci"]["genes"][id]["uid"])
 
-                group_data["uid"] = f"group{group_id}"
-                group_data["label"] = unique_gene
-                group_data["genes"] = list(gene_uids)
+            group_data["uid"] = f"group{group_id}"
+            group_data["label"] = unique_gene
+            group_data["genes"] = list(gene_uids)
 
-                groups_data[unique_gene] = group_data
-                if "UID" in unique_gene:
-                    annotated_groups[group_id] = group_data
-                    candidate_merge_groups[group_id] = group_data
-
-                group_id += 1
-
-        #neighborhood_json_data["groups"] = collapse_identical_groups(groups_data, annotated_groups, candidate_merge_groups)
+            groups_data[unique_gene] = group_data
+            group_id += 1
 
     neighborhood_json_data["links"] = links_data
     neighborhood_json_data["groups"] = groups_data
@@ -695,8 +687,12 @@ def update_UID_groups(json_data):
     """
     # Create a list of unidentified genes across all clusters
     unidentified_genes = []
+    unidentified_genes_by_genome = dict()
     for cluster in json_data["clusters"]:
-        unidentified_genes.extend([gene for gene in cluster["loci"][0]["genes"] if gene["name"].startswith("UID")])
+        for gene in cluster["loci"][0]["genes"]:
+            if gene["name"].startswith("UID"):
+                unidentified_genes.append(gene)
+                unidentified_genes_by_genome[gene["uid"]] = cluster["name"]
 
     # Create a shallow copy, candidate_genes, to avoid iterating over genes already added to a group
     candidate_genes = unidentified_genes[:]
@@ -719,8 +715,11 @@ def update_UID_groups(json_data):
                 query_name = link["query"]["name"]
                 target_name = link["target"]["name"]
 
-                if (unidentified_gene_uid == query_uid and target_name.startswith("UID") or
-                        (unidentified_gene_uid == target_uid and query_name.startswith("UID"))):
+                if (unidentified_gene_uid == query_uid and target_name.startswith("UID") and
+                    unidentified_genes_by_genome[query_uid] != unidentified_genes_by_genome[target_uid]) or \
+                        (unidentified_gene_uid == target_uid and query_name.startswith("UID") and
+                         unidentified_genes_by_genome[target_uid] != unidentified_genes_by_genome[query_uid]):
+
                     # Add both genes to the new UID group if similar enough
                     if link["identity"] >= 0.70:
                         group_genes.append(target_uid)
