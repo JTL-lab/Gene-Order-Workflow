@@ -160,7 +160,8 @@ def load_GBK_file(GBK_filepath):
     Loads a GBK file and gets sequence records, features, and annotations for the file
     """
     filename, extension = os.path.splitext(GBK_filepath)
-    assert extension == '.gbk' or extension == '.gb' or extension == '.gbff', "Error: filepath provided does not lead to a Genbank file."
+    assert extension == '.gbk' or extension == '.gb' or extension == '.gbff', \
+        "Error: filepath provided does not lead to a Genbank file."
 
     # Extract and store all features and annotations per record
     records = [record for record in SeqIO.parse(GBK_filepath, "genbank")]
@@ -809,8 +810,7 @@ def extract_neighborhoods(input_file_path, extract_path, gbk_path, output_path,
             # Create JSON file
             write_neighborhood_JSON(neighborhood_JSON_dict, gene, output_path)
 
-        sample_data_path = '../../../sample_data'
-        make_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
+        make_gene_HTML(neighborhoods.keys(), output_path)
 
         with open(output_path + '/' + 'neighborhood_indices.json', 'w+') as outfile:
             outfile.write(json.dumps(neighborhood_indices, indent=4, sort_keys=True))
@@ -877,8 +877,7 @@ def extract_neighborhoods(input_file_path, extract_path, gbk_path, output_path,
             # Create JSON file
             write_neighborhood_JSON(neighborhood_JSON_dict, gene, output_path)
 
-        sample_data_path = '../../../sample_data'
-        make_gene_HTML(neighborhoods.keys(), sample_data_path, output_path)
+        make_gene_HTML(neighborhoods.keys(), output_path)
 
         with open(output_path + '/' + 'neighborhood_indices.txt', 'w+') as outfile:
             outfile.write(str(neighborhood_indices))

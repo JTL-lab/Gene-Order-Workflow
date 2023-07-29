@@ -526,7 +526,7 @@ def cluster_neighborhoods(assembly_path, fasta_path, blast_path, output_path,
         surrogates_json_data = clean_json_data(surrogates_json_data)
         with open(output_path + '/JSON/' + gene + '_surrogates.json', 'w+') as outfile:
             json.dump(surrogates_json_data, outfile)
-        write_clustermap_JSON_HTML(gene, '../../../sample_data', output_path, rep_type='surrogates')
+        write_clustermap_JSON_HTML(gene, output_path, rep_type='surrogates')
 
 
     # Get neighborhoods dict for calculating similarity matrices (needed to compare contig ends)
